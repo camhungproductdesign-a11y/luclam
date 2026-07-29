@@ -1,0 +1,6 @@
+{
+  "name": "Lục Lam | Saigon Pocket Guide & Premium Herbal Tea",
+  "description": "Interactive multi-language Saigon Pocket Guide featuring Lục Lam Premium Herbal Tea showcase at Takashimaya Saigon B2 and Đà Nẵng flagships.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
