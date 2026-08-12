@@ -90,6 +90,10 @@ function ThumbnailPreview({ url }: { url: string | undefined }) {
     <img 
       src={resolved} 
       alt="" 
+      width={64}
+      height={64}
+      loading="lazy"
+      decoding="async"
       className="w-full h-full object-cover" 
       referrerPolicy="no-referrer"
       onError={useFallbackImage}
@@ -714,13 +718,16 @@ export default function App() {
               {/* ==========================================================================
                   PAGE 01: COVER PAGE
                   ========================================================================== */}
-              <section className="w-full h-full shrink-0 snap-start text-[#f6f3eb] flex flex-col justify-between p-6 relative overflow-y-auto overflow-x-hidden select-none bg-zinc-950">
+              <section className="w-full h-full shrink-0 snap-start text-[#f6f3eb] flex flex-col justify-between p-6 relative overflow-y-auto overflow-x-hidden bg-zinc-950">
                 
                 {/* Full-bleed high-contrast premium Ben Thanh aerial photograph background */}
                 <div className="absolute inset-0 transition-all duration-700">
                   <img 
                     src={withBasePath((customMedia.cover?.img && !customMedia.cover.img.includes('unsplash.com')) ? customMedia.cover.img : "/uploads/cover_benthanh.jpg")}
                     alt="Chợ Bến Thành Sài Gòn Aerial Cover" 
+                    width={1200}
+                    height={1600}
+                    decoding="async"
                     referrerPolicy="no-referrer"
                     onError={useFallbackImage}
                     className="w-full h-full object-cover transition-opacity duration-300 opacity-90"
@@ -1335,6 +1342,10 @@ export default function App() {
                       <img 
                         src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80" 
                         alt="Boutique Hotel Room Saigon" 
+                        width={800}
+                        height={533}
+                        loading="lazy"
+                        decoding="async"
                         referrerPolicy="no-referrer"
                         className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       />
@@ -1373,6 +1384,10 @@ export default function App() {
                             <img 
                               src={rightImages[sidx]} 
                               alt="Wellness illustration" 
+                              width={400}
+                              height={267}
+                              loading="lazy"
+                              decoding="async"
                               referrerPolicy="no-referrer"
                               className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                             />
@@ -1411,6 +1426,10 @@ export default function App() {
                             <img 
                               src={catBanners[cidx]} 
                               alt={cat.title} 
+                              width={400}
+                              height={267}
+                              loading="lazy"
+                              decoding="async"
                               referrerPolicy="no-referrer"
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                             />
@@ -1809,6 +1828,10 @@ export default function App() {
                                 <img 
                                   src={item.image} 
                                   alt={item.name} 
+                                  width={48}
+                                  height={48}
+                                  loading="lazy"
+                                  decoding="async"
                                   className={`w-12 h-12 rounded-lg object-cover shrink-0 border border-zinc-800 transition-transform duration-300 ${isExpanded ? 'scale-105 border-amber-500/30' : ''}`}
                                   referrerPolicy="no-referrer"
                                   onError={useFallbackImage}
@@ -1934,6 +1957,10 @@ export default function App() {
                             <img 
                               src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=800&q=80" 
                               alt="Lục Lam Flagship" 
+                              width={800}
+                              height={533}
+                              loading="lazy"
+                              decoding="async"
                               className="w-full h-24 object-cover rounded-lg border border-zinc-800/80 my-1"
                               referrerPolicy="no-referrer"
                             />
