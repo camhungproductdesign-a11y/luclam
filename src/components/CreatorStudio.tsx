@@ -22,7 +22,8 @@ import {
   Database,
   ArrowRight,
   Info,
-  Sparkles
+  Sparkles,
+  X
 } from 'lucide-react';
 import { googleSignIn, logout, getAccessToken } from '../firebaseAuth';
 import { saveMedia, listMedia, deleteMedia, UploadedMedia, uploadMediaToServer } from '../indexedDBStore';
@@ -474,9 +475,11 @@ export function CreatorStudio({
           {onClose && (
             <button 
               onClick={onClose}
-              className="lg:hidden text-zinc-400 hover:text-white text-xs bg-zinc-800 px-2.5 py-1.5 rounded-lg"
+              className="lg:hidden min-h-11 text-white hover:bg-zinc-700 text-xs font-bold bg-zinc-800 px-4 py-2.5 rounded-xl flex items-center gap-2 border border-zinc-700"
+              aria-label="Đóng Creator Studio"
             >
-              Đóng
+              <X className="w-4 h-4" />
+              <span>Đóng</span>
             </button>
           )}
         </div>

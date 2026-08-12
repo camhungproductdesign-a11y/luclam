@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { 
   X, 
+  ArrowLeft,
   MapPin, 
   Clock, 
   DollarSign, 
@@ -94,10 +95,26 @@ export function PlaceDetailModal({
   const [activeTab, setActiveTab] = useState<'about' | 'info' | 'secret'>('about');
   const [copied, setCopied] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
+  const [tiktokUrl, setTiktokUrl] = useState('');
+  const [tiktokError, setTiktokError] = useState('');
 
   const resolvedImg = useMediaUrl(media.img);
   const resolvedVideo = useMediaUrl(media.video);
   const embedDetails = getEmbedDetails(resolvedVideo);
+
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isOpen, onClose]);
+
+  React.useEffect(() => {
+    setTiktokUrl('');
+    setTiktokError('');
+  }, [place.id]);
 
   if (!isOpen) return null;
 
@@ -105,6 +122,19 @@ export function PlaceDetailModal({
     navigator.clipboard.writeText(place.addr);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleTikTokImport = () => {
+    const trimmedUrl = tiktokUrl.trim();
+    const match = trimmedUrl.match(/^https?:\/\/(?:www\.)?tiktok\.com\/.+\/video\/(\d+)(?:[/?#].*)?$/i);
+    if (!match) {
+      setTiktokError(lang === 'vi'
+        ? 'Link không hợp lệ. Hãy dùng URL TikTok có dạng /video/{id}.'
+        : 'Invalid link. Use a TikTok URL containing /video/{id}.');
+      return;
+    }
+    onUpdateMedia?.(place.id, 'video', trimmedUrl);
+    setTiktokError('');
   };
 
   // Curate mock secret tips based on the place type
@@ -181,10 +211,19 @@ export function PlaceDetailModal({
   };
 
   return (
-    <div className="absolute inset-0 z-50 bg-black/60 backdrop-blur-sm flex flex-col justify-end">
+    <div
+      className="absolute inset-0 z-50 bg-black/60 backdrop-blur-sm flex flex-col justify-end"
+      onClick={onClose}
+    >
       
       {/* Scrollable Container styled as a premium mobile slide-up sheet */}
-      <div className="w-full h-[90%] bg-[#f6f3eb] rounded-t-[32px] overflow-hidden shadow-2xl flex flex-col relative animate-in slide-in-from-bottom duration-300">
+      <div
+        className="w-full h-[90%] bg-[#f6f3eb] rounded-t-[32px] overflow-hidden shadow-2xl flex flex-col relative animate-in slide-in-from-bottom duration-300"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="place-detail-title"
+        onClick={(event) => event.stopPropagation()}
+      >
         
         {/* Top visual bar for dragging effect */}
         <div className="absolute top-2 left-1/2 -translate-x-1/2 w-12 h-1 bg-white/40 rounded-full z-40"></div>
@@ -246,10 +285,11 @@ export function PlaceDetailModal({
                 e.stopPropagation();
                 onClose();
               }}
-              className="w-9 h-9 rounded-full bg-black/50 backdrop-blur-md flex items-center justify-center text-white hover:bg-black/75 transition-all cursor-pointer"
-              title="Close Panel"
+              className="h-9 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center gap-1.5 px-3 text-white hover:bg-black/80 transition-all cursor-pointer"
+              aria-label={lang === 'vi' ? 'Quay lại' : 'Back'}
             >
-              <X className="w-4 h-4" />
+              <ArrowLeft className="w-4 h-4" />
+              <span className="text-[10px] font-bold">{lang === 'vi' ? 'Quay lại' : 'Back'}</span>
             </button>
             
             <div className="flex gap-2">
@@ -303,7 +343,7 @@ export function PlaceDetailModal({
               <span className="text-[10px] uppercase font-serif tracking-[0.2em] text-[#d16b4c] font-bold block filter drop-shadow">
                 {place.sub}
               </span>
-              <h2 className="text-lg font-bold font-serif text-white leading-tight truncate filter drop-shadow">
+              <h2 id="place-detail-title" className="text-lg font-bold font-serif text-white leading-tight truncate filter drop-shadow">
                 {place.name}
               </h2>
             </div>
@@ -432,6 +472,39 @@ export function PlaceDetailModal({
                 </div>
               )}
 
+              {isCreator && (
+                <div className="mt-4 space-y-2 rounded-xl border border-amber-200 bg-amber-50 p-3">
+                  <label htmlFor="place-tiktok-url" className="block text-[10px] font-bold uppercase tracking-wider text-amber-900">
+                    {lang === 'vi' ? 'Import / Thay video TikTok' : 'Import / Replace TikTok video'}
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      id="place-tiktok-url"
+                      type="url"
+                      value={tiktokUrl}
+                      onChange={(event) => {
+                        setTiktokUrl(event.target.value);
+                        if (tiktokError) setTiktokError('');
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter') {
+                          event.preventDefault();
+                          handleTikTokImport();
+                        }
+                      }}
+                      placeholder="https://www.tiktok.com/@creator/video/1234567890"
+                      aria-invalid={Boolean(tiktokError)}
+                      aria-describedby={tiktokError ? 'place-tiktok-error' : undefined}
+                      className="min-w-0 flex-1 rounded-lg border border-amber-200 bg-white px-3 py-2 text-[10px] text-zinc-800 outline-none focus:border-amber-500"
+                    />
+                    <button type="button" onClick={handleTikTokImport} className="rounded-lg bg-amber-700 px-3 py-2 text-[10px] font-bold text-white hover:bg-amber-800">
+                      Import
+                    </button>
+                  </div>
+                  {tiktokError && <p id="place-tiktok-error" role="alert" className="text-[10px] text-red-700">{tiktokError}</p>}
+                </div>
+              )}
+
               {/* Elegant decorative line */}
               <div className="flex items-center justify-center gap-2 text-zinc-300 py-2">
                 <span className="h-px bg-zinc-200 flex-1"></span>
@@ -556,7 +629,15 @@ export function PlaceDetailModal({
         </div>
 
         {/* --- FOOTER CTA ACTION BAR --- */}
-        <div className="p-4 border-t border-zinc-200/60 bg-white flex gap-3.5 sticky bottom-0 shrink-0">
+        <div className="p-4 border-t border-zinc-200/60 bg-white grid grid-cols-3 gap-2 sticky bottom-0 shrink-0">
+          <button
+            type="button"
+            onClick={onClose}
+            className="bg-zinc-800 hover:bg-zinc-900 text-white text-xs font-bold py-3.5 rounded-xl transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+            <span>{lang === 'vi' ? 'Đóng' : 'Close'}</span>
+          </button>
           <button 
             onClick={handleCopyAddress}
             className="flex-1 bg-zinc-100 hover:bg-zinc-200 text-[#0b433f] text-xs font-bold py-3.5 rounded-xl border border-zinc-200 transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"

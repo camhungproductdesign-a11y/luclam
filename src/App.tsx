@@ -45,6 +45,37 @@ const CreatorStudio = React.lazy(() =>
 );
 import { defaultMedia } from './defaultMedia';
 
+const supportedLanguages: Language[] = ['ja', 'vi', 'zh', 'zht', 'en', 'ko'];
+const htmlLanguage: Record<Language, string> = {
+  ja: 'ja', vi: 'vi', zh: 'zh-CN', zht: 'zh-TW', en: 'en', ko: 'ko'
+};
+const fallbackImage = withBasePath('/uploads/cover_benthanh.jpg');
+
+function useFallbackImage(event: React.SyntheticEvent<HTMLImageElement>) {
+  const image = event.currentTarget;
+  if (image.dataset.fallbackApplied === 'true') {
+    image.style.display = 'none';
+    return;
+  }
+  image.dataset.fallbackApplied = 'true';
+  image.src = fallbackImage;
+}
+
+function getInitialLanguage(): Language {
+  const requested = new URLSearchParams(window.location.search).get('lang') as Language | null;
+  if (requested && supportedLanguages.includes(requested)) return requested;
+  try {
+    const saved = localStorage.getItem('saigon_guide_lang') as Language | null;
+    if (saved && supportedLanguages.includes(saved)) return saved;
+  } catch {
+    // Storage can be unavailable in private browsing; continue with browser language.
+  }
+  const browserLanguage = navigator.language.toLowerCase();
+  if (browserLanguage.startsWith('zh-tw') || browserLanguage.startsWith('zh-hk')) return 'zht';
+  const language = browserLanguage.split('-')[0] as Language;
+  return supportedLanguages.includes(language) ? language : 'en';
+}
+
 // Inline helper component to safely resolve hook-based media URLs inside mapped lists
 function ThumbnailPreview({ url }: { url: string | undefined }) {
   const resolved = useMediaUrl(url);
@@ -61,15 +92,13 @@ function ThumbnailPreview({ url }: { url: string | undefined }) {
       alt="" 
       className="w-full h-full object-cover" 
       referrerPolicy="no-referrer"
-      onError={(e) => {
-        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1596422846543-75c6fc1f7f43?auto=format&fit=crop&w=150&q=80';
-      }}
+      onError={useFallbackImage}
     />
   );
 }
 
 export default function App() {
-  const [lang, setLang] = useState<Language>('ja');
+  const [lang, setLang] = useState<Language>(getInitialLanguage);
   const [darkMode, setDarkMode] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [highlightedCard, setHighlightedCard] = useState<string | null>(null);
@@ -128,6 +157,15 @@ export default function App() {
   const [selectedPlace, setSelectedPlace] = useState<any>(null);
   const [refreshKey, setRefreshKey] = useState<number>(0);
   const [activeEditPlaceId, setActiveEditPlaceId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isCreator || !showEditor || selectedPlace) return;
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setShowEditor(false);
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isCreator, showEditor, selectedPlace]);
 
   const phoneScreenRef = useRef<HTMLDivElement>(null);
   const pagesList = ['cover', 'welcome', 'atmosphere', 'transport', 'stay', 'food', 'culture', 'shopping', 'luclam', 'info'] as const;
@@ -206,13 +244,9 @@ export default function App() {
     initConfigAndCreator();
   }, []);
 
-  // Load language and dark mode preference from localStorage
+  // Language is initialized synchronously to avoid a flash of the wrong language.
   useEffect(() => {
     try {
-      const savedLang = localStorage.getItem('saigon_guide_lang') as Language;
-      if (savedLang && ['ja', 'vi', 'zh', 'zht', 'en'].includes(savedLang)) {
-        setLang(savedLang);
-      }
       const savedDark = localStorage.getItem('saigon_guide_dark');
       if (savedDark === 'true') {
         setDarkMode(true);
@@ -226,9 +260,17 @@ export default function App() {
     }
   }, []);
 
+  useEffect(() => {
+    document.documentElement.lang = htmlLanguage[lang];
+  }, [lang]);
+
   // Update localStorage when preferences change
   const handleLangChange = (selectedLang: Language) => {
     setLang(selectedLang);
+    const url = new URL(window.location.href);
+    if (selectedLang === 'vi') url.searchParams.delete('lang');
+    else url.searchParams.set('lang', selectedLang);
+    window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
     try {
       localStorage.setItem('saigon_guide_lang', selectedLang);
     } catch (e) {
@@ -680,9 +722,7 @@ export default function App() {
                     src={withBasePath((customMedia.cover?.img && !customMedia.cover.img.includes('unsplash.com')) ? customMedia.cover.img : "/uploads/cover_benthanh.jpg")}
                     alt="Chợ Bến Thành Sài Gòn Aerial Cover" 
                     referrerPolicy="no-referrer"
-                    onError={(e) => {
-                      e.currentTarget.src = withBasePath('/uploads/cover_benthanh.jpg');
-                    }}
+                    onError={useFallbackImage}
                     className="w-full h-full object-cover transition-opacity duration-300 opacity-90"
                   />
                   {/* Premium vignette gradient overlays for magazine contrast */}
@@ -1771,6 +1811,7 @@ export default function App() {
                                   alt={item.name} 
                                   className={`w-12 h-12 rounded-lg object-cover shrink-0 border border-zinc-800 transition-transform duration-300 ${isExpanded ? 'scale-105 border-amber-500/30' : ''}`}
                                   referrerPolicy="no-referrer"
+                                  onError={useFallbackImage}
                                 />
                               ) : (
                                 <span className="text-2xl shrink-0" role="img" aria-label="menu emoji">{item.emoji}</span>
@@ -2250,8 +2291,17 @@ export default function App() {
 
       {/* Creator Studio sliding drawer overlay for Mobile / Small Screens */}
       {isCreator && showEditor && (
-        <div className="lg:hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex flex-col justify-end">
-          <div className="w-full h-[85%] bg-zinc-950 rounded-t-[28px] overflow-hidden shadow-2xl flex flex-col border-t border-zinc-800">
+        <div
+          className="lg:hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex flex-col justify-end"
+          onClick={() => setShowEditor(false)}
+        >
+          <div
+            className="w-full h-[85%] bg-zinc-950 rounded-t-[28px] overflow-hidden shadow-2xl flex flex-col border-t border-zinc-800"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Creator Studio"
+            onClick={(event) => event.stopPropagation()}
+          >
             <div className="h-1.5 w-12 bg-zinc-700 rounded-full mx-auto my-3 shrink-0"></div>
             <div className="flex-1 overflow-hidden">
               <React.Suspense fallback={

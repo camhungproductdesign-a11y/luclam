@@ -7,7 +7,14 @@
     <meta name="description" content="Sài Gòn Pocket Guide & Trà thảo mộc cao cấp Lục Lam tại Takashimaya B2 & Đà Nẵng. Khám phá địa điểm du lịch, ẩm thực, văn hóa và quà tặng trà thảo mộc thượng hạng." />
     <meta name="keywords" content="Lục Lam, Luc Lam tea, Saigon Pocket Guide, Takashimaya Saigon, trà thảo mộc Lục Lam, quà tặng Sài Gòn, du lịch Sài Gòn" />
     <meta name="author" content="Lục Lam Art Of Tea" />
-    <link rel="canonical" href="https://gift.luclam.vn" />
+    <link rel="canonical" href="https://gift.luclam.vn/" />
+    <link rel="alternate" hreflang="vi" href="https://gift.luclam.vn/" />
+    <link rel="alternate" hreflang="en" href="https://gift.luclam.vn/?lang=en" />
+    <link rel="alternate" hreflang="ja" href="https://gift.luclam.vn/?lang=ja" />
+    <link rel="alternate" hreflang="ko" href="https://gift.luclam.vn/?lang=ko" />
+    <link rel="alternate" hreflang="zh-CN" href="https://gift.luclam.vn/?lang=zh" />
+    <link rel="alternate" hreflang="zh-TW" href="https://gift.luclam.vn/?lang=zht" />
+    <link rel="alternate" hreflang="x-default" href="https://gift.luclam.vn/?lang=en" />
 
     <!-- Open Graph / Facebook / Zalo -->
     <meta property="og:type" content="website" />
@@ -35,7 +42,7 @@
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "TeaStore",
+      "@type": ["TeaStore", "LocalBusiness"],
       "name": "Lục Lam Art Of Tea",
       "alternateName": "Lục Lam Saigon Pocket Guide",
       "image": "https://cdn.hstatic.net/products/200000432665/frame_vu_ng_tet__12__bdc76c1b293c45c5ae8e8711482ea43a_large.png",
@@ -72,13 +79,36 @@
       },
       "sameAs": [
         "https://www.facebook.com/luclamartoftea"
-      ]
+      ],
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Trà thảo mộc và quà tặng Lục Lam",
+        "itemListElement": [
+          { "@type": "Offer", "itemOffered": { "@type": "Product", "name": "Trà thảo mộc Lục Lam" } },
+          { "@type": "Offer", "itemOffered": { "@type": "CreativeWork", "name": "Saigon Pocket Guide", "inLanguage": ["vi", "en", "ja", "ko", "zh-CN", "zh-TW"] } }
+        ]
+      }
     }
     </script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <main>
+        <h1>Lục Lam — Saigon Pocket Guide &amp; Premium Herbal Tea</h1>
+        <p>Khám phá Sài Gòn qua cẩm nang đa ngôn ngữ về điểm đến, ẩm thực, văn hóa, mua sắm và di chuyển an toàn.</p>
+        <section>
+          <h2>Trà thảo mộc và quà tặng Sài Gòn</h2>
+          <p>Lục Lam mang đến trà thảo mộc cao cấp và quà tặng Việt Nam tại Takashimaya B2, Quận 1, Thành phố Hồ Chí Minh.</p>
+        </section>
+        <nav aria-label="Languages">
+          <a href="/?lang=en" lang="en">English</a> ·
+          <a href="/?lang=ja" lang="ja">日本語</a> ·
+          <a href="/?lang=ko" lang="ko">한국어</a> ·
+          <a href="/?lang=zh" lang="zh-CN">简体中文</a> ·
+          <a href="/?lang=zht" lang="zh-TW">繁體中文</a>
+        </nav>
+      </main>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-
