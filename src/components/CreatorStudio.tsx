@@ -698,7 +698,16 @@ export function CreatorStudio({
                         <div key={file.id} className="bg-zinc-950 border border-zinc-800 rounded-xl p-2 flex flex-col justify-between space-y-2 text-[10px]">
                           <div className="flex gap-2">
                             {file.thumbnailLink ? (
-                              <img src={file.thumbnailLink} alt="" className="w-10 h-10 object-cover rounded-lg shrink-0 bg-zinc-900 border border-zinc-800" referrerPolicy="no-referrer" />
+                              <img
+                                src={file.thumbnailLink}
+                                alt=""
+                                width={40}
+                                height={40}
+                                loading="lazy"
+                                decoding="async"
+                                className="w-10 h-10 object-cover rounded-lg shrink-0 bg-zinc-900 border border-zinc-800"
+                                referrerPolicy="no-referrer"
+                              />
                             ) : (
                               <div className="w-10 h-10 bg-zinc-900 rounded-lg flex items-center justify-center shrink-0 border border-zinc-800">
                                 {file.mimeType?.startsWith('video/') ? <FileVideo className="w-5 h-5 text-purple-400" /> : <FileImage className="w-5 h-5 text-blue-400" />}
@@ -903,7 +912,15 @@ export function CreatorStudio({
                   <div className="grid grid-cols-2 gap-2">
                     {imagePresets.map((img, idx) => (
                       <div key={idx} className="bg-zinc-950 rounded-xl overflow-hidden border border-zinc-800/60 flex flex-col justify-between">
-                        <img src={img.url} alt={img.name} className="w-full h-12 object-cover" />
+                        <img
+                          src={img.url}
+                          alt={img.name}
+                          width={200}
+                          height={48}
+                          loading="lazy"
+                          decoding="async"
+                          className="w-full h-12 object-cover"
+                        />
                         <div className="p-1.5 flex justify-between items-center gap-1">
                           <span className="truncate text-[8px] text-zinc-400" title={img.name}>{img.name}</span>
                           <button 

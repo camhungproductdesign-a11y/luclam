@@ -247,9 +247,13 @@ export function PlaceDetailModal({
 
           {/* Main Visual Display */}
           {resolvedImg ? (
-            <img 
-              src={resolvedImg} 
-              alt={place.name} 
+            <img
+              src={resolvedImg}
+              alt={place.name}
+              width={1280}
+              height={720}
+              loading="lazy"
+              decoding="async"
               className={`w-full h-full object-cover transition-transform duration-500 ${isCreator ? 'group-hover/hero:scale-105' : ''}`}
               referrerPolicy="no-referrer"
             />
