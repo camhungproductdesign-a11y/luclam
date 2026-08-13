@@ -74,7 +74,7 @@ function getInitialLanguage(): Language {
   const browserLanguage = navigator.language.toLowerCase();
   if (browserLanguage.startsWith('zh-tw') || browserLanguage.startsWith('zh-hk')) return 'zht';
   const language = browserLanguage.split('-')[0] as Language;
-  return supportedLanguages.includes(language) ? language : 'en';
+  return supportedLanguages.includes(language) ? language : 'vi';
 }
 
 // Inline helper component to safely resolve hook-based media URLs inside mapped lists
@@ -479,12 +479,13 @@ export default function App() {
         <div className="space-y-8">
           {/* Brand header */}
           <div className="space-y-1">
-            <h1 
+            {/* Brand mark, not the page heading — the cover heading is the h1. */}
+            <div
               onClick={handleBrandClick}
-              className="text-2xl font-serif tracking-wider text-[#d16b4c] font-bold select-none"
+              className="text-2xl font-serif tracking-wider text-[#d16b4c] font-bold select-none cursor-pointer"
             >
               {t.brand}
-            </h1>
+            </div>
             <p className="text-xs uppercase tracking-[0.25em] text-zinc-400 font-medium">{t.subtitle}</p>
           </div>
 
