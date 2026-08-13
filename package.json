@@ -11,6 +11,10 @@
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
     "images": "tsx scripts/optimize-images.ts",
+    "media:fetch": "tsx scripts/fetch-external-media.ts",
+    "media:credits": "tsx scripts/fetch-wikimedia-credits.ts",
+    "media:rewrite": "tsx scripts/rewrite-media-urls.ts",
+    "credits": "tsx scripts/generate-credits-module.ts",
     "verify": "tsx scripts/verify-output.ts"
   },
   "dependencies": {

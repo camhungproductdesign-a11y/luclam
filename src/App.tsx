@@ -1391,7 +1391,7 @@ export default function App() {
                     {/* Left block (7 cols): Main colonial boutique hotel room artwork */}
                     <div className="col-span-7 bg-[#dfdacd] border border-zinc-300 rounded-xl relative overflow-hidden group shadow-sm">
                       <img 
-                        src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80" 
+                        src="/uploads/external/9734d76f9fad.jpg" 
                         alt="Boutique Hotel Room Saigon" 
                         width={800}
                         height={533}
@@ -1423,9 +1423,9 @@ export default function App() {
                     <div className="col-span-5 flex flex-col gap-2">
                       {t.stay.rightStack.map((stackText, sidx) => {
                         const rightImages = [
-                          'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=400&q=80', // Spa & Herbal Wash
-                          'https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&w=400&q=80', // Foot & Body Care
-                          'https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=400&q=80'  // Tea & Hideaway Coffee
+                          '/uploads/external/4d9633d557ee.jpg', // Spa & Herbal Wash
+                          '/uploads/external/3b9f45655bcf.jpg', // Foot & Body Care
+                          '/uploads/external/143a201f9dac.jpg'  // Tea & Hideaway Coffee
                         ];
                         return (
                           <div 
@@ -1463,9 +1463,9 @@ export default function App() {
                         <Coffee className="w-3 h-3 text-white" />
                       ];
                       const catBanners = [
-                        'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=400&q=80',
-                        'https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?auto=format&fit=crop&w=400&q=80',
-                        'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=400&q=80'
+                        '/uploads/external/d8f33c48cc5c.jpg',
+                        '/uploads/external/3e15f452ff6b.jpg',
+                        '/uploads/external/2f331a9cff29.jpg'
                       ];
                       return (
                         <div 
@@ -2006,7 +2006,7 @@ export default function App() {
                               </a>
                             </div>
                             <img 
-                              src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=800&q=80" 
+                              src="/uploads/external/c561cd48f545.jpg" 
                               alt="Lục Lam Flagship" 
                               width={800}
                               height={533}

@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { useMediaUrl } from '../hooks/useMediaUrl';
 import { saveMedia } from '../indexedDBStore';
+import { creditFor } from '../mediaCredits';
 
 interface PlaceMedia {
   img: string;
@@ -262,6 +263,14 @@ export function PlaceDetailModal({
               <Compass className="w-12 h-12 text-[#b85233]/40 animate-pulse mb-2" />
               <span className="text-xs font-serif italic">Capturing Saigon Vibes...</span>
             </div>
+          )}
+
+          {/* CC BY-SA requires the author to be credited wherever the image
+              appears, whoever hosts it. */}
+          {creditFor(resolvedImg) && (
+            <p className="absolute bottom-1 right-2 max-w-[85%] truncate text-[9px] text-white/75 bg-black/50 px-1.5 py-0.5 rounded pointer-events-none">
+              {creditFor(resolvedImg)}
+            </p>
           )}
 
           {/* Upload Hover Overlay */}

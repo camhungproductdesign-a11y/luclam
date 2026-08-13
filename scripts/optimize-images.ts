@@ -32,7 +32,7 @@ async function readFailure(sourcePath: string): Promise<string | null> {
   }
 
   try {
-    await sharp(sourcePath).metadata();
+    await sharp(await fs.readFile(sourcePath)).metadata();
     return null;
   } catch (error) {
     return `sharp không đọc được: ${(error as Error).message}`;
@@ -42,7 +42,12 @@ async function readFailure(sourcePath: string): Promise<string | null> {
 async function optimise(relativePath: string) {
   const sourcePath = path.join(UPLOADS, relativePath);
   const base = relativePath.replace(SOURCE_PATTERN, '');
-  const meta = await sharp(sourcePath).metadata();
+
+  // Read the bytes up front rather than letting sharp open the path itself.
+  // On Windows sharp keeps a handle on a file it opened, and writing the
+  // recompressed result back to that same path then fails with EUNKNOWN.
+  const original = await fs.readFile(sourcePath);
+  const meta = await sharp(original).metadata();
   const sourceWidth = meta.width ?? 0;
 
   let derivatives = 0;
@@ -51,12 +56,12 @@ async function optimise(relativePath: string) {
     // Never upscale past the source.
     if (sourceWidth && width > sourceWidth) continue;
 
-    await sharp(sourcePath)
+    await sharp(original)
       .resize({ width })
       .avif({ quality: 55 })
       .toFile(path.join(UPLOADS, `${base}-${width}.avif`));
 
-    await sharp(sourcePath)
+    await sharp(original)
       .resize({ width })
       .webp({ quality: 72 })
       .toFile(path.join(UPLOADS, `${base}-${width}.webp`));
@@ -65,8 +70,8 @@ async function optimise(relativePath: string) {
   }
 
   // Recompress the original in place so the src fallback is light too.
-  const originalSize = (await fs.stat(sourcePath)).size;
-  const recompressed = await sharp(sourcePath)
+  const originalSize = original.length;
+  const recompressed = await sharp(original)
     .resize({ width: Math.min(1920, sourceWidth || 1920) })
     .jpeg({ quality: 78, mozjpeg: true })
     .toBuffer();
