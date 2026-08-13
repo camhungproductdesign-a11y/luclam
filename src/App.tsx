@@ -549,7 +549,7 @@ export default function App() {
 
 
   return (
-    <div className={`min-h-screen w-full flex flex-col md:flex-row transition-colors duration-500 overflow-hidden ${
+    <div className={`app-shell w-full flex flex-col md:flex-row transition-colors duration-500 overflow-hidden ${
       darkMode ? 'bg-zinc-950 text-zinc-100' : 'bg-[#0b1513] text-zinc-200'
     }`} id="saigon-guide-root">
       
@@ -738,7 +738,7 @@ export default function App() {
       {/* ==========================================================================
           MOBILE NAVIGATION TOP STICKY BAR (Visible on mobile/tablet)
           ========================================================================== */}
-      <header className="lg:hidden flex items-center justify-between px-4 py-3 bg-[#0f1f1b] border-b border-zinc-800 sticky top-0 z-50">
+      <header className="lg:hidden shrink-0 flex items-center justify-between px-4 py-3 bg-[#0f1f1b] border-b border-zinc-800 sticky top-0 z-50">
         <div className="flex items-center gap-2">
           <span 
             onClick={handleBrandClick}
@@ -784,7 +784,7 @@ export default function App() {
       <main className="flex-1 flex items-center justify-center p-0 lg:p-8 relative overflow-y-auto">
         
         {/* Device Container Mockup frame on desktop */}
-        <div className="w-full max-w-full lg:max-w-[430px] h-[100vh] lg:h-[860px] bg-zinc-900 border-0 lg:border-[12px] lg:border-zinc-800 lg:rounded-[55px] lg:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] flex flex-col relative overflow-hidden transition-all duration-300">
+        <div className="w-full max-w-full lg:max-w-[430px] h-full lg:h-[860px] bg-zinc-900 border-0 lg:border-[12px] lg:border-zinc-800 lg:rounded-[55px] lg:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] flex flex-col relative overflow-hidden transition-all duration-300">
           
           {/* Notch indicator on desktop */}
           <div className="hidden lg:block absolute top-0 left-1/2 -translate-x-1/2 w-40 h-[24px] bg-zinc-800 rounded-b-2xl z-40">

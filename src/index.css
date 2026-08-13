@@ -50,6 +50,27 @@
 }
 
 /* --------------------------------------------------------------------------
+   App shell height
+
+   100vh on iOS Safari and Chrome Android means the viewport with the browser
+   chrome collapsed, not the area currently visible. On load, with the URL bar
+   showing, the real height is 60-100px less — enough to push the bottom
+   navigation off screen until a scroll collapses the bar.
+
+   dvh tracks the visible area as that chrome comes and goes. The vh line is
+   kept as a fallback, though the build currently strips it: every browser in
+   Vite's target range supports dvh, so the minifier drops the first
+   declaration. It stays for the day those targets widen again.
+
+   Declared here rather than as a Tailwind class because an arbitrary utility
+   cannot express two declarations for the same property.
+   -------------------------------------------------------------------------- */
+.app-shell {
+  height: 100vh;
+  height: 100dvh;
+}
+
+/* --------------------------------------------------------------------------
    Mobile type floor
 
    The interface was drawn to be read inside the 430px device mockup on a
