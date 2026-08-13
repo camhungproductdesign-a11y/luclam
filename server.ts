@@ -137,9 +137,16 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), "dist");
-    app.use(express.static(distPath));
+
+    // extensions: ["html"] so /en/food/ resolves dist/en/food/index.html.
+    // Without it the catch-all below would answer every generated URL with
+    // the Vietnamese homepage.
+    app.use(express.static(distPath, { extensions: ["html"] }));
+
     app.get("*", (req, res) => {
-      res.sendFile(path.join(distPath, "index.html"));
+      // Nothing matched a generated file. Answer 404 honestly — returning
+      // index.html with a 200 is the soft-404 the SEO audit flagged.
+      res.status(404).sendFile(path.join(distPath, "404.html"));
     });
   }
 
