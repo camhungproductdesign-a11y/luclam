@@ -185,6 +185,11 @@ export default function App() {
   }, [isCreator, showEditor, selectedPlace]);
 
   const phoneScreenRef = useRef<HTMLDivElement>(null);
+
+  // True while navigateToPage's own smooth scroll is running, so the scroll
+  // handler does not rewrite state and URL for every page it passes through.
+  const programmaticScrollRef = useRef(false);
+  const scrollSettleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pagesList = ['cover', 'welcome', 'atmosphere', 'transport', 'stay', 'food', 'culture', 'shopping', 'luclam', 'info'] as const;
 
   const [brandClicks, setBrandClicks] = useState<number>(0);
@@ -290,6 +295,13 @@ export default function App() {
     // splash with it. Removing it again is a no-op then, and a safety net if
     // that behaviour ever changes.
     document.getElementById('app-splash')?.remove();
+  }, []);
+
+  useEffect(() => {
+    // Do not leave a pending scroll-settle callback behind on unmount.
+    return () => {
+      if (scrollSettleRef.current) clearTimeout(scrollSettleRef.current);
+    };
   }, []);
 
   useEffect(() => {
@@ -438,6 +450,10 @@ export default function App() {
 
     if (phoneScreenRef.current) {
       const pageWidth = phoneScreenRef.current.clientWidth;
+      // The smooth scroll travels across every page in between, firing the
+      // scroll handler the whole way. State and URL are already correct, so
+      // flag the animation and let the handler stand down until it settles.
+      programmaticScrollRef.current = true;
       phoneScreenRef.current.scrollTo({
         left: index * pageWidth,
         behavior: 'smooth'
@@ -447,21 +463,40 @@ export default function App() {
 
   // Sync state if user swipes inside the mockup (scroll listener)
   const handlePhoneScroll = () => {
-    if (phoneScreenRef.current) {
-      const scrollLeft = phoneScreenRef.current.scrollLeft;
-      const pageWidth = phoneScreenRef.current.clientWidth;
-      if (pageWidth > 0) {
-        const index = Math.round(scrollLeft / pageWidth);
-        if (index !== currentPage && index >= 0 && index < pagesList.length) {
-          setCurrentPage(index);
-          // Swiping is navigation too, so the URL has to follow. replaceState
-          // rather than pushState: a swipe should not stack history entries.
-          const nextPath = pathFor(lang, TOPICS[index]);
-          if (window.location.pathname !== nextPath) {
-            window.history.replaceState({ topic: TOPICS[index] }, '', nextPath);
-          }
-        }
+    if (!phoneScreenRef.current) return;
+    const pageWidth = phoneScreenRef.current.clientWidth;
+    if (pageWidth <= 0) return;
+
+    const index = Math.round(phoneScreenRef.current.scrollLeft / pageWidth);
+    if (index < 0 || index >= pagesList.length) return;
+
+    // Writing the URL on every frame of a scroll rewrites it once per page
+    // crossed, and browsers throttle the History API for exactly that. Wait
+    // until the scroll stops, then write once.
+    if (scrollSettleRef.current) clearTimeout(scrollSettleRef.current);
+    scrollSettleRef.current = setTimeout(() => {
+      scrollSettleRef.current = null;
+      programmaticScrollRef.current = false;
+      if (!phoneScreenRef.current) return;
+
+      const settled = Math.round(phoneScreenRef.current.scrollLeft / pageWidth);
+      if (settled < 0 || settled >= pagesList.length) return;
+
+      // Reconcile against where the scroll actually stopped rather than where it
+      // was sent: a swipe can interrupt a click's animation and land elsewhere.
+      // After a plain click these already match, so nothing is written.
+      setCurrentPage(settled);
+      // A swipe should not stack history entries, hence replace rather than push.
+      const nextPath = pathFor(lang, TOPICS[settled]);
+      if (window.location.pathname !== nextPath) {
+        window.history.replaceState({ topic: TOPICS[settled] }, '', nextPath);
       }
+    }, 120);
+
+    // The page indicator should track a finger in real time, but must not fight
+    // the animation a click already started.
+    if (!programmaticScrollRef.current && index !== currentPage) {
+      setCurrentPage(index);
     }
   };
 
