@@ -29,6 +29,7 @@ import { googleSignIn, logout, getAccessToken } from '../firebaseAuth';
 import { saveMedia, listMedia, deleteMedia, UploadedMedia, uploadMediaToServer } from '../indexedDBStore';
 import { defaultMedia, imagePresets, videoPresets } from '../defaultMedia';
 import { Language, translations } from '../translations';
+import { getAdminToken, setAdminToken } from '../adminToken';
 
 interface CreatorStudioProps {
   lang: Language;
@@ -59,7 +60,16 @@ export function CreatorStudio({
 }: CreatorStudioProps) {
   const [activeStudioTab, setActiveStudioTab] = useState<'media' | 'content'>('media');
   const [activeLang, setActiveLang] = useState<Language>(lang);
-  
+
+  // Admin token for the guarded write endpoints. Entered by the operator and
+  // kept in localStorage — it must never be baked into the bundle.
+  const [adminToken, setAdminTokenState] = useState<string>(getAdminToken);
+
+  const handleAdminTokenChange = (value: string) => {
+    setAdminTokenState(value);
+    setAdminToken(value);
+  };
+
   // Auth state
   const [user, setUser] = useState<any>(null);
   const [authToken, setAuthToken] = useState<string | null>(null);
@@ -485,6 +495,25 @@ export function CreatorStudio({
         </div>
       </header>
 
+      {/* Admin token. Without it the server rejects every save with 401. */}
+      <div className="px-4 py-2.5 bg-zinc-900/40 border-b border-zinc-800 shrink-0 flex items-center gap-3 flex-wrap">
+        <label htmlFor="admin-token" className="text-[10px] uppercase tracking-wider font-bold text-zinc-400 shrink-0">
+          Token quản trị
+        </label>
+        <input
+          id="admin-token"
+          type="password"
+          value={adminToken}
+          onChange={(e) => handleAdminTokenChange(e.target.value)}
+          placeholder="Dán ADMIN_TOKEN của máy chủ"
+          autoComplete="off"
+          className="flex-1 min-w-[180px] bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs text-zinc-200 font-mono focus:outline-none focus:border-[#b85233]"
+        />
+        <span className={`text-[10px] font-mono shrink-0 ${adminToken ? 'text-emerald-400' : 'text-amber-400'}`}>
+          {adminToken ? 'Đã có token' : 'Chưa nhập — mọi thao tác lưu sẽ bị từ chối'}
+        </span>
+      </div>
+
       {/* Primary Tab Navigation */}
       <div className="flex bg-zinc-900/60 border-b border-zinc-800 shrink-0">
         <button
@@ -779,13 +808,25 @@ export function CreatorStudio({
                               <span className="absolute bottom-1 right-1 text-[8px] bg-black/80 px-1 py-0.5 rounded uppercase">Video</span>
                             </div>
                           ) : (
-                            <img 
-                              src={item.serverUrl || `indexeddb-media://${item.id}`} 
-                              alt={item.name} 
-                              className="w-full h-full object-cover" 
+                            <img
+                              src={item.serverUrl || `indexeddb-media://${item.id}`}
+                              alt={item.name}
+                              width={64}
+                              height={64}
+                              loading="lazy"
+                              decoding="async"
+                              className="w-full h-full object-cover"
                               onError={(e) => {
-                                // Fallback if raw protocol is not parsed here
-                                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1596422846543-75c6fc1f7f43?auto=format&fit=crop&w=150&q=80';
+                                // Fallback if the raw protocol is not parsed here.
+                                // The flag stops the handler from reassigning a src
+                                // that is itself broken, which loops forever.
+                                const image = e.currentTarget;
+                                if (image.dataset.fallbackApplied === 'true') {
+                                  image.style.display = 'none';
+                                  return;
+                                }
+                                image.dataset.fallbackApplied = 'true';
+                                image.src = '/uploads/cover_benthanh.jpg';
                               }}
                             />
                           )}

@@ -44,6 +44,7 @@ const CreatorStudio = React.lazy(() =>
   import('./components/CreatorStudio').then((module) => ({ default: module.CreatorStudio }))
 );
 import { defaultMedia } from './defaultMedia';
+import { authHeaders, UNAUTHORIZED_MESSAGE } from './adminToken';
 
 const supportedLanguages: Language[] = ['ja', 'vi', 'zh', 'zht', 'en', 'ko'];
 const htmlLanguage: Record<Language, string> = {
@@ -297,11 +298,14 @@ export default function App() {
     try {
       localStorage.setItem('saigon_guide_overrides', JSON.stringify(newOverrides));
       // Save to server
-      await fetch('/api/config', {
+      const response = await fetch('/api/config', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders(),
         body: JSON.stringify({ overrides: newOverrides, customMedia })
       });
+      if (response.status === 401) {
+        alert(UNAUTHORIZED_MESSAGE);
+      }
     } catch (e) {
       console.warn('Failed to save overrides:', e);
     }
@@ -312,11 +316,14 @@ export default function App() {
     try {
       localStorage.setItem('saigon_guide_custom_media', JSON.stringify(newCustomMedia));
       // Save to server
-      await fetch('/api/config', {
+      const response = await fetch('/api/config', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders(),
         body: JSON.stringify({ overrides, customMedia: newCustomMedia })
       });
+      if (response.status === 401) {
+        alert(UNAUTHORIZED_MESSAGE);
+      }
     } catch (e) {
       console.warn('Failed to save custom media:', e);
     }
