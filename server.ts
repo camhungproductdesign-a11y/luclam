@@ -1,7 +1,18 @@
 import express from "express";
 import path from "path";
 import fs from "fs";
+import crypto from "crypto";
 import { createServer as createViteServer } from "vite";
+
+const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
+
+if (!ADMIN_TOKEN) {
+  console.error(
+    "ADMIN_TOKEN chưa được đặt. Server từ chối khởi động để không chạy ở trạng thái mở.\n" +
+      "Đặt biến môi trường ADMIN_TOKEN rồi chạy lại."
+  );
+  process.exit(1);
+}
 
 async function startServer() {
   const app = express();
@@ -9,6 +20,35 @@ async function startServer() {
 
   // Setup JSON parser with large limit to allow rich custom configurations and media arrays
   app.use(express.json({ limit: "20mb" }));
+
+  // Guards the endpoints that write to disk. Read endpoints stay public.
+  function requireAdmin(
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) {
+    const header = req.get("authorization") ?? "";
+    const prefix = "Bearer ";
+
+    if (!header.startsWith(prefix)) {
+      return res.status(401).json({ error: "Thiếu token xác thực" });
+    }
+
+    const supplied = Buffer.from(header.slice(prefix.length));
+    const expected = Buffer.from(ADMIN_TOKEN as string);
+
+    // Length is compared first because timingSafeEqual throws on a length
+    // mismatch. Leaking the token's length is acceptable; leaking its bytes
+    // through response timing is not.
+    if (
+      supplied.length !== expected.length ||
+      !crypto.timingSafeEqual(supplied, expected)
+    ) {
+      return res.status(401).json({ error: "Token không hợp lệ" });
+    }
+
+    next();
+  }
 
   const CONFIG_PATH = path.join(process.cwd(), "public", "config.json");
   const uploadsDir = path.join(process.cwd(), "public", "uploads");
@@ -37,7 +77,7 @@ async function startServer() {
   });
 
   // API to upload media directly to the server
-  app.post("/api/upload", async (req, res) => {
+  app.post("/api/upload", requireAdmin, async (req, res) => {
     try {
       const { file, fileName, fileType } = req.body;
       if (!file || !fileName) {
@@ -64,7 +104,7 @@ async function startServer() {
   });
 
   // API to save/sync custom guides
-  app.post("/api/config", async (req, res) => {
+  app.post("/api/config", requireAdmin, async (req, res) => {
     try {
       const { overrides, customMedia } = req.body;
       const dataToSave = {
