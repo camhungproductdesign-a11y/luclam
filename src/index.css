@@ -1,9 +1,23 @@
-@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Noto+Sans+JP:wght@300;400;500;700;900&family=Noto+Sans+SC:wght@300;400;500;700;900&family=Outfit:wght@300;400;500;600;700;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+/* Outfit was dropped from this import: nothing references it now that body text
+   is Be Vietnam Pro, so it was six weights downloaded for nothing.
+   Noto Sans JP and SC are still fetched but no rule applies them — see the note
+   on --font-ja and --font-zh below. */
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Noto+Sans+JP:wght@300;400;500;700;900&family=Noto+Sans+SC:wght@300;400;500;700;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Outfit", system-ui, sans-serif;
+  /* Body text is Be Vietnam Pro, not Outfit. Outfit ships only the latin and
+     latin-ext subsets, and latin-ext stops short of U+1EA0-U+1EF1 — which is
+     where most Vietnamese tone-marked vowels live (ạ ấ ầ ậ ắ ế ệ ố ộ ớ ợ ụ ứ ự).
+     Those characters fell back to a system font, so a single Vietnamese word
+     rendered in two typefaces. Be Vietnam Pro covers the full range. */
+  --font-sans: "Be Vietnam Pro", system-ui, sans-serif;
   --font-serif: "Playfair Display", Georgia, serif;
+  /* Declared but not applied anywhere: no component uses font-ja or font-zh, so
+     Japanese and Chinese fall back to whatever the system provides, and no
+     Korean face is imported at all. Either wire these up per html[lang] or drop
+     them from the import — both are open decisions, not oversights to fix
+     silently. */
   --font-ja: "Noto Sans JP", sans-serif;
   --font-zh: "Noto Sans SC", sans-serif;
   --font-vi: "Be Vietnam Pro", sans-serif;
@@ -33,5 +47,36 @@
 }
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(184, 82, 51, 0.4);
+}
+
+/* --------------------------------------------------------------------------
+   Mobile type floor
+
+   The interface was drawn to be read inside the 430px device mockup on a
+   desktop screen, at arm's length — which is why 161 sizes sit between 6px and
+   11px. Below lg the mockup is gone and this is a real phone held close to the
+   face, where 8px is not readable. Apple and Google both put the floor for
+   secondary text around 11px.
+
+   Raising the whole ladder here rather than editing 161 call sites in App.tsx:
+   the ordering between sizes is preserved, so the visual hierarchy survives.
+   These rules sit outside any cascade layer, so they beat Tailwind's utilities
+   regardless of source order.
+
+   Trade-off worth knowing: larger text on mobile pushes back against fitting a
+   page into one screen. Page 02 in particular was tuned to the frame height.
+   -------------------------------------------------------------------------- */
+@media (max-width: 1023px) {
+  .text-\[6px\]    { font-size: 9px; }
+  .text-\[6\.5px\] { font-size: 9.5px; }
+  .text-\[7px\]    { font-size: 10px; }
+  .text-\[7\.5px\] { font-size: 10px; }
+  .text-\[8px\]    { font-size: 10.5px; }
+  .text-\[8\.5px\] { font-size: 11px; }
+  .text-\[9px\]    { font-size: 11.5px; }
+  .text-\[9\.5px\] { font-size: 11.5px; }
+  .text-\[10px\]   { font-size: 12px; }
+  .text-\[10\.5px\]{ font-size: 12px; }
+  .text-\[11px\]   { font-size: 12.5px; }
 }
 
