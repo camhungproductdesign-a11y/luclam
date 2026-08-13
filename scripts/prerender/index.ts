@@ -24,6 +24,45 @@ async function readAssets(): Promise<Assets> {
   return { scripts, stylesheets };
 }
 
+/**
+ * The static block exists for crawlers that do not run JavaScript. It carries no
+ * CSS classes, so leaving it visible meant the first paint was a wall of unstyled
+ * text until the 532KB bundle mounted — about a second that reads as "the CSS
+ * failed to load". Hiding it and painting a branded splash instead removes that
+ * without taking the content out of the HTML.
+ *
+ * This is progressive enhancement rather than cloaking: both the static block and
+ * the React tree are generated from the same translations, so a crawler and a
+ * reader end up with the same content.
+ */
+const BOOT_STYLES = `<style>
+      #static-content { display: none; }
+      #app-splash {
+        position: fixed; inset: 0; z-index: 9999;
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        gap: 14px; background: #0b1513;
+      }
+      #app-splash .wordmark {
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 22px; font-weight: 700; letter-spacing: 0.22em; color: #d16b4c;
+      }
+      #app-splash .bar {
+        width: 56px; height: 2px; background: #d16b4c; opacity: 0.35;
+        animation: app-splash-pulse 1.1s ease-in-out infinite;
+      }
+      @keyframes app-splash-pulse {
+        0%, 100% { opacity: 0.2; transform: scaleX(0.6); }
+        50%      { opacity: 0.7; transform: scaleX(1); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #app-splash .bar { animation: none; opacity: 0.45; }
+      }
+    </style>
+    <noscript><style>
+      #static-content { display: block; }
+      #app-splash { display: none; }
+    </style></noscript>`;
+
 function renderPage(lang: Language, head: string, body: string, scripts: string[]): string {
   const scriptTags = scripts
     .map((src) => `<script type="module" crossorigin src="${src}"></script>`)
@@ -33,12 +72,30 @@ function renderPage(lang: Language, head: string, body: string, scripts: string[
 <html lang="${HTML_LANG[lang]}">
   <head>
     ${head}
+    ${BOOT_STYLES}
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div id="app-splash" aria-hidden="true">
+        <span class="wordmark">LỤC LAM</span>
+        <span class="bar"></span>
+      </div>
+    </div>
     <div id="static-content">
 ${body}
     </div>
+    <script>
+      // The splash covers the viewport, so a bundle that never mounts would leave
+      // the page permanently blank. If React has not taken over in time, drop the
+      // splash and fall back to the static content rather than showing nothing.
+      setTimeout(function () {
+        var splash = document.getElementById('app-splash');
+        if (!splash) return;
+        splash.remove();
+        var fallback = document.getElementById('static-content');
+        if (fallback) fallback.style.display = 'block';
+      }, 8000);
+    </script>
     ${scriptTags}
   </body>
 </html>

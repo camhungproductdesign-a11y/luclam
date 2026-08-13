@@ -282,11 +282,14 @@ export default function App() {
   }, [lang]);
 
   useEffect(() => {
-    // The static block exists for crawlers and for the first paint before this
-    // bundle runs. Remove it once React has rendered, or the page shows the
-    // content twice. This effect runs after the first paint, so there is no
-    // blank frame in between.
+    // The static block exists for crawlers that do not run JavaScript. Remove it
+    // once React has rendered, or the page carries the content twice.
     document.getElementById('static-content')?.remove();
+
+    // createRoot clears #root on mount, which should already have taken the
+    // splash with it. Removing it again is a no-op then, and a safety net if
+    // that behaviour ever changes.
+    document.getElementById('app-splash')?.remove();
   }, []);
 
   useEffect(() => {

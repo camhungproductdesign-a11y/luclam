@@ -24,6 +24,9 @@ function contentLength(html: string): number {
   const body = html.split('<body>')[1] ?? html;
   return body
     .replace(/<script[\s\S]*?<\/script>/g, ' ')
+    // Strip style blocks too, or their CSS text would count as page content and
+    // a nearly empty page could clear the minimum on stylesheet rules alone.
+    .replace(/<style[\s\S]*?<\/style>/g, ' ')
     .replace(/<[^>]*>/g, ' ')
     .replace(/\s+/g, ' ')
     .trim().length;
