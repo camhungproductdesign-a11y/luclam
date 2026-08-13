@@ -870,11 +870,14 @@ export default function App() {
               {/* ==========================================================================
                   PAGE 02: WELCOME / INTRODUCTION
                   ========================================================================== */}
-              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between p-6 overflow-y-auto">
-                <div className="space-y-5">
-                  
+              {/* Sized container so the clamps below scale against this page's own
+                  height. vh would read the browser window, which on desktop is
+                  taller than the 860px device frame this page lives in. */}
+              <section className="[container-type:size] w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between p-5 overflow-y-auto">
+                <div className="space-y-[clamp(0.65rem,2.4cqh,1.25rem)]">
+
                   {/* Minimal page header decoration */}
-                  <div className="flex justify-between items-center border-b-[1.5px] border-[#b85233] pb-1.5 pt-4">
+                  <div className="flex justify-between items-center border-b-[1.5px] border-[#b85233] pb-1.5 pt-2">
                     <span className="text-[11px] font-bold text-[#0b433f] tracking-widest uppercase">
                       02 | {t.pages.welcome}
                     </span>
@@ -882,15 +885,15 @@ export default function App() {
                   </div>
 
                   {/* Welcome core headings */}
-                  <div className="space-y-3">
-                    <h2 className="text-2xl font-bold font-serif text-[#0b433f] leading-snug whitespace-pre-line">
+                  <div className="space-y-2">
+                    <h2 className="text-[clamp(1.15rem,3.2cqh,1.5rem)] font-bold font-serif text-[#0b433f] leading-snug whitespace-pre-line">
                       {t.welcome.heading}
                     </h2>
                     <div className="w-12 h-1 bg-[#b85233]"></div>
                   </div>
 
                   {/* Narrative copy */}
-                  <div className="space-y-3 text-xs leading-relaxed text-zinc-700 font-light">
+                  <div className="space-y-2 text-xs leading-relaxed text-zinc-700 font-light">
                     <p>{t.welcome.p1}</p>
                     <p>{t.welcome.p2}</p>
                   </div>
@@ -900,16 +903,16 @@ export default function App() {
                   </p>
 
                   {/* 2-Column layout: Video mockup + Aesthetic Image Coffee Crop */}
-                  <div className="grid grid-cols-2 gap-4">
-                    
+                  <div className="grid grid-cols-2 gap-3">
+
                     {/* Left: Travel Video & QR Link representation */}
                     <div className="border border-[#b85233]/40 bg-[#b85233]/5 rounded-xl p-3 flex flex-col items-center text-center justify-between space-y-2">
                       <span className="text-[10px] font-bold uppercase tracking-wider text-[#b85233]">
                         {t.welcome.videoTitle}
                       </span>
-                      
+
                       {/* Custom styled vector play button inside circular gradient */}
-                      <div className="relative w-14 h-14 bg-gradient-to-tr from-[#0b433f] to-[#125e59] rounded-full flex items-center justify-center shadow-md shadow-teal-900/20 group cursor-pointer hover:scale-105 transition-all">
+                      <div className="relative w-[clamp(2.75rem,7cqh,3.5rem)] h-[clamp(2.75rem,7cqh,3.5rem)] bg-gradient-to-tr from-[#0b433f] to-[#125e59] rounded-full flex items-center justify-center shadow-md shadow-teal-900/20 group cursor-pointer hover:scale-105 transition-all">
                         <div className="w-0 h-0 border-t-8 border-t-transparent border-l-[14px] border-l-white border-b-8 border-b-transparent ml-1"></div>
                         <div className="absolute inset-0 rounded-full border border-white/20 animate-ping opacity-40"></div>
                       </div>
@@ -920,7 +923,7 @@ export default function App() {
                     </div>
 
                     {/* Right: Coffee & Croissant design visual reconstruction using styled UI */}
-                    <div className="relative bg-[#e6e2d8] rounded-xl overflow-hidden min-h-[140px] flex flex-col justify-end p-3 shadow-sm group">
+                    <div className="relative bg-[#e6e2d8] rounded-xl overflow-hidden min-h-[clamp(100px,15cqh,140px)] flex flex-col justify-end p-3 shadow-sm group">
                       {/* Gradient overlay */}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
                       
@@ -943,7 +946,7 @@ export default function App() {
                   </div>
 
                   {/* 4 Feature Columns list */}
-                  <div className="border-t border-zinc-200/80 pt-4">
+                  <div className="border-t border-zinc-200/80 pt-3">
                     <div className="grid grid-cols-4 gap-2">
                       {t.welcome.features.map((feat, idx) => {
                         const iconsList = [
@@ -981,7 +984,7 @@ export default function App() {
                 </div>
 
                 {/* Bottom Row: Tips Banner (Leaf/Warning/Advice style) */}
-                <div className="mt-6 p-3 bg-[#e6e2d8] rounded-xl border-l-4 border-[#0b433f] flex gap-3 text-[10px] text-zinc-700 leading-relaxed items-start">
+                <div className="mt-3 p-3 bg-[#e6e2d8] rounded-xl border-l-4 border-[#0b433f] flex gap-3 text-[10px] text-zinc-700 leading-relaxed items-start">
                   <Info className="w-4 h-4 text-[#0b433f] shrink-0 mt-0.5" />
                   <div className="grid grid-cols-2 gap-2 divide-x divide-zinc-400/20">
                     <p className="pr-1.5">{t.welcome.advice[0]}</p>
