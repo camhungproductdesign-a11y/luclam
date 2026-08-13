@@ -45,6 +45,7 @@ const CreatorStudio = React.lazy(() =>
 );
 import { defaultMedia } from './defaultMedia';
 import { authHeaders, UNAUTHORIZED_MESSAGE } from './adminToken';
+import { pathFor, parsePath, TOPICS, type Topic } from './routes';
 
 const supportedLanguages: Language[] = ['ja', 'vi', 'zh', 'zht', 'en', 'ko'];
 const htmlLanguage: Record<Language, string> = {
@@ -77,6 +78,16 @@ function getInitialLanguage(): Language {
   return supportedLanguages.includes(language) ? language : 'vi';
 }
 
+/**
+ * A non-root path was requested explicitly, so it decides both language and
+ * topic. Only at the root do we fall back to query, storage, then locale.
+ */
+function getInitialState(): { lang: Language; topic: Topic } {
+  const fromPath = parsePath(window.location.pathname);
+  if (window.location.pathname !== '/') return fromPath;
+  return { lang: getInitialLanguage(), topic: 'cover' };
+}
+
 // Inline helper component to safely resolve hook-based media URLs inside mapped lists
 function ThumbnailPreview({ url }: { url: string | undefined }) {
   const resolved = useMediaUrl(url);
@@ -103,9 +114,10 @@ function ThumbnailPreview({ url }: { url: string | undefined }) {
 }
 
 export default function App() {
-  const [lang, setLang] = useState<Language>(getInitialLanguage);
+  const [initialState] = useState(getInitialState);
+  const [lang, setLang] = useState<Language>(initialState.lang);
   const [darkMode, setDarkMode] = useState<boolean>(false);
-  const [currentPage, setCurrentPage] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(TOPICS.indexOf(initialState.topic));
   const [highlightedCard, setHighlightedCard] = useState<string | null>(null);
   
   // Custom states for interactive elements
@@ -269,13 +281,23 @@ export default function App() {
     document.documentElement.lang = htmlLanguage[lang];
   }, [lang]);
 
+  useEffect(() => {
+    // Back and forward restore the language and topic encoded in the URL.
+    const handlePopState = () => {
+      const { lang: nextLang, topic } = parsePath(window.location.pathname);
+      setLang(nextLang);
+      setCurrentPage(TOPICS.indexOf(topic));
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   // Update localStorage when preferences change
   const handleLangChange = (selectedLang: Language) => {
     setLang(selectedLang);
-    const url = new URL(window.location.href);
-    if (selectedLang === 'vi') url.searchParams.delete('lang');
-    else url.searchParams.set('lang', selectedLang);
-    window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+    // Stay on the topic being read rather than bouncing back to the cover.
+    window.history.pushState({}, '', pathFor(selectedLang, TOPICS[currentPage]));
     try {
       localStorage.setItem('saigon_guide_lang', selectedLang);
     } catch (e) {
@@ -396,6 +418,13 @@ export default function App() {
   const navigateToPage = (index: number) => {
     if (index < 0 || index >= pagesList.length) return;
     setCurrentPage(index);
+
+    // Each topic gets its own URL, so it can be linked to, shared and indexed.
+    const nextPath = pathFor(lang, TOPICS[index]);
+    if (window.location.pathname !== nextPath) {
+      window.history.pushState({ topic: TOPICS[index] }, '', nextPath);
+    }
+
     if (phoneScreenRef.current) {
       const pageWidth = phoneScreenRef.current.clientWidth;
       phoneScreenRef.current.scrollTo({
@@ -414,6 +443,12 @@ export default function App() {
         const index = Math.round(scrollLeft / pageWidth);
         if (index !== currentPage && index >= 0 && index < pagesList.length) {
           setCurrentPage(index);
+          // Swiping is navigation too, so the URL has to follow. replaceState
+          // rather than pushState: a swipe should not stack history entries.
+          const nextPath = pathFor(lang, TOPICS[index]);
+          if (window.location.pathname !== nextPath) {
+            window.history.replaceState({ topic: TOPICS[index] }, '', nextPath);
+          }
         }
       }
     }
