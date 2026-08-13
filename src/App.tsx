@@ -282,6 +282,14 @@ export default function App() {
   }, [lang]);
 
   useEffect(() => {
+    // The static block exists for crawlers and for the first paint before this
+    // bundle runs. Remove it once React has rendered, or the page shows the
+    // content twice. This effect runs after the first paint, so there is no
+    // blank frame in between.
+    document.getElementById('static-content')?.remove();
+  }, []);
+
+  useEffect(() => {
     // Back and forward restore the language and topic encoded in the URL.
     const handlePopState = () => {
       const { lang: nextLang, topic } = parsePath(window.location.pathname);
