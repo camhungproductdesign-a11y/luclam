@@ -159,7 +159,11 @@
         gap: 14px; background: #0b1513;
       }
       #app-splash .wordmark {
-        font-family: Georgia, "Times New Roman", serif;
+        /* A system stack, not Be Vietnam Pro: the splash paints before any
+           webfont has arrived, so naming one here would show nothing until it
+           landed. These are sans faces already installed on the reader's
+           device, which is what keeps the first frame sans too. */
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
         font-size: 22px; font-weight: 700; letter-spacing: 0.22em; color: #d16b4c;
       }
       #app-splash .bar {
