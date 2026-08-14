@@ -558,6 +558,26 @@ export default function App() {
     }
   };
 
+  useEffect(() => {
+    // The carousel always starts on the first page, so anything that sets the
+    // page from outside it — a deep link on load, the back button — moved the
+    // nav and the URL while leaving the cover on screen. Bring the scroll
+    // position to whatever the state says.
+    //
+    // Skipped while navigateToPage's own smooth scroll is running, or this
+    // would jump straight to the destination and cut the animation short.
+    if (programmaticScrollRef.current) return;
+
+    const el = phoneScreenRef.current;
+    if (!el) return;
+    const pageWidth = el.clientWidth;
+    if (pageWidth <= 0) return;
+
+    if (Math.round(el.scrollLeft / pageWidth) === currentPage) return;
+    programmaticScrollRef.current = true;
+    el.scrollLeft = currentPage * pageWidth;
+  }, [currentPage]);
+
   // Handle window resizing to keep page alignment in scroll mockup
   useEffect(() => {
     const handleResize = () => {
