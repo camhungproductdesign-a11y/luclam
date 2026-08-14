@@ -1474,6 +1474,7 @@ export default function App() {
                           <img
                             src={withBasePath(app.logo)}
                             alt={`${app.name} logo`}
+                            onError={useFallbackImage}
                             width={96}
                             height={96}
                             loading="lazy"
@@ -1533,6 +1534,7 @@ export default function App() {
                       <img 
                         src="/uploads/external/9734d76f9fad.jpg" 
                         alt="Boutique Hotel Room Saigon" 
+                        onError={useFallbackImage}
                         width={800}
                         height={533}
                         loading="lazy"
@@ -1575,6 +1577,7 @@ export default function App() {
                             <img 
                               src={rightImages[sidx]} 
                               alt="Wellness illustration" 
+                              onError={useFallbackImage}
                               width={400}
                               height={267}
                               loading="lazy"
@@ -1620,6 +1623,7 @@ export default function App() {
                             <img
                               src={catBanners[cidx]}
                               alt={cat.title}
+                              onError={useFallbackImage}
                               width={400}
                               height={267}
                               loading="lazy"
@@ -2155,6 +2159,7 @@ export default function App() {
                             <img 
                               src="/uploads/external/c561cd48f545.jpg" 
                               alt="Lục Lam Flagship" 
+                              onError={useFallbackImage}
                               width={800}
                               height={533}
                               loading="lazy"

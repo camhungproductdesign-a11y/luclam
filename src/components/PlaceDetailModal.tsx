@@ -52,6 +52,20 @@ interface PlaceDetailModalProps {
   isCreator?: boolean;
 }
 
+/**
+ * Shown when a place has no usable photo. It replaces "Capturing Saigon
+ * Vibes...", which was English for every reader and implied something was
+ * still loading when in fact there was nothing to load.
+ */
+const NO_PHOTO_LABEL = {
+  vi: 'Chưa có ảnh cho địa điểm này',
+  en: 'No photo yet',
+  ja: '写真はまだありません',
+  ko: '사진이 아직 없습니다',
+  zh: '暂无照片',
+  zht: '暫無照片',
+} as const;
+
 const getEmbedDetails = (url: string | undefined) => {
   if (!url) return { type: 'none' as const, embedUrl: '' };
 
@@ -100,6 +114,16 @@ export function PlaceDetailModal({
   const [tiktokError, setTiktokError] = useState('');
 
   const resolvedImg = useMediaUrl(media.img);
+
+  // A URL that exists but will not load is different from no URL at all, and
+  // only the second case was handled — so a dead link rendered the browser's
+  // broken-image glyph with the alt text sprawled across the hero.
+  const [heroFailed, setHeroFailed] = useState(false);
+  const lastHeroSrc = useRef(resolvedImg);
+  if (lastHeroSrc.current !== resolvedImg) {
+    lastHeroSrc.current = resolvedImg;
+    if (heroFailed) setHeroFailed(false);
+  }
   const resolvedVideo = useMediaUrl(media.video);
   const embedDetails = getEmbedDetails(resolvedVideo);
 
@@ -257,7 +281,7 @@ export function PlaceDetailModal({
           )}
 
           {/* Main Visual Display */}
-          {resolvedImg ? (
+          {resolvedImg && !heroFailed ? (
             <img
               src={resolvedImg}
               alt={place.name}
@@ -265,13 +289,16 @@ export function PlaceDetailModal({
               height={720}
               loading="lazy"
               decoding="async"
+              onError={() => setHeroFailed(true)}
               className={`w-full h-full object-cover transition-transform duration-500 ${isCreator ? 'group-hover/hero:scale-105' : ''}`}
               referrerPolicy="no-referrer"
             />
           ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-900 text-zinc-500">
-              <Compass className="w-12 h-12 text-[#b85233]/40 animate-pulse mb-2" />
-              <span className="text-xs font-serif italic">Capturing Saigon Vibes...</span>
+            <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-900 text-zinc-500 gap-2">
+              <Compass className="w-12 h-12 text-[#b85233]/40" />
+              <span className="text-xs font-serif italic">
+                {NO_PHOTO_LABEL[lang as keyof typeof NO_PHOTO_LABEL] ?? NO_PHOTO_LABEL.en}
+              </span>
             </div>
           )}
 
