@@ -784,17 +784,12 @@ export default function App() {
           MOBILE NAVIGATION TOP STICKY BAR (Visible on mobile/tablet)
           ========================================================================== */}
       <header className="lg:hidden shrink-0 flex items-center justify-between px-4 py-3 bg-[#0f1f1b] border-b border-zinc-800 sticky top-0 z-50">
-        <div className="flex items-center gap-2">
-          <span 
-            onClick={handleBrandClick}
-            className="text-lg font-serif font-bold text-[#d16b4c] select-none"
-          >
-            {t.brand}
-          </span>
-          <span className="text-[9px] uppercase tracking-wider text-zinc-400 px-1.5 py-0.5 bg-zinc-800 rounded">
-            {t.pages[pagesList[currentPage]]}
-          </span>
-        </div>
+        <span
+          onClick={handleBrandClick}
+          className="text-lg font-serif font-bold text-[#d16b4c] select-none cursor-pointer"
+        >
+          {t.brand}
+        </span>
         <div className="flex items-center gap-2">
           {/* Quick select language */}
           <select 
