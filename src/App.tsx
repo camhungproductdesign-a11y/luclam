@@ -5,7 +5,6 @@ import {
   Car,
   TrainFront,
   CarTaxiFront,
-  MapPin,
   Navigation, 
   BookOpen, 
   Compass, 
@@ -1692,26 +1691,19 @@ export default function App() {
                             <ThumbnailPreview url={media.img || media.video} />
                           </div>
 
-                          <div className="flex-1 min-w-0 relative z-10">
-                            <div className="flex justify-between items-start">
-                              <h3 className="text-[11px] font-bold text-[#0b433f] leading-snug truncate pr-2">{item.name}</h3>
-                              <span className="text-[9px] font-mono font-bold text-[#b85233] shrink-0">#{idx + 1}</span>
+                          {/* Description and address live in the modal this card
+                              opens; clamped to a line and 65% width they only ever
+                              broke mid-word here. */}
+                          <div className="flex-1 min-w-0 relative z-10 flex flex-col justify-center gap-1">
+                            <div className="flex justify-between items-start gap-2">
+                              <h3 className="text-[14px] font-bold text-[#0b433f] leading-snug line-clamp-2">{item.name}</h3>
+                              <span className="text-[11.5px] font-mono font-bold text-[#b85233] shrink-0">#{idx + 1}</span>
                             </div>
-                            <span className="text-[8.5px] text-[#b85233] font-medium block">{item.sub}</span>
-                            <p className="text-[9px] text-zinc-500 leading-normal font-light line-clamp-1 mt-1">
-                              {item.desc}
-                            </p>
-                            
-                            <div className="flex items-center gap-2 mt-1 text-[8px] text-zinc-400">
-                              <span className="truncate flex items-center gap-0.5 max-w-[65%]">
-                                <MapPin className="w-2.5 h-2.5 text-[#b85233] shrink-0" />
-                                <span className="truncate">{item.addr}</span>
-                              </span>
-                              <span className="flex items-center gap-0.5">
-                                <Clock className="w-2.5 h-2.5 text-[#0b433f] shrink-0" />
-                                <span>{item.hours}</span>
-                              </span>
-                            </div>
+                            <span className="text-[12px] text-[#b85233] font-medium block line-clamp-1">{item.sub}</span>
+                            <span className="flex items-center gap-1 text-[11.5px] text-zinc-500">
+                              <Clock className="w-3 h-3 text-[#0b433f] shrink-0" />
+                              <span className="line-clamp-1">{item.hours}</span>
+                            </span>
                           </div>
                         </div>
                       );
@@ -1792,26 +1784,21 @@ export default function App() {
                               <ThumbnailPreview url={media.img || media.video} />
                             </div>
 
-                            <div className="flex-1 min-w-0">
-                              <h3 className="text-[11px] font-bold text-[#0b433f] leading-snug flex items-center gap-1.5 truncate">
-                                <span role="img" aria-label="culture emoji" className="text-sm shrink-0">{item.emoji}</span>
-                                <span className="truncate">{item.name}</span>
+                            {/* Description and address are not shown here: at one
+                                clamped line and 65% width they always broke
+                                mid-word and told the reader nothing. Both are in
+                                the modal this card opens. The space pays for type
+                                that can actually be read. */}
+                            <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
+                              <h3 className="text-[14px] font-bold text-[#0b433f] leading-snug flex items-center gap-1.5 min-w-0">
+                                <span role="img" aria-label="culture emoji" className="text-base shrink-0">{item.emoji}</span>
+                                <span className="line-clamp-2">{item.name}</span>
                               </h3>
-                              <span className="text-[8.5px] text-[#b85233] font-medium block">{item.sub}</span>
-                              <p className="text-[9px] text-zinc-500 leading-normal font-light line-clamp-1 mt-1">
-                                {item.desc}
-                              </p>
-
-                              <div className="flex items-center gap-2 mt-1 text-[8px] text-zinc-400">
-                                <span className="truncate flex items-center gap-0.5 max-w-[65%]">
-                                  <MapPin className="w-2.5 h-2.5 text-[#b85233] shrink-0" />
-                                  <span className="truncate">{item.addr}</span>
-                                </span>
-                                <span className="flex items-center gap-0.5">
-                                  <Clock className="w-2.5 h-2.5 text-[#0b433f] shrink-0" />
-                                  <span>{item.hours}</span>
-                                </span>
-                              </div>
+                              <span className="text-[12px] text-[#b85233] font-medium block line-clamp-1">{item.sub}</span>
+                              <span className="flex items-center gap-1 text-[11.5px] text-zinc-500">
+                                <Clock className="w-3 h-3 text-[#0b433f] shrink-0" />
+                                <span className="line-clamp-1">{item.hours}</span>
+                              </span>
                             </div>
                           </div>
                         );
@@ -1855,28 +1842,21 @@ export default function App() {
                             <ThumbnailPreview url={media.img || media.video} />
                           </div>
 
-                          <div className="flex-1 min-w-0">
-                            <div className="flex gap-2 items-start">
+                          {/* Description and address live in the modal this card
+                              opens; clamped to a line and 65% width they only ever
+                              broke mid-word here. */}
+                          <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
+                            <div className="flex gap-2 items-start min-w-0">
                               <span className="text-base shrink-0" role="img" aria-label="shopping emoji">{item.emoji}</span>
-                              <div className="min-w-0">
-                                <h3 className="text-[11px] font-bold text-[#0b433f] leading-snug truncate">{item.name}</h3>
-                                <span className="text-[8.5px] text-amber-700 font-medium block">{item.sub}</span>
+                              <div className="min-w-0 space-y-0.5">
+                                <h3 className="text-[14px] font-bold text-[#0b433f] leading-snug line-clamp-2">{item.name}</h3>
+                                <span className="text-[12px] text-amber-700 font-medium block line-clamp-1">{item.sub}</span>
                               </div>
                             </div>
-                            <p className="text-[9px] text-zinc-500 leading-normal font-light line-clamp-1 mt-1">
-                              {item.desc}
-                            </p>
-
-                            <div className="flex items-center gap-2 mt-1 text-[8px] text-zinc-400">
-                              <span className="truncate flex items-center gap-0.5 max-w-[65%]">
-                                  <MapPin className="w-2.5 h-2.5 text-[#b85233] shrink-0" />
-                                  <span className="truncate">{item.addr}</span>
-                              </span>
-                              <span className="flex items-center gap-0.5">
-                                <Clock className="w-2.5 h-2.5 text-[#0b433f] shrink-0" />
-                                <span>{item.hours}</span>
-                              </span>
-                            </div>
+                            <span className="flex items-center gap-1 text-[11.5px] text-zinc-500">
+                              <Clock className="w-3 h-3 text-[#0b433f] shrink-0" />
+                              <span className="line-clamp-1">{item.hours}</span>
+                            </span>
                           </div>
                         </div>
                       );
