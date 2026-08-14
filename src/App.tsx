@@ -1038,8 +1038,14 @@ export default function App() {
                             <div className="w-10 h-10 rounded-full bg-white border border-zinc-200/80 flex items-center justify-center text-[#0b433f] shadow-sm group-hover:bg-[#0b433f] group-hover:text-white group-hover:-translate-y-1 transition-all duration-300">
                               {iconsList[idx]}
                             </div>
-                            <span className="text-[8px] font-bold text-[#0b433f] leading-tight mt-1.5">
-                              {feat.title.split(' ')[0]}
+                            {/* The whole title, wrapped over at most two lines.
+                                Taking the first word left Vietnamese readers with
+                                "Con", "Thiên", "Bản", "Di" — fragments that mean
+                                nothing on their own. It only ever looked passable
+                                in Japanese and Chinese, which have no spaces for
+                                it to cut at. */}
+                            <span className="text-[8px] font-bold text-[#0b433f] leading-tight mt-1.5 line-clamp-2 text-balance">
+                              {feat.title}
                             </span>
 
                             {/* Popup with full detail */}
