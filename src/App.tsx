@@ -1507,11 +1507,16 @@ export default function App() {
                       {/* Each tile takes the ground its own mark was drawn for, the way
                           app icons sit side by side on a home screen.
 
-                          Grab's icon is 80% #00a848, so the tile continues that green and
-                          the grey ring around it disappears. Xanh SM's mark is 72%
-                          #30d8d8 on transparency — drawn for a light ground, and it keeps
-                          one. A cyan tile would swallow it, and even a pale cyan tint
-                          only reaches about 1.6:1 against the mark.
+                          Grab's icon is 76.5% #00b14f, so the tile continues that green
+                          and the grey ring around it disappears. Xanh SM's mark is 50.9%
+                          #2dccd3 on transparency — drawn for a light ground, and it keeps
+                          one. A cyan tile would swallow it: the mark clears only 1.96:1
+                          even against plain white, and a cyan tint would close that.
+
+                          Those figures are exact pixel counts. An earlier pass reported
+                          #00a848 and #30d8d8, which were artefacts of bucketing colours
+                          to multiples of 24 while counting — enough to move #00b14f two
+                          steps down each channel.
 
                           Each border matches its own fill so the two tiles keep identical
                           geometry: Grab's reads as one solid green square, while Xanh
@@ -1521,7 +1526,7 @@ export default function App() {
                           name: 'Grab',
                           tag: 'All-in-one',
                           logo: '/uploads/brand/grab.png',
-                          tile: 'bg-[#00a848] border-[#00a848]',
+                          tile: 'bg-[#00b14f] border-[#00b14f]',
                         },
                         {
                           name: 'Xanh SM',
