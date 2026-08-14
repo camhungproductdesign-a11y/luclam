@@ -1,58 +1,6 @@
 {
   "overrides": {},
   "customMedia": {
-    "cover": {
-      "img": "/uploads/cover_benthanh.jpg",
-      "video": ""
-    },
-    "food-0-0": {
-      "img": "/uploads/cover_benthanh.jpg",
-      "video": ""
-    },
-    "food-0-1": {
-      "img": "/uploads/cover_benthanh.jpg",
-      "video": ""
-    },
-    "food-0-2": {
-      "img": "/uploads/cover_benthanh.jpg",
-      "video": ""
-    },
-    "food-1-0": {
-      "img": "/uploads/cover_benthanh.jpg",
-      "video": ""
-    },
-    "food-1-1": {
-      "img": "/uploads/cover_benthanh.jpg",
-      "video": ""
-    },
-    "food-1-2": {
-      "img": "/uploads/cover_benthanh.jpg",
-      "video": ""
-    },
-    "food-2-0": {
-      "img": "/uploads/cover_benthanh.jpg",
-      "video": ""
-    },
-    "food-2-1": {
-      "img": "/uploads/cover_benthanh.jpg",
-      "video": ""
-    },
-    "food-2-2": {
-      "img": "/uploads/cover_benthanh.jpg",
-      "video": ""
-    },
-    "food-3-0": {
-      "img": "/uploads/cover_benthanh.jpg",
-      "video": ""
-    },
-    "food-3-1": {
-      "img": "/uploads/cover_benthanh.jpg",
-      "video": ""
-    },
-    "food-3-2": {
-      "img": "/uploads/cover_benthanh.jpg",
-      "video": ""
-    },
     "food-4-0": {
       "img": "https://file.hstatic.net/200000432665/file/11_01cbf04e827e45b784d8f19354047388_1024x1024.png",
       "video": ""
@@ -65,24 +13,12 @@
       "img": "https://static.chotot.com/storage/chotot-kinhnghiem/nha/2025/11/4a0c8374-chung-cu-42-nguyen-hue-1.jpeg",
       "video": ""
     },
-    "culture-0": {
-      "img": "/uploads/cover_benthanh.jpg",
-      "video": ""
-    },
-    "culture-1": {
-      "img": "/uploads/cover_benthanh.jpg",
-      "video": ""
-    },
     "culture-2": {
       "img": "/uploads/external/7abe2e9e3c93.jpg",
       "video": ""
     },
     "culture-3": {
       "img": "https://vi.wikipedia.org/wiki/Nh%C3%A0_h%C3%A1t_Th%C3%A0nh_ph%E1%BB%91_H%E1%BB%93_Ch%C3%AD_Minh",
-      "video": ""
-    },
-    "culture-4": {
-      "img": "/uploads/cover_benthanh.jpg",
       "video": ""
     },
     "culture-5": {
@@ -125,16 +61,8 @@
       "img": "https://go2joy.s3.ap-southeast-1.amazonaws.com/blog/wp-content/uploads/2022/08/23150553/pho-di-bo-nguyen-hue-o-dau.jpg",
       "video": ""
     },
-    "culture-15": {
-      "img": "/uploads/cover_benthanh.jpg",
-      "video": ""
-    },
     "culture-16": {
       "img": "/uploads/external/b81340493a2a.jpg",
-      "video": ""
-    },
-    "culture-17": {
-      "img": "/uploads/cover_benthanh.jpg",
       "video": ""
     },
     "culture-18": {
@@ -175,10 +103,6 @@
     },
     "shopping-1": {
       "img": "/uploads/external/0d4c09ff3ef0.jpg",
-      "video": ""
-    },
-    "shopping-2": {
-      "img": "/uploads/cover_benthanh.jpg",
       "video": ""
     }
   }

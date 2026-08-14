@@ -51,7 +51,25 @@ const supportedLanguages: Language[] = ['ja', 'vi', 'zh', 'zht', 'en', 'ko'];
 const htmlLanguage: Record<Language, string> = {
   ja: 'ja', vi: 'vi', zh: 'zh-CN', zht: 'zh-TW', en: 'en', ko: 'ko'
 };
-const fallbackImage = withBasePath('/uploads/cover_benthanh.jpg');
+/**
+ * An inline SVG rather than a file: this is the last resort for every image on
+ * the site, so it must not depend on a network request or on a file being
+ * decodable. It previously pointed at /uploads/cover_benthanh.jpg, which cannot
+ * be decoded, so a broken image fell back to another broken image and the
+ * handler ended up hiding the element entirely — the empty grey boxes.
+ *
+ * A tea leaf on the brand's cream, drawn so a missing photo reads as a
+ * deliberate placeholder rather than a failure.
+ */
+const fallbackImage =
+  'data:image/svg+xml,' +
+  encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+      <rect width="96" height="96" fill="#e6e2d8"/>
+      <path d="M48 24C34 38 34 60 48 74C62 60 62 38 48 24Z" fill="#0b433f" opacity="0.22"/>
+      <path d="M48 30V70" stroke="#0b433f" stroke-opacity="0.3" stroke-width="2" stroke-linecap="round"/>
+    </svg>`.replace(/\s+/g, ' ')
+  );
 
 /**
  * Where each tea can be bought, used when nothing has been set in the editor.
@@ -126,10 +144,19 @@ function getInitialState(): { lang: Language; topic: Topic } {
 function ThumbnailPreview({ url }: { url: string | undefined }) {
   const resolved = useMediaUrl(url);
   if (!resolved) {
+    // The flag emoji that used to sit here has no glyph on Windows, which draws
+    // the two regional-indicator letters instead — every place without a photo
+    // showed a bare "VN". The shared fallback graphic renders the same
+    // everywhere.
     return (
-      <div className="w-full h-full flex items-center justify-center bg-zinc-100 text-zinc-300 font-serif font-black text-xs">
-        🇻🇳
-      </div>
+      <img
+        src={fallbackImage}
+        alt=""
+        width={64}
+        height={64}
+        decoding="async"
+        className="w-full h-full object-cover"
+      />
     );
   }
   return (
