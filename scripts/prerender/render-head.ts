@@ -152,6 +152,84 @@ const FAQ_BY_LANGUAGE: Partial<Record<Language, Array<{ q: string; a: string }>>
   ],
 };
 
+type MenuItem = {
+  name: string;
+  desc?: string;
+  price?: string;
+  image?: string;
+  buyLuclam?: string;
+};
+
+/**
+ * Prices are authored as "155,000 VND". Structured data needs a bare number and
+ * a separate currency, so parse rather than pass the string through.
+ *
+ * Anything that does not parse cleanly gets no `offers` block at all. A wrong
+ * price in structured data is worse than an absent one — search engines and
+ * assistants repeat it as fact, and nobody sees the mistake on the page.
+ */
+function parsePrice(raw: string | undefined): { price: string; currency: string } | null {
+  if (!raw) return null;
+
+  const match = raw.match(/^\s*([\d.,]+)\s*(VND|VNĐ|đ)\s*$/i);
+  if (!match) return null;
+
+  const digits = match[1].replace(/[.,]/g, '');
+  if (!/^\d+$/.test(digits)) return null;
+
+  const value = Number(digits);
+  if (!Number.isFinite(value) || value <= 0) return null;
+
+  return { price: String(value), currency: 'VND' };
+}
+
+function products(lang: Language, topic: Topic): string {
+  if (topic !== 'luclam') return '';
+
+  const items = ((translations[lang] as unknown as Record<string, { menuItems?: MenuItem[] }>)
+    .luclam?.menuItems ?? []) as MenuItem[];
+  if (items.length === 0) return '';
+
+  const listed = items.map((item, index) => {
+    const offer = parsePrice(item.price);
+
+    const product: Record<string, unknown> = {
+      '@type': 'Product',
+      '@id': `${absolute(pathFor(lang, 'luclam'))}#product-${index}`,
+      name: item.name,
+      brand: { '@type': 'Brand', name: 'Lục Lam Art Of Tea' },
+      category: 'Herbal tea',
+    };
+
+    if (item.desc) product.description = item.desc;
+    if (item.image) product.image = item.image;
+
+    if (offer) {
+      product.offers = {
+        '@type': 'Offer',
+        price: offer.price,
+        priceCurrency: offer.currency,
+        availability: 'https://schema.org/InStock',
+        // Sold through the shop's own store and Takashimaya rather than here —
+        // this page presents the range, it does not take orders.
+        url: item.buyLuclam || 'https://luclam.vn/collections/all',
+        seller: { '@type': 'Organization', name: 'Lục Lam Art Of Tea' },
+      };
+    }
+
+    return { '@type': 'ListItem', position: index + 1, item: product };
+  });
+
+  return JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    '@id': `${absolute(pathFor(lang, 'luclam'))}#products`,
+    name: translations[lang].pages.luclam,
+    numberOfItems: listed.length,
+    itemListElement: listed,
+  });
+}
+
 function localBusiness(lang: Language): string {
   // The telephone field is deliberately absent: the official number has not
   // been confirmed by Lục Lam, and a wrong number in structured data is worse
@@ -205,6 +283,7 @@ export function renderHead(lang: Language, topic: Topic, assets: Assets): string
     breadcrumb(lang, topic),
     faqPage(lang, topic),
     infoItemList(lang, topic),
+    products(lang, topic),
   ]
     .filter(Boolean)
     .map((json) => `<script type="application/ld+json">${json}</script>`)

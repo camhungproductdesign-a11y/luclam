@@ -360,7 +360,13 @@ export function CreatorStudio({
     for (let i = 0; i < path.length; i++) {
       const part = path[i];
       if (!current[part]) {
-        current[part] = path[i] === 'items' || path[i] === 'restaurants' || path[i] === 'districts' ? [] : {};
+        current[part] =
+          path[i] === 'items' ||
+          path[i] === 'restaurants' ||
+          path[i] === 'districts' ||
+          path[i] === 'menuItems'
+            ? []
+            : {};
       }
       current = current[part];
     }
@@ -465,6 +471,12 @@ export function CreatorStudio({
 
   const getShoppingValue = (itemIdx: number, field: string) => {
     return overrides[activeLang]?.shopping?.items?.[itemIdx]?.[field] ?? translations[activeLang]?.shopping?.items?.[itemIdx]?.[field] ?? '';
+  };
+
+  const getProductValue = (itemIdx: number, field: string) => {
+    return (overrides as any)[activeLang]?.luclam?.menuItems?.[itemIdx]?.[field]
+      ?? (translations[activeLang] as any)?.luclam?.menuItems?.[itemIdx]?.[field]
+      ?? '';
   };
 
   return (
@@ -1004,6 +1016,7 @@ export function CreatorStudio({
                 <option value="food">Ẩm Thực 5 Danh Mục (Legends Food)</option>
                 <option value="culture">Địa Điểm Check-In (Culture)</option>
                 <option value="shopping">Mua Sắm Đặc Sản (Shopping)</option>
+                <option value="products">Sản Phẩm Trà Lục Lam (Products)</option>
               </select>
             </div>
 
@@ -1555,6 +1568,154 @@ export function CreatorStudio({
                       </div>
                     );
                   })}
+                </div>
+              )}
+
+              {/* SECTION: PRODUCTS (trà Lục Lam) */}
+              {selectedSection === 'products' && (
+                <div className="space-y-4 text-xs">
+                  <div className="space-y-1.5">
+                    <label className="text-zinc-400 font-medium">Tiêu đề khối sản phẩm:</label>
+                    <input
+                      type="text"
+                      value={
+                        (overrides as any)[activeLang]?.luclam?.menuHeading
+                          ?? (translations[activeLang] as any)?.luclam?.menuHeading
+                          ?? ''
+                      }
+                      onChange={(e) => updateOverrideValue(['luclam', 'menuHeading'], e.target.value)}
+                      placeholder="Sản phẩm trứ danh..."
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 focus:outline-none focus:border-[#b85233]"
+                    />
+                  </div>
+
+                  <span className="block border-t border-zinc-800 pt-2 text-[10px] font-bold text-zinc-400 uppercase">
+                    Danh sách sản phẩm ({(translations[activeLang] as any)?.luclam?.menuItems?.length || 0} sản phẩm):
+                  </span>
+
+                  {((translations[activeLang] as any)?.luclam?.menuItems || []).map(
+                    (item: any, itemIdx: number) => {
+                      const placeId = `luclam-${itemIdx}`;
+                      const currentCustom = customMedia[placeId] || { img: '', video: '' };
+
+                      return (
+                        <div
+                          key={itemIdx}
+                          id={`edit-place-${placeId}`}
+                          className="p-3 bg-zinc-950 rounded-xl border border-zinc-800 space-y-3"
+                        >
+                          <span className="text-[10px] font-bold text-amber-500 font-mono">
+                            Sản phẩm #{itemIdx + 1} ({getProductValue(itemIdx, 'name') || item.name})
+                          </span>
+
+                          <div className="space-y-1">
+                            <label className="text-zinc-500 font-semibold">Tên sản phẩm:</label>
+                            <input
+                              type="text"
+                              value={getProductValue(itemIdx, 'name')}
+                              onChange={(e) =>
+                                updateOverrideListValue(['luclam', 'menuItems'], itemIdx, 'name', e.target.value)
+                              }
+                              placeholder="Tên dòng trà..."
+                              className="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2 focus:outline-none focus:border-[#b85233]"
+                            />
+                          </div>
+
+                          <div className="space-y-1">
+                            <label className="text-zinc-500 font-semibold">Mô tả:</label>
+                            <textarea
+                              value={getProductValue(itemIdx, 'desc')}
+                              onChange={(e) =>
+                                updateOverrideListValue(['luclam', 'menuItems'], itemIdx, 'desc', e.target.value)
+                              }
+                              placeholder="Thành phần, hương vị, công dụng..."
+                              className="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2 min-h-[60px] focus:outline-none focus:border-[#b85233]"
+                            />
+                          </div>
+
+                          <div className="space-y-1">
+                            <label className="text-zinc-500 font-semibold">Giá:</label>
+                            <input
+                              type="text"
+                              value={getProductValue(itemIdx, 'price')}
+                              onChange={(e) =>
+                                updateOverrideListValue(['luclam', 'menuItems'], itemIdx, 'price', e.target.value)
+                              }
+                              placeholder="155,000 VND"
+                              className="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2 focus:outline-none focus:border-[#b85233]"
+                            />
+                            <p className="text-[8.5px] text-zinc-500 leading-normal">
+                              Giữ đúng dạng <span className="font-mono text-zinc-400">155,000 VND</span>. Con số này
+                              được công bố ra Google và trợ lý AI qua structured data, nên sai là sai công khai.
+                            </p>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2 border-t border-zinc-800/70 pt-2.5">
+                            <div className="space-y-1">
+                              <label className="text-zinc-400 text-[10px]">Link mua tại Lục Lam:</label>
+                              <input
+                                type="text"
+                                value={getProductValue(itemIdx, 'buyLuclam')}
+                                onChange={(e) =>
+                                  updateOverrideListValue(['luclam', 'menuItems'], itemIdx, 'buyLuclam', e.target.value)
+                                }
+                                placeholder="https://luclam.vn/..."
+                                className="w-full bg-zinc-900 border border-zinc-800 rounded p-1 text-[9px] focus:outline-none text-zinc-300"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="text-zinc-400 text-[10px]">Link mua tại Takashimaya:</label>
+                              <input
+                                type="text"
+                                value={getProductValue(itemIdx, 'buyTaka')}
+                                onChange={(e) =>
+                                  updateOverrideListValue(['luclam', 'menuItems'], itemIdx, 'buyTaka', e.target.value)
+                                }
+                                placeholder="https://online.takashimaya-vn.com/..."
+                                className="w-full bg-zinc-900 border border-zinc-800 rounded p-1 text-[9px] focus:outline-none text-zinc-300"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2 border-t border-zinc-800/70 pt-2.5">
+                            <div className="space-y-1">
+                              <label className="text-zinc-400 text-[10px]">Ảnh sản phẩm:</label>
+                              <input
+                                type="text"
+                                value={currentCustom.img || item.image || ''}
+                                onChange={(e) => assignMediaToPlace(placeId, 'img', e.target.value)}
+                                placeholder="Gán link ảnh..."
+                                className="w-full bg-zinc-900 border border-zinc-800 rounded p-1 text-[9px] focus:outline-none text-zinc-300"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="text-zinc-400 text-[10px]">Video TikTok:</label>
+                              <input
+                                type="text"
+                                value={currentCustom.video || ''}
+                                onChange={(e) => assignMediaToPlace(placeId, 'video', e.target.value)}
+                                placeholder="https://www.tiktok.com/@.../video/..."
+                                className="w-full bg-zinc-900 border border-zinc-800 rounded p-1 text-[9px] focus:outline-none text-zinc-300"
+                              />
+                            </div>
+                          </div>
+                          <p className="text-[8.5px] text-zinc-500 leading-normal">
+                            Dán link TikTok để nút xem video hiện ra trên thẻ sản phẩm. Bỏ trống thì không có nút.
+                          </p>
+
+                          {(currentCustom.img || currentCustom.video) && (
+                            <button
+                              type="button"
+                              onClick={() => clearPlaceMedia(placeId)}
+                              className="text-[8.5px] text-red-400 hover:underline cursor-pointer block"
+                            >
+                              Xóa ảnh/video tùy chỉnh (khôi phục mặc định)
+                            </button>
+                          )}
+                        </div>
+                      );
+                    }
+                  )}
                 </div>
               )}
 

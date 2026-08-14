@@ -53,6 +53,40 @@ const htmlLanguage: Record<Language, string> = {
 };
 const fallbackImage = withBasePath('/uploads/cover_benthanh.jpg');
 
+/**
+ * Where each tea can be bought, used when nothing has been set in the editor.
+ * These sat inline in the render as an array indexed by position, so a sixth
+ * product silently fell through to a generic search page. Editable per product
+ * as menuItems[i].buyLuclam / buyTaka; these are only the starting values.
+ */
+const DEFAULT_BUY_LINKS: Array<{ luclam: string; taka: string }> = [
+  {
+    luclam: 'https://luclam.vn/collections/hop-50-g',
+    taka: 'https://online.takashimaya-vn.com/chai-tra-red-lava-luc-lam-50g--s230800289',
+  },
+  {
+    luclam: 'https://luclam.vn/collections/hop-50-g',
+    taka: 'https://online.takashimaya-vn.com/chai-tra-velvet-rose-luc-lam-50g--s230800295',
+  },
+  {
+    luclam: 'https://luclam.vn/collections/hop-50-g',
+    taka: 'https://online.takashimaya-vn.com/c/luc-lam-tet',
+  },
+  {
+    luclam: 'https://luclam.vn/collections/hop-50-g',
+    taka: 'https://online.takashimaya-vn.com/c/luc-lam-tet',
+  },
+  {
+    luclam: 'https://luclam.vn/collections/hop-50-g',
+    taka: 'https://online.takashimaya-vn.com/c/luc-lam-tet',
+  },
+];
+
+const FALLBACK_BUY_LINKS = {
+  luclam: 'https://luclam.vn/collections/all',
+  taka: 'https://www.takashimaya-vietnam.com/vn/search?q=luc+lam',
+};
+
 function useFallbackImage(event: React.SyntheticEvent<HTMLImageElement>) {
   const image = event.currentTarget;
   if (image.dataset.fallbackApplied === 'true') {
@@ -409,7 +443,7 @@ export default function App() {
     return defaultMedia[placeId] || { img: '', video: '' };
   };
 
-  const handleOpenDetail = (type: 'food' | 'culture' | 'shopping', catIdxOrIdx: number, itemIdx?: number, placeData?: any) => {
+  const handleOpenDetail = (type: 'food' | 'culture' | 'shopping' | 'product', catIdxOrIdx: number, itemIdx?: number, placeData?: any) => {
     let placeId = '';
     let emoji = '📍';
     if (type === 'food') {
@@ -421,9 +455,20 @@ export default function App() {
     } else if (type === 'shopping') {
       placeId = `shopping-${catIdxOrIdx}`;
       emoji = placeData.emoji || '🛍️';
+    } else if (type === 'product') {
+      // Tea products reuse the place modal so they inherit its TikTok embed.
+      placeId = `luclam-${catIdxOrIdx}`;
+      emoji = '🍵';
     }
 
-    const media = getPlaceMedia(placeId);
+    const stored = getPlaceMedia(placeId);
+    // Product images live in translations rather than defaultMedia, so fall back
+    // to the one shipped with the item when nothing has been assigned.
+    const media =
+      type === 'product' && !stored.img
+        ? { ...stored, img: placeData.image || '' }
+        : stored;
+
     setSelectedPlace({
       id: placeId,
       name: placeData.name,
@@ -1871,30 +1916,14 @@ export default function App() {
                     <div className="grid grid-cols-1 gap-2.5">
                       {t.luclam.menuItems.map((item, idx) => {
                         const isExpanded = expandedTea === idx;
-                        const paths = [
-                          {
-                            luclam: "https://luclam.vn/collections/hop-50-g",
-                            taka: "https://online.takashimaya-vn.com/chai-tra-red-lava-luc-lam-50g--s230800289"
-                          },
-                          {
-                            luclam: "https://luclam.vn/collections/hop-50-g",
-                            taka: "https://online.takashimaya-vn.com/chai-tra-velvet-rose-luc-lam-50g--s230800295"
-                          },
-                          {
-                            luclam: "https://luclam.vn/collections/hop-50-g",
-                            taka: "https://online.takashimaya-vn.com/c/luc-lam-tet"
-                          },
-                          {
-                            luclam: "https://luclam.vn/collections/hop-50-g",
-                            taka: "https://online.takashimaya-vn.com/c/luc-lam-tet"
-                          },
-                          {
-                            luclam: "https://luclam.vn/collections/hop-50-g",
-                            taka: "https://online.takashimaya-vn.com/c/luc-lam-tet"
-                          }
-                        ];
-                        const links = paths[idx] || { luclam: "https://luclam.vn/collections/all", taka: "https://www.takashimaya-vietnam.com/vn/search?q=luc+lam" };
-                        
+                        const productItem = item as any;
+                        const defaults = DEFAULT_BUY_LINKS[idx] ?? FALLBACK_BUY_LINKS;
+                        const links = {
+                          luclam: productItem.buyLuclam || defaults.luclam,
+                          taka: productItem.buyTaka || defaults.taka,
+                        };
+                        const productVideo = getPlaceMedia(`luclam-${idx}`).video;
+
                         const ctaLabels = {
                           vi: { taka: "Mua tại Takashimaya", luclam: "Mua tại Lục Lam" },
                           en: { taka: "Buy at Takashimaya", luclam: "Buy on Lục Lam" },
@@ -1903,6 +1932,15 @@ export default function App() {
                           zh: { taka: "高岛屋购买", luclam: "Lục Lam 官网购买" },
                           zht: { taka: "高島屋購買", luclam: "Lục Lam 官網購買" }
                         }[lang] || { taka: "Buy at Takashimaya", luclam: "Buy on Lục Lam" };
+
+                        const videoLabel = {
+                          vi: 'Xem video sản phẩm',
+                          en: 'Watch product video',
+                          ja: '商品動画を見る',
+                          ko: '제품 영상 보기',
+                          zh: '观看产品视频',
+                          zht: '觀看產品影片',
+                        }[lang] || 'Watch product video';
 
                         return (
                           <div 
@@ -1988,6 +2026,20 @@ export default function App() {
                                     <ExternalLink className="w-2.5 h-2.5 opacity-80" />
                                   </a>
                                 </div>
+
+                                {/* Only offered once a video has been assigned in the
+                                    editor. The place modal already knows how to embed
+                                    TikTok, so products reuse it rather than repeating
+                                    that logic here. */}
+                                {productVideo && (
+                                  <button
+                                    onClick={() => handleOpenDetail('product', idx, undefined, item)}
+                                    className="w-full flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg text-[9px] font-bold bg-zinc-800/80 text-amber-200 hover:bg-zinc-700/80 border border-amber-500/25 transition-all shadow-md active:scale-95"
+                                  >
+                                    <span className="text-[10px]">▶</span>
+                                    <span>{videoLabel}</span>
+                                  </button>
+                                )}
                               </div>
                             )}
                           </div>
