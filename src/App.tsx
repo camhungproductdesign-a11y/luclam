@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Globe,
+  Motorbike,
+  Car,
+  TrainFront,
+  CarTaxiFront,
   MapPin,
   Navigation, 
   BookOpen, 
@@ -1294,11 +1298,13 @@ export default function App() {
                   {/* 4 Circles Transport Grid */}
                   <div className="grid grid-cols-4 gap-2">
                     {t.transport.options.map((opt, idx) => {
+                      // Line icons rather than emoji: emoji render differently on
+                      // every platform and cannot take the brand colour.
                       const iconsList = [
-                        <span className="text-2xl font-bold">🛵</span>,
-                        <span className="text-2xl font-bold">🚗</span>,
-                        <span className="text-2xl font-bold">🚇</span>,
-                        <span className="text-2xl font-bold">🚕</span>
+                        <Motorbike className="w-6 h-6 text-[#0b433f]" strokeWidth={1.75} />,
+                        <Car className="w-6 h-6 text-[#0b433f]" strokeWidth={1.75} />,
+                        <TrainFront className="w-6 h-6 text-[#0b433f]" strokeWidth={1.75} />,
+                        <CarTaxiFront className="w-6 h-6 text-[#0b433f]" strokeWidth={1.75} />
                       ];
                       return (
                         <div 
@@ -1309,8 +1315,11 @@ export default function App() {
                           <div className="w-14 h-14 rounded-full bg-white border border-zinc-200 shadow-sm flex items-center justify-center hover:scale-105 hover:bg-zinc-100 transition-all">
                             {iconsList[idx]}
                           </div>
+                          {/* Drop the parenthetical, keep the rest: taking only the
+                              first word rendered both Grab options as "Grab" and
+                              "Traditional Taxi" as "Traditional". */}
                           <span className="text-[8px] font-bold text-[#0b433f] leading-tight mt-1.5">
-                            {opt.name.split(' ')[0]}
+                            {opt.name.replace(/\s*\(.*\)\s*$/, '')}
                           </span>
 
                           {/* Detail Popup */}
