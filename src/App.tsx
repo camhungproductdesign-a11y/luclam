@@ -838,7 +838,7 @@ export default function App() {
               {/* ==========================================================================
                   PAGE 01: COVER PAGE
                   ========================================================================== */}
-              <section className="w-full h-full shrink-0 snap-start text-[#f6f3eb] flex flex-col justify-between p-6 relative overflow-y-auto overflow-x-hidden bg-zinc-950">
+              <section className="w-full h-full shrink-0 snap-start text-[#f6f3eb] flex flex-col justify-between page-section p-6 relative overflow-y-auto overflow-x-hidden bg-zinc-950">
                 
                 {/* Full-bleed high-contrast premium Ben Thanh aerial photograph background */}
                 <div className="absolute inset-0 transition-all duration-700">
@@ -953,7 +953,7 @@ export default function App() {
               {/* Sized container so the clamps below scale against this page's own
                   height. vh would read the browser window, which on desktop is
                   taller than the 860px device frame this page lives in. */}
-              <section className="[container-type:size] w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between p-5 overflow-y-auto">
+              <section className="[container-type:size] w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-5 overflow-y-auto">
                 <div className="space-y-[clamp(0.65rem,2.4cqh,1.25rem)]">
 
                   {/* Minimal page header decoration */}
@@ -1083,7 +1083,7 @@ export default function App() {
               {/* ==========================================================================
                   PAGE 03: CITY GUIDE / DISTRICTS WITH MAP
                   ========================================================================== */}
-              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between p-6 overflow-y-auto">
+              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
                 <div className="space-y-4">
                   
                   {/* Minimal page header decoration */}
@@ -1294,7 +1294,7 @@ export default function App() {
               {/* ==========================================================================
                   PAGE 04: TRANSPORTATION
                   ========================================================================== */}
-              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between p-6 overflow-y-auto">
+              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
                 <div className="space-y-4">
                   
                   {/* Minimal page header decoration */}
@@ -1474,7 +1474,7 @@ export default function App() {
               {/* ==========================================================================
                   PAGE 05: STAY & REJUVENATE (CARE)
                   ========================================================================== */}
-              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between p-6 overflow-y-auto">
+              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
                 <div className="space-y-4">
                   
                   {/* Minimal page header decoration */}
@@ -1634,7 +1634,7 @@ export default function App() {
               {/* ==========================================================================
                   PAGE 06: FOOD (Legends Must-Eat)
                   ========================================================================== */}
-              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between p-6 overflow-y-auto" id="food-page-section">
+              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto" id="food-page-section">
                 <div className="space-y-4">
                   <div className="flex justify-between items-center border-b-[1.5px] border-[#b85233] pb-1.5 pt-4">
                     <span className="text-[11px] font-bold text-[#0b433f] tracking-widest uppercase">
@@ -1727,7 +1727,7 @@ export default function App() {
               {/* ==========================================================================
                   PAGE 07: CULTURE & LANDMARKS
                   ========================================================================== */}
-              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between p-6 overflow-y-auto">
+              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
                 <div className="space-y-4">
                   <div className="flex justify-between items-center border-b-[1.5px] border-[#b85233] pb-1.5 pt-4">
                     <span className="text-[11px] font-bold text-[#0b433f] tracking-widest uppercase">
@@ -1827,7 +1827,7 @@ export default function App() {
               {/* ==========================================================================
                   PAGE 08: SHOPPING & SOUVENIRS
                   ========================================================================== */}
-              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between p-6 overflow-y-auto">
+              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
                 <div className="space-y-4">
                   <div className="flex justify-between items-center border-b-[1.5px] border-[#b85233] pb-1.5 pt-4">
                     <span className="text-[11px] font-bold text-[#0b433f] tracking-widest uppercase">
@@ -1892,7 +1892,7 @@ export default function App() {
               {/* ==========================================================================
                   PAGE 09: LỤC LAM TRẠM DỪNG CHÂN (Signature Experience)
                   ========================================================================== */}
-              <section className="w-full h-full shrink-0 snap-start bg-[#0b1513] text-[#f6f3eb] flex flex-col justify-between p-6 overflow-y-auto">
+              <section className="w-full h-full shrink-0 snap-start bg-[#0b1513] text-[#f6f3eb] flex flex-col justify-between page-section p-6 overflow-y-auto">
                 <div className="space-y-5">
                   <div className="flex justify-between items-center border-b-[1.5px] border-amber-500/30 pb-1.5 pt-4">
                     <span className="text-[11px] font-bold text-amber-400 tracking-widest uppercase flex items-center gap-1">
@@ -2316,7 +2316,7 @@ export default function App() {
               {/* ==========================================================================
                   PAGE 10: USEFUL INFO (Safety, Cash & SIM)
                   ========================================================================== */}
-              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between p-6 overflow-y-auto">
+              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
                 <div className="space-y-4">
                   <div className="flex justify-between items-center border-b-[1.5px] border-[#b85233] pb-1.5 pt-4">
                     <span className="text-[11px] font-bold text-[#0b433f] tracking-widest uppercase">

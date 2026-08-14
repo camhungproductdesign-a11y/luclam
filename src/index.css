@@ -71,6 +71,23 @@
 }
 
 /* --------------------------------------------------------------------------
+   Pages must not squash their own content
+
+   Each page is a flex column that scrolls. Flex items shrink by default, so
+   once a page's content is taller than the frame the blocks inside get
+   compressed rather than the page simply scrolling — and any block carrying
+   overflow-hidden then clips whatever no longer fits.
+
+   Measured on the atmosphere page at 440x956: the closing tip banner wanted
+   151px, was squeezed to 24px, and hid the rest behind its own overflow. It
+   read as though something were covering it, which sent three fixes chasing
+   the floating language selector instead.
+   -------------------------------------------------------------------------- */
+.page-section > * {
+  flex-shrink: 0;
+}
+
+/* --------------------------------------------------------------------------
    Mobile type floor
 
    The interface was drawn to be read inside the 430px device mockup on a
