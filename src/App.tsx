@@ -601,8 +601,12 @@ export default function App() {
       {/* ==========================================================================
           DESKTOP SIDEBAR NAVIGATION (Hidden on mobile)
           ========================================================================== */}
-      <aside className="hidden lg:flex flex-col w-[340px] border-r border-zinc-800/50 p-8 shrink-0 bg-[#0f1f1b] relative z-10 justify-between">
-        <div className="space-y-8">
+      {/* Scrolls on its own: the shell is a fixed 100dvh so anything taller than
+          the viewport has nowhere else to go. justify-start plus mt-auto on the
+          footer rather than justify-between, which can push content above the
+          scroll origin once it overflows. */}
+      <aside className="hidden lg:flex flex-col w-[340px] border-r border-zinc-800/50 p-8 shrink-0 bg-[#0f1f1b] relative z-10 justify-start overflow-y-auto">
+        <div className="space-y-8 shrink-0">
           {/* Brand header */}
           <div className="space-y-1">
             {/* Brand mark, not the page heading — the cover heading is the h1. */}
@@ -774,7 +778,7 @@ export default function App() {
         </div>
 
         {/* Sidebar Footer */}
-        <div className="pt-6 border-t border-zinc-800/50 space-y-1 text-center">
+        <div className="mt-auto pt-6 border-t border-zinc-800/50 space-y-1 text-center shrink-0">
           <p className="text-[11px] text-zinc-400">&copy; 2026 Lục Lam. All rights reserved.</p>
           <p className="text-[9px] text-zinc-600">Designed for Saigon Travelers with Premium UI</p>
         </div>
