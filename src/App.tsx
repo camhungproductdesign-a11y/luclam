@@ -1591,7 +1591,10 @@ export default function App() {
                   </div>
 
                   {/* Recommendations Columns list (3 elements) with header illustration banners */}
-                  <div className="grid grid-cols-3 gap-2">
+                  {/* One per row. At three across, each card was about 118px wide
+                      with a 56px banner, the title wrapped over the photo and the
+                      subtitle was cut to twelve characters in code. */}
+                  <div className="grid grid-cols-1 gap-3">
                     {t.stay.categories.map((cat, cidx) => {
                       const iconsList = [
                         <Star className="w-3 h-3 text-white" />,
@@ -1609,10 +1612,10 @@ export default function App() {
                           className="bg-white border border-zinc-200 rounded-xl overflow-hidden flex flex-col justify-between shadow-sm hover:ring-1 hover:ring-[#b85233] transition-all group"
                         >
                           {/* Top Image Banner */}
-                          <div className="h-14 relative overflow-hidden bg-zinc-100">
-                            <img 
-                              src={catBanners[cidx]} 
-                              alt={cat.title} 
+                          <div className="h-28 relative overflow-hidden bg-zinc-100">
+                            <img
+                              src={catBanners[cidx]}
+                              alt={cat.title}
                               width={400}
                               height={267}
                               loading="lazy"
@@ -1620,27 +1623,29 @@ export default function App() {
                               referrerPolicy="no-referrer"
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent"></div>
-                            <div className="absolute bottom-1.5 left-2 right-2 flex items-center justify-between">
-                              <span className="text-[8.5px] font-bold text-white leading-tight font-serif drop-shadow-sm">
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent"></div>
+                            <div className="absolute bottom-2 left-3 right-3 flex items-end justify-between gap-2">
+                              <span className="text-[12px] font-bold text-white leading-tight font-serif drop-shadow-md">
                                 {cat.title}
                               </span>
-                              <div className="w-5 h-5 rounded-full bg-[#b85233] flex items-center justify-center shrink-0 shadow">
+                              <div className="w-7 h-7 rounded-full bg-[#b85233] flex items-center justify-center shrink-0 shadow-md">
                                 {iconsList[cidx]}
                               </div>
                             </div>
                           </div>
 
-                          <div className="p-2 flex-1 flex flex-col justify-between">
-                            <span className="text-[6.5px] text-zinc-400 block tracking-wider uppercase mb-1">
-                              {cat.subtitle.substring(0, 12)}
+                          <div className="p-3 flex-1 flex flex-col gap-1.5">
+                            {/* Full subtitle: it used to be cut with substring(0, 12),
+                                which turned "Urban Sanctuary" into "URBAN SANCTU". */}
+                            <span className="text-[8px] text-zinc-400 block tracking-[0.14em] uppercase">
+                              {cat.subtitle}
                             </span>
 
-                            <ul className="space-y-1 text-[7.5px] text-zinc-600 leading-normal font-light">
+                            <ul className="space-y-1.5 text-[9px] text-zinc-600 leading-relaxed font-light">
                               {cat.bullets.map((bul, bidx) => (
-                                <li key={bidx} className="flex gap-1 items-start">
-                                  <span className="text-[#b85233]">•</span>
-                                  <p className="line-clamp-2">{bul}</p>
+                                <li key={bidx} className="flex gap-1.5 items-start">
+                                  <span className="text-[#b85233] shrink-0">•</span>
+                                  <p>{bul}</p>
                                 </li>
                               ))}
                             </ul>
