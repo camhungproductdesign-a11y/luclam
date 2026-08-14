@@ -1471,9 +1471,31 @@ export default function App() {
 
                       {/* The real marks, not the brand name in a coloured box.
                           Third-party trademarks — see public/uploads/brand/CREDITS.md. */}
+                      {/* Each tile takes the ground its own mark was drawn for, the way
+                          app icons sit side by side on a home screen.
+
+                          Grab's icon is 80% #00a848, so the tile continues that green and
+                          the grey ring around it disappears. Xanh SM's mark is 72%
+                          #30d8d8 on transparency — drawn for a light ground, and it keeps
+                          one. A cyan tile would swallow it, and even a pale cyan tint
+                          only reaches about 1.6:1 against the mark.
+
+                          Each border matches its own fill so the two tiles keep identical
+                          geometry: Grab's reads as one solid green square, while Xanh
+                          SM's hairline is what separates a white tile from a white card. */}
                       {[
-                        { name: 'Grab', tag: 'All-in-one', logo: '/uploads/brand/grab.png' },
-                        { name: 'Xanh SM', tag: 'Eco Taxi', logo: '/uploads/brand/xanh-sm.png' },
+                        {
+                          name: 'Grab',
+                          tag: 'All-in-one',
+                          logo: '/uploads/brand/grab.png',
+                          tile: 'bg-[#00a848] border-[#00a848]',
+                        },
+                        {
+                          name: 'Xanh SM',
+                          tag: 'Eco Taxi',
+                          logo: '/uploads/brand/xanh-sm.png',
+                          tile: 'bg-white border-zinc-200',
+                        },
                       ].map((app) => (
                         <div
                           key={app.name}
@@ -1492,7 +1514,7 @@ export default function App() {
                             height={96}
                             loading="lazy"
                             decoding="async"
-                            className="w-9 h-9 shrink-0 rounded-lg object-contain p-1 bg-zinc-50 border border-zinc-200/70"
+                            className={`w-9 h-9 shrink-0 rounded-lg object-contain p-1 border border-zinc-200/70 ${app.tile}`}
                           />
                           <div className="min-w-0 leading-tight">
                             <strong className="block text-[9px] text-zinc-800 font-bold truncate">
