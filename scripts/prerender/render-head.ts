@@ -299,6 +299,8 @@ export function renderHead(lang: Language, topic: Topic, assets: Assets): string
     <meta name="description" content="${escapeHtml(description)}" />
     <meta name="author" content="Lục Lam Art Of Tea" />
     <link rel="canonical" href="${canonical}" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     ${hreflangTags(topic)}
     <meta property="og:type" content="website" />
     <meta property="og:url" content="${canonical}" />
