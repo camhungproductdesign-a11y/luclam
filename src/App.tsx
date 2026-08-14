@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
-  Globe, 
-  Moon, 
-  Sun, 
-  MapPin, 
+  Globe,
+  MapPin,
   Navigation, 
   BookOpen, 
   Compass, 
@@ -177,7 +175,6 @@ function ThumbnailPreview({ url }: { url: string | undefined }) {
 export default function App() {
   const [initialState] = useState(getInitialState);
   const [lang, setLang] = useState<Language>(initialState.lang);
-  const [darkMode, setDarkMode] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(TOPICS.indexOf(initialState.topic));
   const [highlightedCard, setHighlightedCard] = useState<string | null>(null);
   
@@ -330,10 +327,6 @@ export default function App() {
   // Language is initialized synchronously to avoid a flash of the wrong language.
   useEffect(() => {
     try {
-      const savedDark = localStorage.getItem('saigon_guide_dark');
-      if (savedDark === 'true') {
-        setDarkMode(true);
-      }
       const savedVoucher = localStorage.getItem('saigon_guide_voucher');
       if (savedVoucher === 'true') {
         setVoucherClaimed(true);
@@ -386,16 +379,6 @@ export default function App() {
       localStorage.setItem('saigon_guide_lang', selectedLang);
     } catch (e) {
       console.warn('Failed to save language:', e);
-    }
-  };
-
-  const handleDarkToggle = () => {
-    const nextDark = !darkMode;
-    setDarkMode(nextDark);
-    try {
-      localStorage.setItem('saigon_guide_dark', String(nextDark));
-    } catch (e) {
-      console.warn('Failed to save dark mode:', e);
     }
   };
 
@@ -621,9 +604,10 @@ export default function App() {
 
 
   return (
-    <div className={`app-shell w-full flex flex-col md:flex-row transition-colors duration-500 overflow-hidden ${
-      darkMode ? 'bg-zinc-950 text-zinc-100' : 'bg-[#0b1513] text-zinc-200'
-    }`} id="saigon-guide-root">
+    <div
+      className="app-shell w-full flex flex-col md:flex-row overflow-hidden bg-[#0b1513] text-zinc-200"
+      id="saigon-guide-root"
+    >
       
       {/* ==========================================================================
           DESKTOP SIDEBAR NAVIGATION (Hidden on mobile)
@@ -723,34 +707,15 @@ export default function App() {
           </div>
 
           {/* Theme Switcher & Settings */}
-          <div className="space-y-3">
-            <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-[#d16b4c]" />
-              <span>{isCreator ? 'Theme & Editor / 画面モード' : 'Theme / 画面モード'}</span>
-            </label>
-            <button 
-              id="btn-theme-toggle"
-              onClick={handleDarkToggle}
-              className="w-full flex items-center justify-between p-3 bg-black/30 hover:bg-black/50 border border-zinc-800/40 rounded-xl transition-all group text-left mb-2"
-            >
-              <div className="flex items-center gap-3">
-                {darkMode ? (
-                  <Moon className="w-5 h-5 text-amber-400 group-hover:scale-110 transition-transform" />
-                ) : (
-                  <Sun className="w-5 h-5 text-yellow-500 group-hover:scale-110 transition-transform" />
-                )}
-                <div>
-                  <div className="text-xs font-medium text-zinc-200">
-                    {darkMode ? 'Dark Mode / ダーク' : 'Light Mode / ライト'}
-                  </div>
-                  <div className="text-[10px] text-zinc-400">Tap to toggle style / 雰囲気切り替え</div>
-                </div>
-              </div>
-              <ChevronRight className="w-4 h-4 text-zinc-500" />
-            </button>
-
-            {/* Creator Studio Toggle */}
-            {isCreator && (
+          {/* Whole block is creator-only now. It used to hold the theme toggle
+              too, so a reader saw the heading with the editor button hidden
+              beneath it; with the toggle gone that left a heading over nothing. */}
+          {isCreator && (
+            <div className="space-y-3">
+              <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-[#d16b4c]" />
+                <span>Editor / 編集</span>
+              </label>
               <button 
                 onClick={() => setShowEditor(!showEditor)}
                 className={`w-full flex items-center justify-between p-3 border rounded-xl transition-all group text-left ${
@@ -768,8 +733,8 @@ export default function App() {
                 </div>
                 <ChevronRight className="w-4 h-4 text-zinc-500 shrink-0" />
               </button>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Navigation Menu Links */}
           <nav className="space-y-2">
@@ -842,15 +807,6 @@ export default function App() {
             <option value="vi">Tiếng Việt</option>
           </select>
           
-          {/* Theme switch */}
-          <button 
-            id="btn-mobile-theme"
-            onClick={handleDarkToggle}
-            className="p-1.5 bg-zinc-800 rounded-lg hover:bg-zinc-700 text-zinc-300"
-            title="Toggle theme mode"
-          >
-            {darkMode ? <Sun className="w-4 h-4 text-yellow-500" /> : <Moon className="w-4 h-4 text-amber-400" />}
-          </button>
         </div>
       </header>
 
