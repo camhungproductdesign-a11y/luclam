@@ -1479,6 +1479,11 @@ export default function App() {
                           key={app.name}
                           className="flex items-center gap-2 bg-white p-1.5 rounded-lg border border-zinc-200/80 shadow-sm"
                         >
+                          {/* Grab ships a full-bleed app icon, opaque to all four edges,
+                              so with no inset it sat flush against the card. Xanh SM's
+                              mark carries its own 21% margin. The padding gives the
+                              first one room without shrinking the second, which
+                              object-contain already leaves smaller. */}
                           <img
                             src={withBasePath(app.logo)}
                             alt={`${app.name} logo`}
@@ -1487,7 +1492,7 @@ export default function App() {
                             height={96}
                             loading="lazy"
                             decoding="async"
-                            className="w-7 h-7 shrink-0 rounded-md object-contain"
+                            className="w-9 h-9 shrink-0 rounded-lg object-contain p-1 bg-zinc-50 border border-zinc-200/70"
                           />
                           <div className="min-w-0 leading-tight">
                             <strong className="block text-[9px] text-zinc-800 font-bold truncate">
