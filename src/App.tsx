@@ -101,6 +101,22 @@ const DEFAULT_BUY_LINKS: Array<{ luclam: string; taka: string }> = [
   },
 ];
 
+/**
+ * Fare guide for the transport page. Figures are language-neutral, so only the
+ * mode name is looked up — from transport.options, which lists the same four in
+ * the same order. fallbackName covers a language that has not translated them.
+ */
+const TRANSPORT_FARES: Array<{
+  fallbackName: string;
+  prices: [string, string, string];
+  payment: string;
+}> = [
+  { fallbackName: 'Grab Bike', prices: ['15k-25k', '25k-40k', '40k-70k'], payment: 'App / Cash' },
+  { fallbackName: 'Grab Car', prices: ['40k-70k', '70k-120k', '120k-200k'], payment: 'App / Cash' },
+  { fallbackName: 'Metro', prices: ['7k-10k', '10k-15k', '15k-20k'], payment: 'IC / Cash' },
+  { fallbackName: 'Taxi', prices: ['20k-40k', '50k-90k', '90k-150k'], payment: 'Cash / Card' },
+];
+
 const FALLBACK_BUY_LINKS = {
   luclam: 'https://luclam.vn/collections/all',
   taka: 'https://www.takashimaya-vietnam.com/vn/search?q=luc+lam',
@@ -1391,57 +1407,48 @@ export default function App() {
                       <span>{t.transport.tableTitle}</span>
                     </h4>
                     
-                    <div className="border border-zinc-200 rounded-lg overflow-hidden bg-white shadow-sm">
-                      <table className="w-full text-left border-collapse text-[9px]">
-                        <thead>
-                          <tr className="bg-[#0b433f] text-white">
-                            {t.transport.tableHeaders.map((head, hidx) => (
-                              <th key={hidx} className="p-2 border-r border-teal-800/50 last:border-0 font-medium">
-                                {head}
-                              </th>
+                    {/* One card per mode rather than a five-column table: at this
+                        width every header and figure wrapped. Names come from
+                        transport.options, which already carries them translated —
+                        the rows used to be hardcoded English. */}
+                    <div className="space-y-2">
+                      {TRANSPORT_FARES.map((fare, fidx) => (
+                        <div
+                          key={fidx}
+                          className="bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-sm"
+                        >
+                          <div className="flex items-center justify-between gap-2 bg-[#0b433f] text-white px-3 py-1.5">
+                            <span className="text-[10px] font-semibold truncate">
+                              {t.transport.options[fidx]?.name ?? fare.fallbackName}
+                            </span>
+                            <span className="text-[9px] text-teal-100/80 shrink-0">{fare.payment}</span>
+                          </div>
+                          <div className="grid grid-cols-3 divide-x divide-zinc-200">
+                            {fare.prices.map((price, pidx) => (
+                              <div key={pidx} className="px-2 py-2 text-center">
+                                <span className="block text-[8px] uppercase tracking-wider text-zinc-400">
+                                  {t.transport.tableHeaders[pidx + 1]}
+                                </span>
+                                <span className="block text-[11px] font-semibold text-[#0b433f] mt-0.5">
+                                  {price}
+                                </span>
+                              </div>
                             ))}
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-zinc-200">
-                          <tr className="hover:bg-[#b85233]/5 transition-colors">
-                            <td className="p-2 font-semibold">Bike (Grab)</td>
-                            <td className="p-2">15k-25k</td>
-                            <td className="p-2">25k-40k</td>
-                            <td className="p-2">40k-70k</td>
-                            <td className="p-2 text-[8px] text-zinc-500">App/Cash</td>
-                          </tr>
-                          <tr className="hover:bg-[#b85233]/5 transition-colors">
-                            <td className="p-2 font-semibold">Car (Grab)</td>
-                            <td className="p-2">40k-70k</td>
-                            <td className="p-2">70k-120k</td>
-                            <td className="p-2">120k-200k</td>
-                            <td className="p-2 text-[8px] text-zinc-500">App/Cash</td>
-                          </tr>
-                          <tr className="hover:bg-[#b85233]/5 transition-colors">
-                            <td className="p-2 font-semibold">Metro</td>
-                            <td className="p-2">7k-10k</td>
-                            <td className="p-2">10k-15k</td>
-                            <td className="p-2">15k-20k</td>
-                            <td className="p-2 text-[8px] text-zinc-500">IC/Cash</td>
-                          </tr>
-                          <tr className="hover:bg-[#b85233]/5 transition-colors">
-                            <td className="p-2 font-semibold">Taxi (Traditional)</td>
-                            <td className="p-2">20k-40k</td>
-                            <td className="p-2">50k-90k</td>
-                            <td className="p-2">90k-150k</td>
-                            <td className="p-2 text-[8px] text-zinc-500">Cash/Card</td>
-                          </tr>
-                        </tbody>
-                      </table>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                     <span className="text-[8px] text-zinc-400 italic block">{t.transport.tableNote}</span>
                   </div>
 
                   {/* 2-Column: Key points list + Ride Apps banner */}
-                  <div className="grid grid-cols-12 gap-3">
-                    
-                    {/* Points checklist (7 cols) */}
-                    <div className="col-span-7 space-y-2">
+                  {/* Stacked rather than split 7/5. The frame is 430px at most, so
+                      the narrower column landed near 150px and the ride-app card's
+                      own heading wrapped onto two lines inside it. */}
+                  <div className="space-y-3">
+
+                    {/* Points checklist */}
+                    <div className="space-y-2">
                       <h5 className="text-[10px] font-bold text-[#0b433f] uppercase tracking-wider">
                         {t.transport.pointsTitle}
                       </h5>
@@ -1456,10 +1463,11 @@ export default function App() {
                     </div>
 
                     {/* App recommendations banner & QRs (5 cols) */}
-                    <div className="col-span-5 bg-white border border-[#b85233]/20 rounded-xl p-2.5 flex flex-col justify-between space-y-1.5">
-                      <span className="text-[8px] font-bold uppercase text-[#b85233] block text-center">
+                    <div className="bg-white border border-[#b85233]/20 rounded-xl p-3 space-y-2">
+                      <span className="text-[9px] font-bold uppercase tracking-wider text-[#b85233] block">
                         {t.transport.rideApps}
                       </span>
+                      <div className="grid grid-cols-2 gap-2">
 
                       {/* The real marks, not the brand name in a coloured box.
                           Third-party trademarks — see public/uploads/brand/CREDITS.md. */}
@@ -1482,13 +1490,14 @@ export default function App() {
                             className="w-7 h-7 shrink-0 rounded-md object-contain"
                           />
                           <div className="min-w-0 leading-tight">
-                            <strong className="block text-[8px] text-zinc-800 font-bold truncate">
+                            <strong className="block text-[9px] text-zinc-800 font-bold truncate">
                               {app.name}
                             </strong>
-                            <span className="block text-[7.5px] text-zinc-500 truncate">{app.tag}</span>
+                            <span className="block text-[8px] text-zinc-500 truncate">{app.tag}</span>
                           </div>
                         </div>
                       ))}
+                      </div>
 
 
                     </div>
