@@ -662,17 +662,24 @@ export function PlaceDetailModal({
                 </p>
               </div>
 
-              {/* Safety notice for travelers */}
-              <div className="bg-zinc-100 rounded-2xl p-4 flex gap-3 text-[10px] text-zinc-600 leading-relaxed items-start">
-                <Info className="w-4 h-4 text-zinc-500 shrink-0 mt-0.5" />
-                <p>
-                  {lang === 'vi' 
-                    ? 'Bạn có thể chỉnh sửa mô tả địa điểm này, hình ảnh và video hiển thị trực tiếp từ bảng Creator Studio ở góc màn hình!' 
-                    : lang === 'ja'
-                    ? 'この場所の紹介文、写真、動画は、画面の隅にある「Creator Studio」から直接編集できます。'
-                    : 'You can modify this description, photo, and playing video directly from the Creator Studio panel on the desktop layout!'}
-                </p>
-              </div>
+              {/* Instructions for whoever maintains the guide, not for its
+                  readers — it points at a panel a visitor has no way to open.
+                  The comment above this block used to call it a safety notice
+                  for travellers, which is how it ended up shown to everyone.
+                  Every other editing affordance in this file is already behind
+                  isCreator; this one had been missed. */}
+              {isCreator && (
+                <div className="bg-zinc-100 rounded-2xl p-4 flex gap-3 text-[10px] text-zinc-600 leading-relaxed items-start">
+                  <Info className="w-4 h-4 text-zinc-500 shrink-0 mt-0.5" />
+                  <p>
+                    {lang === 'vi'
+                      ? 'Bạn có thể chỉnh sửa mô tả địa điểm này, hình ảnh và video hiển thị trực tiếp từ bảng Creator Studio ở góc màn hình!'
+                      : lang === 'ja'
+                      ? 'この場所の紹介文、写真、動画は、画面の隅にある「Creator Studio」から直接編集できます。'
+                      : 'You can modify this description, photo, and playing video directly from the Creator Studio panel on the desktop layout!'}
+                  </p>
+                </div>
+              )}
             </div>
           )}
 

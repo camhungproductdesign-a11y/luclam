@@ -73,6 +73,33 @@ const fallbackImage =
   );
 
 /**
+ * Opens the Creator Studio interface, and nothing beyond it.
+ *
+ * This value ships inside the JavaScript bundle, so anyone who opens devtools
+ * can read it. That is a door kept shut against visitors, not a lock — and it
+ * is all this needs to be, because it guards no data on its own.
+ *
+ * Writing is a separate gate on the server: every change to config.json is
+ * checked against ADMIN_TOKEN with a timing-safe comparison, and the server
+ * refuses to start without one. Someone who reads the passcode out of the
+ * bundle can open the panel and look; saving still fails without that token.
+ *
+ * There used to be two entrances and only one of them asked. `?creator=true`
+ * granted creator mode outright, so the passcode on the brand tap was
+ * decorative — typing the parameter walked straight past it. Both go through
+ * here now.
+ */
+const CREATOR_PASSCODE = '12345';
+
+function askForCreatorPasscode(): boolean {
+  const entered = window.prompt('Nhập mật khẩu quản trị để mở Creator Studio:');
+  if (entered === null) return false; // cancelled — say nothing
+  if (entered === CREATOR_PASSCODE) return true;
+  window.alert('Mật khẩu không đúng.');
+  return false;
+}
+
+/**
  * Where each tea can be bought, used when nothing has been set in the editor.
  * These sat inline in the render as an array indexed by position, so a sixth
  * product silently fell through to a generic search page. Editable per product
@@ -278,12 +305,17 @@ export default function App() {
       try {
         const params = new URLSearchParams(window.location.search);
         if (params.get('creator') === 'true') {
-          localStorage.setItem('saigon_guide_is_creator', 'true');
-          setIsCreator(true);
-          setShowEditor(true);
-          // Strip parameters for a clean experience
+          // Strip the parameter before asking, not after. Left in place, a
+          // wrong answer would be met with the same prompt on every reload,
+          // and the URL would keep advertising the way in.
           const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
           window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
+
+          if (askForCreatorPasscode()) {
+            localStorage.setItem('saigon_guide_is_creator', 'true');
+            setIsCreator(true);
+            setShowEditor(true);
+          }
         }
       } catch (e) {
         console.warn('URL parsing error:', e);
@@ -437,23 +469,24 @@ export default function App() {
     }
   };
 
+  // The prompt used to live inside the setBrandClicks updater. React may run an
+  // updater more than once for the same click — StrictMode does exactly that in
+  // development — and each run opened its own dialog, so unlocking meant typing
+  // the passcode twice. Updaters have to stay pure; the dialog belongs out here.
   const handleBrandClick = () => {
-    setBrandClicks(prev => {
-      const next = prev + 1;
-      if (next >= 5) {
-        const passcode = prompt("Nhập mã số Creator để kích hoạt chế độ chỉnh sửa (Creator Mode):");
-        if (passcode === "luclam") {
-          localStorage.setItem('saigon_guide_is_creator', 'true');
-          setIsCreator(true);
-          setShowEditor(true);
-          alert("🎉 Đã kích hoạt Chế độ Creator trên thiết bị này!");
-        } else if (passcode !== null) {
-          alert("❌ Mã số không chính xác!");
-        }
-        return 0;
-      }
-      return next;
-    });
+    const next = brandClicks + 1;
+    if (next < 5) {
+      setBrandClicks(next);
+      return;
+    }
+
+    setBrandClicks(0);
+    if (askForCreatorPasscode()) {
+      localStorage.setItem('saigon_guide_is_creator', 'true');
+      setIsCreator(true);
+      setShowEditor(true);
+      alert("🎉 Đã kích hoạt Chế độ Creator trên thiết bị này!");
+    }
   };
 
   const handleDeactivateCreator = () => {
