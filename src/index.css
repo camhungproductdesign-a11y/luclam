@@ -10,9 +10,21 @@
    600. The browser slanted and smeared the nearest weight it had. Be Vietnam Pro
    now supplies both for real.
 
-   Noto Sans JP and SC are still fetched but no rule applies them — see the note
-   on --font-ja and --font-zh below. */
-@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,900;1,400;1,600&family=Noto+Sans+JP:wght@300;400;500;700;900&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
+   Noto Sans JP and SC went too, and they were the expensive pair. The font
+   files themselves were never a cost — a browser only downloads a webfont once
+   text actually needs it, and no rule ever asked for these. The bill was the
+   stylesheet that declared them: Google Fonts cuts a CJK family into more than
+   a hundred unicode-range slices, so five weights of two families came to 1,125
+   extra @font-face blocks. Measured, the response fell from 1,142,404 bytes to
+   10,454 — and it is render-blocking, fetched before the first paint on every
+   page load.
+
+   Nothing changes on screen. Japanese, Chinese and Korean were already being
+   drawn by the reader's system fonts, because no component ever applied these
+   families; --font-sans falls through Be Vietnam Pro, which carries no CJK, to
+   system-ui and then to the OS fallback. Those system faces are sans, which is
+   what the rest of the interface is now. */
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,900;1,400;1,600&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -35,14 +47,15 @@
      here comes from weight, size and tracking, which those call sites already
      carry — uppercase, tracking-[0.3em], font-black. */
   --font-serif: "Be Vietnam Pro", system-ui, sans-serif;
-  /* Declared but not applied anywhere: no component uses font-ja or font-zh, so
-     Japanese and Chinese fall back to whatever the system provides, and no
-     Korean face is imported at all. Either wire these up per html[lang] or drop
-     them from the import — both are open decisions, not oversights to fix
-     silently. */
-  --font-ja: "Noto Sans JP", sans-serif;
-  --font-zh: "Noto Sans SC", sans-serif;
-  --font-vi: "Be Vietnam Pro", sans-serif;
+  /* --font-ja, --font-zh and --font-vi lived here and are gone. No component
+     ever spelled font-ja, font-zh or font-vi, so all three were declarations
+     nothing read. The first two had to go with the import — a token naming a
+     family that is no longer fetched is a claim the stylesheet cannot keep —
+     and --font-vi was a second name for --font-sans.
+
+     If per-language faces are wanted later, the place for them is a :lang()
+     rule, and the decision to make first is whether to serve CJK webfonts at
+     all: they are large, and every modern OS already ships a good CJK sans. */
 }
 
 /* Premium global transition for smooth dark/light mode toggles */
