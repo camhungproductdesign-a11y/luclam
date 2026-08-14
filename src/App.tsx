@@ -857,13 +857,24 @@ export default function App() {
                   <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-transparent to-black/85"></div>
                 </div>
                 
-                {/* Minimal top bar border decoration */}
-                <div className="pt-8 flex justify-between items-center border border-amber-500/30 pb-3 relative z-10 bg-black/40 backdrop-blur-md px-3.5 py-2 rounded-xl">
-                  <span className="text-[11px] uppercase tracking-[0.25em] text-amber-400 font-serif font-bold">{t.brand}</span>
-                  <div className="flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 bg-amber-400 rounded-full animate-ping"></span>
-                    <span className="text-[9px] uppercase tracking-wider text-amber-200 font-serif font-semibold">2026 EDITION</span>
-                  </div>
+                {/* Masthead strip. The brand leads and the edition is a quiet
+                    stamp beside it; they used to compete because wide tracking
+                    made the brand read thin while the tighter edition read
+                    heavier. Padding was pt-8/pb-3 alongside py-2, so the box sat
+                    32px off the top and 12px off the bottom. */}
+                <div className="relative z-10 flex items-center justify-between gap-3 rounded-xl border border-amber-500/25 bg-black/45 backdrop-blur-md px-4 py-2.5">
+                  {/* Larger below lg because the mobile type floor lifts the
+                      edition stamp from 8.5px to 11px; without this the two
+                      would sit a pixel apart and read as equals again. */}
+                  <span className="font-serif font-bold uppercase text-[12px] max-lg:text-[15px] tracking-[0.3em] text-amber-400 leading-none">
+                    {t.brand}
+                  </span>
+                  <span className="flex items-center gap-1.5 shrink-0">
+                    <span className="w-1 h-1 rounded-full bg-amber-500/70"></span>
+                    <span className="font-serif uppercase text-[8.5px] font-medium tracking-[0.14em] text-amber-200/70 leading-none tabular-nums">
+                      2026 Edition
+                    </span>
+                  </span>
                 </div>
 
                 {/* Elegant Minimal Magazine Typography Heading */}
