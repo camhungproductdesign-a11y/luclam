@@ -1718,11 +1718,12 @@ export default function App() {
                       const placeId = `food-${activeFoodTab}-${idx}`;
                       const media = getPlaceMedia(placeId);
                       return (
-                        <div 
-                          key={idx} 
+                        <button
+                          type="button"
+                          key={idx}
                           id={`food-restaurant-${idx}`}
                           onClick={() => handleOpenDetail('food', activeFoodTab, idx, item)}
-                          className="bg-white rounded-2xl p-3 border border-zinc-200/80 shadow-sm hover:border-[#b85233]/40 transition-all duration-300 relative group overflow-hidden flex gap-3 cursor-pointer hover:shadow-md"
+                          className="w-full text-left bg-white rounded-2xl p-3 border border-zinc-200/80 shadow-sm hover:border-[#b85233]/40 hover:shadow-md active:scale-[0.99] active:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b85233]/50 transition-all duration-200 relative group overflow-hidden flex gap-3 items-center cursor-pointer"
                         >
                           {/* Card Media Thumbnail Left */}
                           <div className="w-16 h-16 rounded-xl bg-zinc-100 overflow-hidden shrink-0 border border-zinc-200/50 relative">
@@ -1743,7 +1744,12 @@ export default function App() {
                               <span className="line-clamp-1">{item.hours}</span>
                             </span>
                           </div>
-                        </div>
+
+                          {/* Persistent disclosure cue. Every other signal on this
+                              card was a hover state, which a touch device never
+                              shows — so on a phone nothing said it opened. */}
+                          <ChevronRight className="w-4 h-4 text-zinc-300 shrink-0 self-center group-hover:text-[#b85233] transition-colors" />
+                        </button>
                       );
                     })}
                   </div>
@@ -1811,10 +1817,11 @@ export default function App() {
                         const media = getPlaceMedia(placeId);
                         
                         return (
-                          <div 
+                          <button
+                            type="button"
                             key={idx}
                             onClick={() => handleOpenDetail('culture', originalIdx >= 0 ? originalIdx : idx, undefined, item)}
-                            className="bg-white rounded-2xl p-3 border border-zinc-200/80 shadow-sm hover:border-[#0b433f]/40 transition-all duration-300 relative overflow-hidden flex gap-3 cursor-pointer hover:shadow-md"
+                            className="w-full text-left bg-white rounded-2xl p-3 border border-zinc-200/80 shadow-sm hover:border-[#0b433f]/40 hover:shadow-md active:scale-[0.99] active:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b433f]/50 transition-all duration-200 relative group overflow-hidden flex gap-3 items-center cursor-pointer"
                           >
                             <div className="absolute top-0 left-0 w-1 h-full bg-[#0b433f]"></div>
 
@@ -1838,7 +1845,9 @@ export default function App() {
                                 <span className="line-clamp-1">{item.hours}</span>
                               </span>
                             </div>
-                          </div>
+
+                            <ChevronRight className="w-4 h-4 text-zinc-300 shrink-0 self-center group-hover:text-[#0b433f] transition-colors" />
+                          </button>
                         );
                       })}
                   </div>
@@ -1871,10 +1880,11 @@ export default function App() {
                       const media = getPlaceMedia(placeId);
 
                       return (
-                        <div 
+                        <button
+                          type="button"
                           key={idx}
                           onClick={() => handleOpenDetail('shopping', idx, undefined, item)}
-                          className="bg-white rounded-2xl p-3 border border-zinc-200/80 shadow-sm hover:border-amber-600/40 transition-all duration-300 relative overflow-hidden flex gap-3 cursor-pointer hover:shadow-md"
+                          className="w-full text-left bg-white rounded-2xl p-3 border border-zinc-200/80 shadow-sm hover:border-amber-600/40 hover:shadow-md active:scale-[0.99] active:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-600/50 transition-all duration-200 relative group overflow-hidden flex gap-3 items-center cursor-pointer"
                         >
                           <div className="w-16 h-16 rounded-xl bg-zinc-100 overflow-hidden shrink-0 border border-zinc-200/50 relative">
                             <ThumbnailPreview url={media.img || media.video} />
@@ -1896,7 +1906,9 @@ export default function App() {
                               <span className="line-clamp-1">{item.hours}</span>
                             </span>
                           </div>
-                        </div>
+
+                          <ChevronRight className="w-4 h-4 text-zinc-300 shrink-0 self-center group-hover:text-amber-600 transition-colors" />
+                        </button>
                       );
                     })}
                   </div>
