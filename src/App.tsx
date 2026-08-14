@@ -1186,7 +1186,9 @@ export default function App() {
 
                             {/* Center Dome (Gian trung tâm) */}
                             <div className="text-center w-1/3 flex flex-col items-center justify-center p-1 bg-[#b85233]/10 border border-[#b85233]/30 rounded-full aspect-square relative">
-                              <span className="text-[8px] font-bold text-[#b85233] block">ẨM THỰC</span>
+                              <span className="text-[8px] font-bold text-[#b85233] block">
+                                {lang === 'vi' ? 'ẨM THỰC' : lang === 'ko' ? '푸드코트' : 'FOOD'}
+                              </span>
                               <span className="text-[6px] text-zinc-500 block leading-none font-light">{lang === 'vi' ? 'Chè, Cà phê' : 'Food court'}</span>
                             </div>
 
@@ -1881,7 +1883,9 @@ export default function App() {
                       <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
                       <span>09 | {t.pages.luclam}</span>
                     </span>
-                    <span className="text-[11px] font-serif italic text-amber-500/90">Trạm Dừng Chân Lục Lam</span>
+                    {/* English by design, like the eyebrow on the other eight
+                        pages. This one was the only Vietnamese hold-out. */}
+                    <span className="text-[11px] font-serif italic text-amber-500/90">Cultural Rest Stop</span>
                   </div>
 
                   {/* Stunning Shimmering Indochine Intro Card */}
