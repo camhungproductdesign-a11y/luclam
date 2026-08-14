@@ -96,25 +96,35 @@
    face, where 8px is not readable. Apple and Google both put the floor for
    secondary text around 11px.
 
-   Raising the whole ladder here rather than editing 161 call sites in App.tsx:
+   Raising the whole ladder here rather than editing 200 call sites in App.tsx:
    the ordering between sizes is preserved, so the visual hierarchy survives.
    These rules sit outside any cascade layer, so they beat Tailwind's utilities
    regardless of source order.
+
+   The floor is 11px, which is where both Apple and Google put the smallest
+   text they will name a role for. The ceiling is 14px, so nothing lifted here
+   can outgrow text-sm.
+
+   Tailwind's own scale is left alone — text-xs is already 12px, and lifting it
+   would reach into Creator Studio, a dense admin panel that is not the problem
+   being solved.
 
    Trade-off worth knowing: larger text on mobile pushes back against fitting a
    page into one screen. Page 02 in particular was tuned to the frame height.
    -------------------------------------------------------------------------- */
 @media (max-width: 1023px) {
-  .text-\[6px\]    { font-size: 9px; }
-  .text-\[6\.5px\] { font-size: 9.5px; }
-  .text-\[7px\]    { font-size: 10px; }
-  .text-\[7\.5px\] { font-size: 10px; }
-  .text-\[8px\]    { font-size: 10.5px; }
-  .text-\[8\.5px\] { font-size: 11px; }
-  .text-\[9px\]    { font-size: 11.5px; }
-  .text-\[9\.5px\] { font-size: 11.5px; }
-  .text-\[10px\]   { font-size: 12px; }
-  .text-\[10\.5px\]{ font-size: 12px; }
-  .text-\[11px\]   { font-size: 12.5px; }
+  .text-\[6px\]    { font-size: 11px; }
+  .text-\[6\.5px\] { font-size: 11px; }
+  .text-\[7px\]    { font-size: 11.5px; }
+  .text-\[7\.5px\] { font-size: 11.5px; }
+  .text-\[8px\]    { font-size: 12px; }
+  .text-\[8\.5px\] { font-size: 12px; }
+  .text-\[9px\]    { font-size: 12.5px; }
+  .text-\[9\.5px\] { font-size: 12.5px; }
+  .text-\[10px\]   { font-size: 13px; }
+  .text-\[10\.5px\]{ font-size: 13px; }
+  .text-\[11px\]   { font-size: 13.5px; }
+  .text-\[11\.5px\]{ font-size: 14px; }
+  .text-\[12px\]   { font-size: 14px; }
 }
 

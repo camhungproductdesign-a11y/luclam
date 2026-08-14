@@ -1729,11 +1729,11 @@ export default function App() {
                               broke mid-word here. */}
                           <div className="flex-1 min-w-0 relative z-10 flex flex-col justify-center gap-1">
                             <div className="flex justify-between items-start gap-2">
-                              <h3 className="text-[14px] font-bold text-[#0b433f] leading-snug line-clamp-2">{item.name}</h3>
-                              <span className="text-[11.5px] font-mono font-bold text-[#b85233] shrink-0">#{idx + 1}</span>
+                              <h3 className="text-[15px] font-bold text-[#0b433f] leading-snug line-clamp-2">{item.name}</h3>
+                              <span className="text-[10px] font-mono font-bold text-[#b85233] shrink-0">#{idx + 1}</span>
                             </div>
-                            <span className="text-[12px] text-[#b85233] font-medium block line-clamp-1">{item.sub}</span>
-                            <span className="flex items-center gap-1 text-[11.5px] text-zinc-500">
+                            <span className="text-[11px] text-[#b85233] font-medium block line-clamp-1">{item.sub}</span>
+                            <span className="flex items-center gap-1 text-[10px] text-zinc-500">
                               <Clock className="w-3 h-3 text-[#0b433f] shrink-0" />
                               <span className="line-clamp-1">{item.hours}</span>
                             </span>
@@ -1823,12 +1823,12 @@ export default function App() {
                                 the modal this card opens. The space pays for type
                                 that can actually be read. */}
                             <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
-                              <h3 className="text-[14px] font-bold text-[#0b433f] leading-snug flex items-center gap-1.5 min-w-0">
+                              <h3 className="text-[15px] font-bold text-[#0b433f] leading-snug flex items-center gap-1.5 min-w-0">
                                 <span role="img" aria-label="culture emoji" className="text-base shrink-0">{item.emoji}</span>
                                 <span className="line-clamp-2">{item.name}</span>
                               </h3>
-                              <span className="text-[12px] text-[#b85233] font-medium block line-clamp-1">{item.sub}</span>
-                              <span className="flex items-center gap-1 text-[11.5px] text-zinc-500">
+                              <span className="text-[11px] text-[#b85233] font-medium block line-clamp-1">{item.sub}</span>
+                              <span className="flex items-center gap-1 text-[10px] text-zinc-500">
                                 <Clock className="w-3 h-3 text-[#0b433f] shrink-0" />
                                 <span className="line-clamp-1">{item.hours}</span>
                               </span>
@@ -1882,11 +1882,11 @@ export default function App() {
                             <div className="flex gap-2 items-start min-w-0">
                               <span className="text-base shrink-0" role="img" aria-label="shopping emoji">{item.emoji}</span>
                               <div className="min-w-0 space-y-0.5">
-                                <h3 className="text-[14px] font-bold text-[#0b433f] leading-snug line-clamp-2">{item.name}</h3>
-                                <span className="text-[12px] text-amber-700 font-medium block line-clamp-1">{item.sub}</span>
+                                <h3 className="text-[15px] font-bold text-[#0b433f] leading-snug line-clamp-2">{item.name}</h3>
+                                <span className="text-[11px] text-amber-700 font-medium block line-clamp-1">{item.sub}</span>
                               </div>
                             </div>
-                            <span className="flex items-center gap-1 text-[11.5px] text-zinc-500">
+                            <span className="flex items-center gap-1 text-[10px] text-zinc-500">
                               <Clock className="w-3 h-3 text-[#0b433f] shrink-0" />
                               <span className="line-clamp-1">{item.hours}</span>
                             </span>
