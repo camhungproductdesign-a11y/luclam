@@ -1417,27 +1417,33 @@ export default function App() {
                         {t.transport.rideApps}
                       </span>
 
-                      {/* Grab logo row */}
-                      <div className="flex items-center gap-1.5 bg-zinc-50 p-1 rounded border border-zinc-100">
-                        <div className="brand-chip shrink-0 rounded bg-[#00b14f] text-white font-black">
-                          Grab
+                      {/* The real marks, not the brand name in a coloured box.
+                          Third-party trademarks — see public/uploads/brand/CREDITS.md. */}
+                      {[
+                        { name: 'Grab', tag: 'All-in-one', logo: '/uploads/brand/grab.png' },
+                        { name: 'Xanh SM', tag: 'Eco Taxi', logo: '/uploads/brand/xanh-sm.png' },
+                      ].map((app) => (
+                        <div
+                          key={app.name}
+                          className="flex items-center gap-2 bg-white p-1.5 rounded-lg border border-zinc-200/80 shadow-sm"
+                        >
+                          <img
+                            src={withBasePath(app.logo)}
+                            alt={`${app.name} logo`}
+                            width={96}
+                            height={96}
+                            loading="lazy"
+                            decoding="async"
+                            className="w-7 h-7 shrink-0 rounded-md object-contain"
+                          />
+                          <div className="min-w-0 leading-tight">
+                            <strong className="block text-[8px] text-zinc-800 font-bold truncate">
+                              {app.name}
+                            </strong>
+                            <span className="block text-[7.5px] text-zinc-500 truncate">{app.tag}</span>
+                          </div>
                         </div>
-                        <div className="text-[7.5px] leading-tight">
-                          <strong className="block text-zinc-800 font-bold">Grab</strong>
-                          <span className="text-zinc-500 block">All-in-one</span>
-                        </div>
-                      </div>
-
-                      {/* Xanh SM logo row */}
-                      <div className="flex items-center gap-1.5 bg-zinc-50 p-1 rounded border border-zinc-100">
-                        <div className="brand-chip shrink-0 rounded bg-[#00afb9] text-white font-extrabold">
-                          Xanh SM
-                        </div>
-                        <div className="text-[7.5px] leading-tight">
-                          <strong className="block text-zinc-800 font-bold">Xanh SM</strong>
-                          <span className="text-zinc-500 block">Eco Taxi</span>
-                        </div>
-                      </div>
+                      ))}
 
 
                     </div>
