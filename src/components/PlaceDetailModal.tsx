@@ -246,8 +246,22 @@ export function PlaceDetailModal({
   };
 
   return (
+    /* Two positions, because the sheet covers a different box on each layout.
+       It used to be plain `absolute inset-0`, and the nearest positioned
+       ancestor was nothing at all — the shell it sat in has no `relative` — so
+       it fell back to the initial containing block and stretched across the
+       whole browser window. On a phone that is the right answer by accident,
+       which is why it went unnoticed; on desktop it spilled far outside the
+       860px device mockup the rest of the app lives in.
+
+       The sheet is now rendered inside that mockup. At lg and up `absolute`
+       binds to it, so the sheet fills the phone screen and is clipped to its
+       rounded corners. Below lg `fixed` reaches the viewport instead, keeping
+       the full-screen cover the mobile layout already had, including over the
+       lg:hidden header that sits outside the frame. Nothing on the way up sets
+       transform, filter or contain, so `fixed` escapes as intended. */
     <div
-      className="absolute inset-0 z-50 bg-black/60 backdrop-blur-sm flex flex-col justify-end"
+      className="fixed lg:absolute inset-0 z-50 bg-black/60 backdrop-blur-sm flex flex-col justify-end"
       onClick={onClose}
     >
       

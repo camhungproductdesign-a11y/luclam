@@ -2570,6 +2570,45 @@ export default function App() {
 
 
           </div>
+          {/* Place Detail Overlay Modal */}
+          {selectedPlace && (
+            <PlaceDetailModal
+              isOpen={!!selectedPlace}
+              onClose={() => setSelectedPlace(null)}
+              place={selectedPlace}
+              media={selectedPlace.media}
+              lang={lang}
+              isCreator={isCreator}
+              onUpdateMedia={(placeId, type, url) => {
+                const nextMedia = {
+                  ...customMedia,
+                  [placeId]: {
+                    ...(customMedia[placeId] || { img: '', video: '' }),
+                    [type]: url
+                  }
+                };
+                handleUpdateCustomMedia(nextMedia);
+                // Dynamic instant update of modal state so preview updates immediately
+                setSelectedPlace((prev: any) => {
+                  if (prev && prev.id === placeId) {
+                    return {
+                      ...prev,
+                      media: {
+                        ...prev.media,
+                        [type]: url
+                      }
+                    };
+                  }
+                  return prev;
+                });
+              }}
+              onOpenEditor={(placeId) => {
+                setShowEditor(true);
+                setActiveEditPlaceId(placeId);
+              }}
+            />
+          )}
+
         </div>
 
         {/* Creator Studio panel on desktop (side-by-side) */}
@@ -2648,45 +2687,6 @@ export default function App() {
         >
           <Settings className={`w-5 h-5 ${showEditor ? 'animate-spin-slow text-amber-200' : ''}`} />
         </button>
-      )}
-
-      {/* Place Detail Overlay Modal */}
-      {selectedPlace && (
-        <PlaceDetailModal
-          isOpen={!!selectedPlace}
-          onClose={() => setSelectedPlace(null)}
-          place={selectedPlace}
-          media={selectedPlace.media}
-          lang={lang}
-          isCreator={isCreator}
-          onUpdateMedia={(placeId, type, url) => {
-            const nextMedia = {
-              ...customMedia,
-              [placeId]: {
-                ...(customMedia[placeId] || { img: '', video: '' }),
-                [type]: url
-              }
-            };
-            handleUpdateCustomMedia(nextMedia);
-            // Dynamic instant update of modal state so preview updates immediately
-            setSelectedPlace((prev: any) => {
-              if (prev && prev.id === placeId) {
-                return {
-                  ...prev,
-                  media: {
-                    ...prev.media,
-                    [type]: url
-                  }
-                };
-              }
-              return prev;
-            });
-          }}
-          onOpenEditor={(placeId) => {
-            setShowEditor(true);
-            setActiveEditPlaceId(placeId);
-          }}
-        />
       )}
 
     </div>
