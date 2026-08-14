@@ -1404,7 +1404,7 @@ export default function App() {
 
                       {/* Grab logo row */}
                       <div className="flex items-center gap-1.5 bg-zinc-50 p-1 rounded border border-zinc-100">
-                        <div className="w-6 h-6 rounded bg-[#00b14f] text-white font-black text-[7px] flex items-center justify-center">
+                        <div className="brand-chip shrink-0 rounded bg-[#00b14f] text-white font-black">
                           Grab
                         </div>
                         <div className="text-[7.5px] leading-tight">
@@ -1415,8 +1415,8 @@ export default function App() {
 
                       {/* Xanh SM logo row */}
                       <div className="flex items-center gap-1.5 bg-zinc-50 p-1 rounded border border-zinc-100">
-                        <div className="w-6 h-6 rounded bg-[#00afb9] text-white font-extrabold text-[7px] flex items-center justify-center leading-none">
-                          Xanh
+                        <div className="brand-chip shrink-0 rounded bg-[#00afb9] text-white font-extrabold">
+                          Xanh SM
                         </div>
                         <div className="text-[7.5px] leading-tight">
                           <strong className="block text-zinc-800 font-bold">Xanh SM</strong>

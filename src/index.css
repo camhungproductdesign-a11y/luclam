@@ -71,6 +71,40 @@
 }
 
 /* --------------------------------------------------------------------------
+   Brand chips
+
+   The Grab and Xanh SM marks are the brand name set in a coloured box, not
+   real logos. They were built from a fixed w-6 h-6 square plus a text-[7px]
+   utility, which the mobile type floor below then raised to 10px — the text
+   outgrew a box that could not follow.
+
+   Sizing them here keeps them out of that override: they are graphics, not
+   copy, and the box grows with the word rather than clipping it.
+
+   Replacing them with real SVG marks would be better still, and would need
+   permission from Grab and Xanh SM to use their logos.
+   -------------------------------------------------------------------------- */
+.brand-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding-inline: 0.3rem;
+  font-size: 7px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+@media (max-width: 1023px) {
+  .brand-chip {
+    min-width: 1.75rem;
+    height: 1.75rem;
+    font-size: 9px;
+  }
+}
+
+/* --------------------------------------------------------------------------
    Mobile type floor
 
    The interface was drawn to be read inside the 430px device mockup on a
