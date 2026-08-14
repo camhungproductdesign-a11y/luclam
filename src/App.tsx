@@ -2510,9 +2510,15 @@ export default function App() {
             <div
               className={`shrink-0 flex justify-center pt-1 pb-2 transition-colors duration-300 md:contents ${selectorStripBackground}`}
             >
+            {/* No pill below md: the buttons sit straight on the strip, which
+                already matches the page behind it, so they read as floating.
+                From md up this same element becomes the vertical selector at the
+                right edge, floating over whatever the page happens to show —
+                photos, text — and there the dark backing and blur are what keep
+                it legible, so they stay. */}
             <div
               id="sticky-flag-selector"
-              className="z-[45] flex flex-row gap-1.5 bg-black/75 backdrop-blur-md p-1.5 rounded-full border border-zinc-800/80 shadow-2xl md:absolute md:top-[35%] md:right-2 md:-translate-y-1/2 md:flex-col md:gap-2 md:rounded-2xl md:animate-in md:slide-in-from-right md:duration-500"
+              className="z-[45] flex flex-row gap-1.5 p-1.5 rounded-full md:bg-black/75 md:backdrop-blur-md md:border md:border-zinc-800/80 md:shadow-2xl md:absolute md:top-[35%] md:right-2 md:-translate-y-1/2 md:flex-col md:gap-2 md:rounded-2xl md:animate-in md:slide-in-from-right md:duration-500"
               title="Chọn ngôn ngữ / Select Language"
             >
               <div className="hidden md:block text-[8px] font-bold text-center text-zinc-400 uppercase py-0.5 tracking-wider select-none border-b border-zinc-800/60">
@@ -2528,12 +2534,18 @@ export default function App() {
                 const isActive = lang === code;
                 return (
                   <div key={code} className="relative group flex items-center justify-center">
+                    {/* The inactive edge is white at low alpha rather than
+                        zinc-800. With the pill gone, two of the ten pages are
+                        near-black behind these buttons — the cover and Lục Lam —
+                        and a dark ring on a dark ground left nothing to see. A
+                        light hairline reads there, and on the cream pages the
+                        dark fill carries the contrast on its own. */}
                     <button
                       onClick={() => handleLangChange(code)}
                       className={`w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center text-lg md:text-xl transition-all duration-300 cursor-pointer ${
                         isActive
                           ? 'bg-amber-500/20 border-2 border-[#d16b4c] scale-110 shadow-lg shadow-amber-500/25 ring-2 ring-amber-500/10'
-                          : 'bg-zinc-900/60 border border-zinc-800 hover:bg-zinc-800/80 hover:scale-105 hover:border-zinc-700'
+                          : 'bg-zinc-900/70 border border-white/20 shadow-md hover:bg-zinc-800/90 hover:scale-105 hover:border-white/35'
                       }`}
                       title={label}
                     >
