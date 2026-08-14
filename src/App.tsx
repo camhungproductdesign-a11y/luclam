@@ -605,6 +605,19 @@ export default function App() {
 
   const t = deepMerge(deepMerge(translations['en'], translations[lang] || {}), overrides[lang] || {});
 
+  /**
+   * The language selector sits in its own row below md, so the strip behind it
+   * would otherwise show the frame's cream through every page. Two pages are
+   * dark, so it has to follow whichever is open rather than pick one colour.
+   * Values match the section backgrounds exactly.
+   */
+  const selectorStripBackground =
+    pagesList[currentPage] === 'cover'
+      ? 'bg-zinc-950'
+      : pagesList[currentPage] === 'luclam'
+        ? 'bg-[#0b1513]'
+        : 'bg-[#f6f3eb]';
+
 
   return (
     <div
@@ -2356,9 +2369,14 @@ export default function App() {
                 from md up, where it never overlapped anything. It used to be
                 absolutely positioned over the pages at every width, which hid
                 whatever ended at the bottom of one. */}
+            {/* md:contents dissolves this wrapper from md up, where the selector
+                goes back to floating at the right edge and needs no strip. */}
+            <div
+              className={`shrink-0 flex justify-center pt-1 pb-2 transition-colors duration-300 md:contents ${selectorStripBackground}`}
+            >
             <div
               id="sticky-flag-selector"
-              className="shrink-0 mx-auto mb-2 z-[45] flex flex-row gap-1.5 bg-black/75 backdrop-blur-md p-1.5 rounded-full border border-zinc-800/80 shadow-2xl md:absolute md:top-[35%] md:right-2 md:mx-0 md:mb-0 md:-translate-y-1/2 md:flex-col md:gap-2 md:rounded-2xl md:animate-in md:slide-in-from-right md:duration-500"
+              className="z-[45] flex flex-row gap-1.5 bg-black/75 backdrop-blur-md p-1.5 rounded-full border border-zinc-800/80 shadow-2xl md:absolute md:top-[35%] md:right-2 md:-translate-y-1/2 md:flex-col md:gap-2 md:rounded-2xl md:animate-in md:slide-in-from-right md:duration-500"
               title="Chọn ngôn ngữ / Select Language"
             >
               <div className="hidden md:block text-[8px] font-bold text-center text-zinc-400 uppercase py-0.5 tracking-wider select-none border-b border-zinc-800/60">
@@ -2394,6 +2412,7 @@ export default function App() {
                   </div>
                 );
               })}
+            </div>
             </div>
 
             {/* ==========================================================================
