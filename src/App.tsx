@@ -1068,10 +1068,12 @@ export default function App() {
                           <Navigation className="w-4 h-4" />
                         ];
                         return (
-                          <div 
-                            key={idx} 
+                          <button
+                            type="button"
+                            key={idx}
+                            aria-expanded={showFeaturePopup === idx}
                             onClick={() => setShowFeaturePopup(showFeaturePopup === idx ? null : idx)}
-                            className="relative flex flex-col items-center text-center cursor-pointer group"
+                            className="relative flex flex-col items-center text-center cursor-pointer group rounded-lg active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b433f]/50 transition-transform"
                           >
                             <div className="w-10 h-10 rounded-full bg-white border border-zinc-200/80 flex items-center justify-center text-[#0b433f] shadow-sm group-hover:bg-[#0b433f] group-hover:text-white group-hover:-translate-y-1 transition-all duration-300">
                               {iconsList[idx]}
@@ -1093,7 +1095,7 @@ export default function App() {
                                 <p className="text-zinc-300">{feat.desc}</p>
                               </div>
                             )}
-                          </div>
+                          </button>
                         );
                       })}
                     </div>
@@ -1353,10 +1355,12 @@ export default function App() {
                         <CarTaxiFront className="w-6 h-6 text-[#0b433f]" strokeWidth={1.75} />
                       ];
                       return (
-                        <div 
+                        <button
+                          type="button"
                           key={idx}
+                          aria-expanded={showTransportPopup === idx}
                           onClick={() => setShowTransportPopup(showTransportPopup === idx ? null : idx)}
-                          className="relative flex flex-col items-center text-center cursor-pointer group"
+                          className="relative flex flex-col items-center text-center cursor-pointer group rounded-lg active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b433f]/50 transition-transform"
                         >
                           <div className="w-14 h-14 rounded-full bg-white border border-zinc-200 shadow-sm flex items-center justify-center hover:scale-105 hover:bg-zinc-100 transition-all">
                             {iconsList[idx]}
@@ -1375,7 +1379,7 @@ export default function App() {
                               <p className="text-zinc-300">{opt.desc}</p>
                             </div>
                           )}
-                        </div>
+                        </button>
                       );
                     })}
                   </div>
