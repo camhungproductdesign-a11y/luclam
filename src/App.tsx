@@ -1281,7 +1281,9 @@ export default function App() {
                       <p className="text-zinc-600 leading-tight font-light">{t.atmosphere.tipsDesc}</p>
                     </div>
                     <div className="space-y-0.5 border-l border-zinc-300/40 pl-3">
-                      <strong className="block text-[#0b433f] font-bold">Transit</strong>
+                      {/* No dedicated key exists for this heading, and pages.transport
+                          already names the same idea in all six languages. */}
+                      <strong className="block text-[#0b433f] font-bold">{t.pages.transport}</strong>
                       <p className="text-zinc-600 leading-tight font-light">{t.atmosphere.transportTip}</p>
                     </div>
                   </div>
