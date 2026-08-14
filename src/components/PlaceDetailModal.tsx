@@ -151,7 +151,7 @@ export function PlaceDetailModal({
           en: 'Local Pro-Tip: Taste the broth pure first. Then squeeze some fresh lime, add wild herbs, and a few chili slices. Always order a plate of savory Chinese donuts (Quẩy) to dip into the rich broth!',
           zh: '行家建议：喝汤前先尝一口原汤。然后挤点柠檬汁，加几叶新鲜罗勒和辣椒片。别忘了点一份热油条（Quẩy）泡汤吃，绝配！',
           zht: '行家建議：喝湯前先嚐一口原湯。然後擠點檸檬汁，加幾葉新鮮羅勒和辣椒片。別忘了點一份熱油條（Quẩy）泡湯吃，絕配！',
-          ko: '현지인 팁: 국물은 먼저 아무것도 넣지 말고 한 모금 그대로 맛보세요. 그다음 라임을 짜 넣고 향채와 고추 몇 조각을 더하면 됩니다. 국물에 찍어 먹는 꽈배기(Quẩy)도 꼭 함께 주문해 보세요!'
+          ko: '현지인 꿀팁: 국물은 먼저 아무것도 넣지 말고 한 모금 그대로 맛보세요. 그다음 라임을 짜 넣고 허브잎과 고추 몇 조각을 더해 보세요. 국물에 찍어 먹는 튀김빵(Quẩy)도 꼭 같이 주문해 보세요!'
         }[lang] || place.desc;
       }
       if (place.id.includes('food-3')) { // Cafe
@@ -160,8 +160,8 @@ export function PlaceDetailModal({
           vi: 'Mẹo địa phương: Hãy kiên nhẫn đợi từng giọt cà phê phin đậm đặc nhỏ giọt xuống ly sữa đặc. Trút toàn bộ hỗn hợp vào ly đá đầy, khuấy thật đều tay cho đến khi bọt nâu mịn nổi lên rồi thưởng thức.',
           en: 'Local Pro-Tip: The slow, patient drip of the coffee through the traditional Phin filter over sweet condensed milk is a Saigon ritual. Pour it over ice, stir vigorously until frothy, and sip slowly.',
           zh: '行家建议：耐心等待咖啡通过传统Phin滴滤器慢慢滴入炼乳中。然后倒入满是冰块的杯中，用力搅拌均匀，直到冒出细密泡沫再享用。',
-          zht: '行家建議：耐心等待咖啡通過傳統Phin滴濾器慢慢滴入煉乳中。然後倒入滿是冰塊的杯中，用力攪拌均勻，直到冒出細密泡沫再享用。',
-          ko: '현지인 팁: 전통 핀(Phin) 필터에서 커피가 연유 위로 천천히 떨어지는 시간을 기다리는 것이 사이공의 방식입니다. 얼음을 가득 채운 잔에 부은 뒤 고운 거품이 올라올 때까지 힘차게 저어 천천히 즐겨 보세요.'
+          zht: '行家建議：耐心等待咖啡透過傳統滴滴壺（Phin）慢慢滴入煉乳中。然後倒入滿是冰塊的杯中，用力攪拌均勻，直到冒出細密泡沫再享用。',
+          ko: '현지인 꿀팁: 전통 핀(Phin) 필터에서 커피가 연유 위로 한 방울씩 천천히 떨어지길 기다리는 시간, 그 여유가 사이공의 방식입니다. 얼음을 가득 채운 잔에 부은 뒤 고운 거품이 올라올 때까지 힘차게 저어 천천히 음미해 보세요.'
         }[lang] || place.desc;
       }
       return {
@@ -170,7 +170,7 @@ export function PlaceDetailModal({
         en: 'Local Pro-Tip: 5 PM to 7 PM is peak rush hour, but it is the best time to experience Saigon’s energetic, sizzling street food culture. Sit down comfortably on a tiny plastic stool and enjoy!',
         zh: '行家建议：傍晚5点到7点是高峰期，但也是体验西贡最具活力、最热闹的街头美食文化的最佳时机。大大方方地拉张塑料矮凳，融入人群中吧！',
         zht: '行家建議：傍晚5點到7點是尖峰時段，但也是體驗西貢最具活力、最熱鬧的街頭美食文化的最佳時機。大大方方地拉張塑膠矮凳，融入人群中吧！',
-        ko: '현지인 팁: 저녁 5시에서 7시는 가장 붐비는 시간이지만, 사이공의 활기찬 길거리 음식 문화를 가장 생생하게 느낄 수 있는 때이기도 합니다. 편하게 플라스틱 의자를 끌어당겨 앉아 즐겨 보세요!'
+        ko: '현지인 꿀팁: 저녁 5시에서 7시는 가장 붐비는 시간이지만, 사이공의 활기찬 길거리 음식 문화를 가장 생생하게 느낄 수 있는 때이기도 합니다. 플라스틱 간이 의자 하나 끌어다 편하게 앉아 즐겨 보세요!'
       }[lang] || place.desc;
     }
 
@@ -181,7 +181,7 @@ export function PlaceDetailModal({
         en: 'Local Pro-Tip: When shopping at local markets, always wear a warm smile and negotiate politely. Start bargaining around 40-50% off the initial quoted price. Buying first thing in the morning makes you the lucky "Mở hàng" opener!',
         zh: '行家建议：传统市场购物时，保持微笑并礼貌还价。可以先从开价的四至五折开始。清晨第一个购买，你会成为让老板非常开心的“开张幸客”（Mở hàng）！',
         zht: '行家建議：傳統市場購物時，保持微笑並禮貌還價。可以先從開價的四至五折開始。清晨第一個購買，你會成為讓老闆非常開心的「開張幸客」（Mở hàng）！',
-        ko: '현지인 팁: 재래시장에서는 늘 웃는 얼굴로 정중하게 흥정하세요. 처음 부른 값의 40~50% 선에서 시작하면 적당합니다. 아침 첫 손님이 되면 상인에게 행운을 가져다주는 “머항(Mở hàng)”으로 반갑게 맞아 줍니다!'
+        ko: '현지인 꿀팁: 재래시장에서는 늘 웃는 얼굴로 정중하게 흥정하세요. 처음 부른 값의 40~50% 선에서 시작하면 적당합니다. 아침 첫 손님이 되면 상인들이 행운을 부르는 ‘머항(Mở hàng)’ 손님이라며 유난히 반겨 줍니다!'
       }[lang] || place.desc;
     }
 
@@ -192,7 +192,7 @@ export function PlaceDetailModal({
       en: 'Local Pro-Tip: For the absolute best photo captures, visit before 8 AM or after 4 PM to secure soft golden hour lighting. Please ensure shoulders and knees are covered when visiting ancient, sacred temples.',
       zh: '行家建议：想要拍出最好看的打卡照，建议在上午8点前或下午4点后光线柔和时段前往。参拜古老庄严的寺庙和古迹时，请务必穿着得体，遮住肩膀和膝盖。',
       zht: '行家建議：想要拍出最好看的打卡照，建議在上午8點前或下午4點後光線柔和的時段前往。參拜古老莊嚴的寺廟和古蹟時，請務必穿著得體，遮住肩膀和膝蓋。',
-      ko: '현지인 팁: 가장 예쁜 사진을 남기려면 오전 8시 이전이나 오후 4시 이후, 햇살이 부드러운 시간에 방문하세요. 오래된 사원과 유적을 둘러볼 때는 어깨와 무릎을 가린 단정한 옷차림을 지켜 주세요.'
+      ko: '현지인 꿀팁: 인생샷을 남기려면 햇살이 부드러운 골든아워, 오전 8시 이전이나 오후 4시 이후에 방문하세요. 오래된 사찰과 유적을 둘러볼 때는 어깨와 무릎을 가린 단정한 옷차림을 지켜 주세요.'
     }[lang] || place.desc;
   };
 
