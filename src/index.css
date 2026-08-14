@@ -71,26 +71,6 @@
 }
 
 /* --------------------------------------------------------------------------
-   Clearance for the floating language selector
-
-   Below lg the selector sits at bottom-[52px] and overlays the last ~44px of
-   the page it floats over, hiding whatever ends there.
-
-   The obvious fix — padding-bottom on the page — does not work. Browsers do
-   not include a scroll container's bottom padding in its scrollable overflow,
-   so the space is painted but cannot be scrolled to. Verified: pb-16 shipped
-   in both the bundle and the stylesheet and the content stayed covered.
-
-   Margin on the last child does count, because it is part of that child's
-   outer size rather than the container's box.
-   -------------------------------------------------------------------------- */
-@media (max-width: 1023px) {
-  .page-section > :last-child {
-    margin-bottom: 3.25rem;
-  }
-}
-
-/* --------------------------------------------------------------------------
    Mobile type floor
 
    The interface was drawn to be read inside the 430px device mockup on a

@@ -838,7 +838,7 @@ export default function App() {
               {/* ==========================================================================
                   PAGE 01: COVER PAGE
                   ========================================================================== */}
-              <section className="w-full h-full shrink-0 snap-start text-[#f6f3eb] flex flex-col justify-between page-section p-6 relative overflow-y-auto overflow-x-hidden bg-zinc-950">
+              <section className="w-full h-full shrink-0 snap-start text-[#f6f3eb] flex flex-col justify-between p-6 relative overflow-y-auto overflow-x-hidden bg-zinc-950">
                 
                 {/* Full-bleed high-contrast premium Ben Thanh aerial photograph background */}
                 <div className="absolute inset-0 transition-all duration-700">
@@ -953,7 +953,7 @@ export default function App() {
               {/* Sized container so the clamps below scale against this page's own
                   height. vh would read the browser window, which on desktop is
                   taller than the 860px device frame this page lives in. */}
-              <section className="[container-type:size] w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-5 overflow-y-auto">
+              <section className="[container-type:size] w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between p-5 overflow-y-auto">
                 <div className="space-y-[clamp(0.65rem,2.4cqh,1.25rem)]">
 
                   {/* Minimal page header decoration */}
@@ -1083,7 +1083,7 @@ export default function App() {
               {/* ==========================================================================
                   PAGE 03: CITY GUIDE / DISTRICTS WITH MAP
                   ========================================================================== */}
-              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
+              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between p-6 overflow-y-auto">
                 <div className="space-y-4">
                   
                   {/* Minimal page header decoration */}
@@ -1294,7 +1294,7 @@ export default function App() {
               {/* ==========================================================================
                   PAGE 04: TRANSPORTATION
                   ========================================================================== */}
-              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
+              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between p-6 overflow-y-auto">
                 <div className="space-y-4">
                   
                   {/* Minimal page header decoration */}
@@ -1474,7 +1474,7 @@ export default function App() {
               {/* ==========================================================================
                   PAGE 05: STAY & REJUVENATE (CARE)
                   ========================================================================== */}
-              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
+              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between p-6 overflow-y-auto">
                 <div className="space-y-4">
                   
                   {/* Minimal page header decoration */}
@@ -1634,7 +1634,7 @@ export default function App() {
               {/* ==========================================================================
                   PAGE 06: FOOD (Legends Must-Eat)
                   ========================================================================== */}
-              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto" id="food-page-section">
+              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between p-6 overflow-y-auto" id="food-page-section">
                 <div className="space-y-4">
                   <div className="flex justify-between items-center border-b-[1.5px] border-[#b85233] pb-1.5 pt-4">
                     <span className="text-[11px] font-bold text-[#0b433f] tracking-widest uppercase">
@@ -1727,7 +1727,7 @@ export default function App() {
               {/* ==========================================================================
                   PAGE 07: CULTURE & LANDMARKS
                   ========================================================================== */}
-              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
+              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between p-6 overflow-y-auto">
                 <div className="space-y-4">
                   <div className="flex justify-between items-center border-b-[1.5px] border-[#b85233] pb-1.5 pt-4">
                     <span className="text-[11px] font-bold text-[#0b433f] tracking-widest uppercase">
@@ -1827,7 +1827,7 @@ export default function App() {
               {/* ==========================================================================
                   PAGE 08: SHOPPING & SOUVENIRS
                   ========================================================================== */}
-              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
+              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between p-6 overflow-y-auto">
                 <div className="space-y-4">
                   <div className="flex justify-between items-center border-b-[1.5px] border-[#b85233] pb-1.5 pt-4">
                     <span className="text-[11px] font-bold text-[#0b433f] tracking-widest uppercase">
@@ -1892,7 +1892,7 @@ export default function App() {
               {/* ==========================================================================
                   PAGE 09: LỤC LAM TRẠM DỪNG CHÂN (Signature Experience)
                   ========================================================================== */}
-              <section className="w-full h-full shrink-0 snap-start bg-[#0b1513] text-[#f6f3eb] flex flex-col justify-between page-section p-6 overflow-y-auto">
+              <section className="w-full h-full shrink-0 snap-start bg-[#0b1513] text-[#f6f3eb] flex flex-col justify-between p-6 overflow-y-auto">
                 <div className="space-y-5">
                   <div className="flex justify-between items-center border-b-[1.5px] border-amber-500/30 pb-1.5 pt-4">
                     <span className="text-[11px] font-bold text-amber-400 tracking-widest uppercase flex items-center gap-1">
@@ -2316,7 +2316,7 @@ export default function App() {
               {/* ==========================================================================
                   PAGE 10: USEFUL INFO (Safety, Cash & SIM)
                   ========================================================================== */}
-              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
+              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between p-6 overflow-y-auto">
                 <div className="space-y-4">
                   <div className="flex justify-between items-center border-b-[1.5px] border-[#b85233] pb-1.5 pt-4">
                     <span className="text-[11px] font-bold text-[#0b433f] tracking-widest uppercase">
@@ -2371,6 +2371,51 @@ export default function App() {
 
             </div>
 
+            {/* Language selector. In the flow below md, sitting between the pages
+                and the nav so it takes its own space; floating at the right edge
+                from md up, where it never overlapped anything. It used to be
+                absolutely positioned over the pages at every width, which hid
+                whatever ended at the bottom of one. */}
+            <div
+              id="sticky-flag-selector"
+              className="shrink-0 mx-auto mb-2 z-[45] flex flex-row gap-1.5 bg-black/75 backdrop-blur-md p-1.5 rounded-full border border-zinc-800/80 shadow-2xl md:absolute md:top-[35%] md:right-2 md:mx-0 md:mb-0 md:-translate-y-1/2 md:flex-col md:gap-2 md:rounded-2xl md:animate-in md:slide-in-from-right md:duration-500"
+              title="Chọn ngôn ngữ / Select Language"
+            >
+              <div className="hidden md:block text-[8px] font-bold text-center text-zinc-400 uppercase py-0.5 tracking-wider select-none border-b border-zinc-800/60">
+                Lang
+              </div>
+              {[
+                { code: 'en' as Language, label: 'English', flag: '🇺🇸' },
+                { code: 'zht' as Language, label: '繁體中文', flag: '🇹🇼' },
+                { code: 'zh' as Language, label: '简体中文', flag: '🇨🇳' },
+                { code: 'ja' as Language, label: '日本語', flag: '🇯🇵' },
+                { code: 'ko' as Language, label: '한국어', flag: '🇰🇷' }
+              ].map(({ code, label, flag }) => {
+                const isActive = lang === code;
+                return (
+                  <div key={code} className="relative group flex items-center justify-center">
+                    <button
+                      onClick={() => handleLangChange(code)}
+                      className={`w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center text-lg md:text-xl transition-all duration-300 cursor-pointer ${
+                        isActive
+                          ? 'bg-amber-500/20 border-2 border-[#d16b4c] scale-110 shadow-lg shadow-amber-500/25 ring-2 ring-amber-500/10'
+                          : 'bg-zinc-900/60 border border-zinc-800 hover:bg-zinc-800/80 hover:scale-105 hover:border-zinc-700'
+                      }`}
+                      title={label}
+                    >
+                      <span className="leading-none drop-shadow-sm">{flag}</span>
+                    </button>
+                    
+                    {/* Tooltip on Hover */}
+                    <div className="absolute right-12 top-1/2 -translate-y-1/2 pointer-events-none opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 bg-zinc-950/95 text-white text-[10px] font-bold px-2.5 py-1.5 rounded-lg border border-zinc-800 shadow-xl whitespace-nowrap transition-all duration-200 z-50 hidden md:block">
+                      <span className="mr-1.5">{flag}</span>
+                      <span>{label}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
             {/* ==========================================================================
                 MOBILE VIEWPORT BOTTOM TABS NAVIGATOR (Syncs scroll snaps)
                 ========================================================================== */}
@@ -2408,46 +2453,6 @@ export default function App() {
               })}
             </nav>
 
-            {/* Sticky Floating Flag Language Selector (Horizontal on mobile, Vertical on desktop) */}
-            <div 
-              id="sticky-flag-selector"
-              className="absolute bottom-[52px] left-1/2 -translate-x-1/2 md:bottom-auto md:top-[35%] md:-translate-y-1/2 md:right-2 md:left-auto md:translate-x-0 z-[45] flex flex-row md:flex-col gap-1.5 md:gap-2 bg-black/75 backdrop-blur-md p-1.5 rounded-full md:rounded-2xl border border-zinc-800/80 shadow-2xl animate-in slide-in-from-right duration-500"
-              title="Chọn ngôn ngữ / Select Language"
-            >
-              <div className="hidden md:block text-[8px] font-bold text-center text-zinc-400 uppercase py-0.5 tracking-wider select-none border-b border-zinc-800/60">
-                Lang
-              </div>
-              {[
-                { code: 'en' as Language, label: 'English', flag: '🇺🇸' },
-                { code: 'zht' as Language, label: '繁體中文', flag: '🇹🇼' },
-                { code: 'zh' as Language, label: '简体中文', flag: '🇨🇳' },
-                { code: 'ja' as Language, label: '日本語', flag: '🇯🇵' },
-                { code: 'ko' as Language, label: '한국어', flag: '🇰🇷' }
-              ].map(({ code, label, flag }) => {
-                const isActive = lang === code;
-                return (
-                  <div key={code} className="relative group flex items-center justify-center">
-                    <button
-                      onClick={() => handleLangChange(code)}
-                      className={`w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center text-lg md:text-xl transition-all duration-300 cursor-pointer ${
-                        isActive
-                          ? 'bg-amber-500/20 border-2 border-[#d16b4c] scale-110 shadow-lg shadow-amber-500/25 ring-2 ring-amber-500/10'
-                          : 'bg-zinc-900/60 border border-zinc-800 hover:bg-zinc-800/80 hover:scale-105 hover:border-zinc-700'
-                      }`}
-                      title={label}
-                    >
-                      <span className="leading-none drop-shadow-sm">{flag}</span>
-                    </button>
-                    
-                    {/* Tooltip on Hover */}
-                    <div className="absolute right-12 top-1/2 -translate-y-1/2 pointer-events-none opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 bg-zinc-950/95 text-white text-[10px] font-bold px-2.5 py-1.5 rounded-lg border border-zinc-800 shadow-xl whitespace-nowrap transition-all duration-200 z-50 hidden md:block">
-                      <span className="mr-1.5">{flag}</span>
-                      <span>{label}</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
 
 
           </div>
