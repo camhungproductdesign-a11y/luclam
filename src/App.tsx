@@ -129,19 +129,25 @@ const DEFAULT_BUY_LINKS: Array<{ luclam: string; taka: string }> = [
 ];
 
 /**
- * Fare guide for the transport page. Figures are language-neutral, so only the
- * mode name is looked up — from transport.options, which lists the same four in
- * the same order. fallbackName covers a language that has not translated them.
+ * Fare guide for the transport page. Only the figures live here — they are the
+ * one part of the card that is the same in every language.
+ *
+ * The mode name and the accepted payment methods both come from
+ * transport.options, which lists the same four modes in the same order. Payment
+ * used to sit in this array as 'App / Cash', 'IC / Cash', 'Cash / Card', which
+ * meant readers of all six languages were shown English there. It belongs
+ * beside the name it describes, where the two cannot drift apart by index.
+ *
+ * fallbackName covers a language that has not translated the modes.
  */
 const TRANSPORT_FARES: Array<{
   fallbackName: string;
   prices: [string, string, string];
-  payment: string;
 }> = [
-  { fallbackName: 'Grab Bike', prices: ['15k-25k', '25k-40k', '40k-70k'], payment: 'App / Cash' },
-  { fallbackName: 'Grab Car', prices: ['40k-70k', '70k-120k', '120k-200k'], payment: 'App / Cash' },
-  { fallbackName: 'Metro', prices: ['7k-10k', '10k-15k', '15k-20k'], payment: 'IC / Cash' },
-  { fallbackName: 'Taxi', prices: ['20k-40k', '50k-90k', '90k-150k'], payment: 'Cash / Card' },
+  { fallbackName: 'Grab Bike', prices: ['15k-25k', '25k-40k', '40k-70k'] },
+  { fallbackName: 'Grab Car', prices: ['40k-70k', '70k-120k', '120k-200k'] },
+  { fallbackName: 'Metro', prices: ['7k-10k', '10k-15k', '15k-20k'] },
+  { fallbackName: 'Taxi', prices: ['20k-40k', '50k-90k', '90k-150k'] },
 ];
 
 const FALLBACK_BUY_LINKS = {
@@ -1454,7 +1460,17 @@ export default function App() {
                             <span className="text-[10px] font-semibold truncate">
                               {t.transport.options[fidx]?.name ?? fare.fallbackName}
                             </span>
-                            <span className="text-[9px] text-teal-100/80 shrink-0">{fare.payment}</span>
+                            {/* tableHeaders[4] is the word "Payment", translated in
+                                all six languages but rendered nowhere since the
+                                table became cards. It labels the value here, where
+                                "App / Cash" on its own tells a screen reader
+                                nothing about what it is. */}
+                            <span
+                              className="text-[9px] text-teal-100/80 shrink-0"
+                              aria-label={`${t.transport.tableHeaders[4]}: ${t.transport.options[fidx]?.payment ?? ''}`}
+                            >
+                              {t.transport.options[fidx]?.payment}
+                            </span>
                           </div>
                           <div className="grid grid-cols-3 divide-x divide-zinc-200">
                             {fare.prices.map((price, pidx) => (

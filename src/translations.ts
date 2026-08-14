@@ -131,10 +131,10 @@ shopping: 'お買い物',
         }
       ],
       options: [
-        { name: 'Grab Bike (バイク便)', desc: '最も安く、渋滞をすり抜けて最速で移動できる手段。ヘルメットが支給されます。' },
-        { name: 'Grab Car (普通車)', desc: '快適でエアコンが効いた安全な移動手段。最大4〜7名まで乗車可能。' },
-        { name: 'メトロ (都市鉄道)', desc: 'サイゴン初の都市鉄道。1区から隣接エリアを快適に結びます。' },
-        { name: '一般タクシー', desc: 'ビナサンやマイリンなど。メーター制で信頼性が高く、街頭で拾うのに適しています。' }
+        { name: 'Grab Bike (バイク便)', desc: '最も安く、渋滞をすり抜けて最速で移動できる手段。ヘルメットが支給されます。', payment: 'アプリ / 現金' },
+        { name: 'Grab Car (普通車)', desc: '快適でエアコンが効いた安全な移動手段。最大4〜7名まで乗車可能。', payment: 'アプリ / 現金' },
+        { name: 'メトロ (都市鉄道)', desc: 'サイゴン初の都市鉄道。1区から隣接エリアを快適に結びます。', payment: 'カード / 現金' },
+        { name: '一般タクシー', desc: 'ビナサンやマイリンなど。メーター制で信頼性が高く、街頭で拾うのに適しています。', payment: '現金 / カード' }
       ],
       tableTitle: '料金の目安 (VND)',
       tableHeaders: ['移動手段', '1-2 km', '3-5 km', '5-10 km', '支払方法'],
@@ -545,7 +545,7 @@ shopping: 'お買い物',
       {
         category: 'spiritual',
         name: '永厳寺 (ビンギエム寺)',
-        sub: '南部最大級 of 敷地を誇る、格調高い仏教寺院',
+        sub: '南部最大級の敷地を誇る、格調高い仏教寺院',
         desc: '見事な彫刻が施された高さ40メートルの七重の石塔が有名。ベトナム北部の伝統的な伽藍配置を近代的なコンクリート技術で再現した名刹です。',
         addr: '339 Nam Kỳ Khởi Nghĩa, Võ Thị Sáu, Quận 3',
         hours: '07:00 - 20:00',
@@ -636,7 +636,7 @@ shopping: 'お買い物',
         category: 'modern',
         name: 'バイクで行く市内探検ツアー',
         sub: 'サイゴンの圧倒的な生活の鼓動をダイレクトに体験',
-        desc: 'ローカルライダーの背中に乗って細い路地をすり抜け、溢れかえるバイク of 波と一体になる体験。ストリートの喧騒と美しい夜風を一度に浴びる、最もリアルな旅。',
+        desc: 'ローカルライダーの背中に乗って細い路地をすり抜け、溢れかえるバイクの波と一体になる体験。ストリートの喧騒と美しい夜風を一度に浴びる、最もリアルな旅。',
         addr: 'ホーチミン市中心部全域',
         hours: '終日・夜間（フレキシブル）',
         price: 'ツアー会社による',
@@ -940,10 +940,10 @@ shopping: 'Mua sắm',
         }
       ],
       options: [
-        { name: 'Grab Bike (Xe ôm)', desc: 'Cách nhanh nhất và tiết kiệm nhất để di chuyển qua những con phố đông đúc. Được trang bị mũ bảo hiểm.' },
-        { name: 'Grab Car (Ô tô)', desc: 'Di chuyển an toàn, mát mẻ và thoải mái. Thích hợp cho nhóm từ 4-7 người.' },
-        { name: 'Metro (Đường sắt đô thị)', desc: 'Tuyến đường sắt đô thị đầu tiên của Sài Gòn, kết nối Quận 1 với các khu vực lân cận.' },
-        { name: 'Taxi truyền thống', desc: 'Các hãng lớn uy tín như Vinasun, Mai Linh. Thích hợp khi bắt trực tiếp trên đường.' }
+        { name: 'Grab Bike (Xe ôm)', desc: 'Cách nhanh nhất và tiết kiệm nhất để di chuyển qua những con phố đông đúc. Được trang bị mũ bảo hiểm.', payment: 'App / Tiền mặt' },
+        { name: 'Grab Car (Ô tô)', desc: 'Di chuyển an toàn, mát mẻ và thoải mái. Thích hợp cho nhóm từ 4-7 người.', payment: 'App / Tiền mặt' },
+        { name: 'Metro (Đường sắt đô thị)', desc: 'Tuyến đường sắt đô thị đầu tiên của Sài Gòn, kết nối Quận 1 với các khu vực lân cận.', payment: 'Thẻ / Tiền mặt' },
+        { name: 'Taxi truyền thống', desc: 'Các hãng lớn uy tín như Vinasun, Mai Linh. Thích hợp khi bắt trực tiếp trên đường.', payment: 'Tiền mặt / Thẻ' }
       ],
       tableTitle: 'Bảng giá ước tính (VND)',
       tableHeaders: ['Phương tiện', '1-2 km', '3-5 km', '5-10 km', 'Thanh toán'],
@@ -1749,10 +1749,10 @@ shopping: '特色购物',
         }
       ],
       options: [
-        { name: 'Grab Bike (摩托车)', desc: '最快且最省钱 of 出行方式，可以轻松穿过拥堵的街道。司机会提供头盔。' },
-        { name: 'Grab Car (汽车)', desc: '安全、凉爽且舒适的选择。适合4-7人的团体。' },
-        { name: '地铁 (城市轨道交通)', desc: '西贡首条城市轨道交通线，连接第1区和周边区域。' },
-        { name: '传统出租车', desc: '如 Vinasun 和 Mai Linh 等正规大品牌，适合在路边直接招手拦车。' }
+        { name: 'Grab Bike (摩托车)', desc: '最快且最省钱的出行方式，可以轻松穿过拥堵的街道。司机会提供头盔。', payment: 'App / 现金' },
+        { name: 'Grab Car (汽车)', desc: '安全、凉爽且舒适的选择。适合4-7人的团体。', payment: 'App / 现金' },
+        { name: '地铁 (城市轨道交通)', desc: '西贡首条城市轨道交通线，连接第1区和周边区域。', payment: '刷卡 / 现金' },
+        { name: '传统出租车', desc: '如 Vinasun 和 Mai Linh 等正规大品牌，适合在路边直接招手拦车。', payment: '现金 / 刷卡' }
       ],
       tableTitle: '估算价格表 (VND)',
       tableHeaders: ['出行方式', '1-2 公里', '3-5 公里', '5-10 公里', '支付方式'],
@@ -2558,10 +2558,10 @@ shopping: '特色購物',
         }
       ],
       options: [
-        { name: 'Grab Bike (摩托車)', desc: '最快且最省錢 of 出行方式，可以輕松穿過擁堵的街道。司機會提供頭盔。' },
-        { name: 'Grab Car (汽車)', desc: '安全、涼爽且舒適的選擇。適合4-7人的團體。' },
-        { name: '地鐵 (城市軌道交通)', desc: '西貢首條城市軌道交通線，連接第1區和周邊區域。' },
-        { name: '傳統出租車', desc: '如 Vinasun 和 Mai Linh 等正規大品牌，適合在路邊直接招手攔車。' }
+        { name: 'Grab Bike (摩托車)', desc: '最快且最省錢的出行方式，可以輕鬆穿過擁堵的街道。司機會提供頭盔。', payment: 'App / 現金' },
+        { name: 'Grab Car (汽車)', desc: '安全、涼爽且舒適的選擇。適合4-7人的團體。', payment: 'App / 現金' },
+        { name: '地鐵 (城市軌道交通)', desc: '西貢首條城市軌道交通線，連接第1區和周邊區域。', payment: '刷卡 / 現金' },
+        { name: '傳統出租車', desc: '如 Vinasun 和 Mai Linh 等正規大品牌，適合在路邊直接招手攔車。', payment: '現金 / 刷卡' }
       ],
       tableTitle: '估算價格表 (VND)',
       tableHeaders: ['出行方式', '1-2 公里', '3-5 公里', '5-10 公里', '支付方式'],
@@ -3367,10 +3367,10 @@ shopping: 'Shop Local',
         }
       ],
       options: [
-        { name: 'Grab Bike (Motorbike)', desc: 'The fastest and cheapest way to navigate through busy streets. Driver provides a helmet.' },
-        { name: 'Grab Car (Car)', desc: 'Safe, cool, and comfortable transit option. Suitable for groups of 4-7 people.' },
-        { name: 'Metro (Urban Rail)', desc: 'Saigon\'s first urban railway line, connecting District 1 with neighboring areas.' },
-        { name: 'Traditional Taxi', desc: 'Reputable brands like Vinasun and Mai Linh, ideal for hailing on the street.' }
+        { name: 'Grab Bike (Motorbike)', desc: 'The fastest and cheapest way to navigate through busy streets. Driver provides a helmet.', payment: 'App / Cash' },
+        { name: 'Grab Car (Car)', desc: 'Safe, cool, and comfortable transit option. Suitable for groups of 4-7 people.', payment: 'App / Cash' },
+        { name: 'Metro (Urban Rail)', desc: 'Saigon\'s first urban railway line, connecting District 1 with neighboring areas.', payment: 'Card / Cash' },
+        { name: 'Traditional Taxi', desc: 'Reputable brands like Vinasun and Mai Linh, ideal for hailing on the street.', payment: 'Cash / Card' }
       ],
       tableTitle: 'Estimated Pricing (VND)',
       tableHeaders: ['Type', '1-2 km', '3-5 km', '5-10 km', 'Payment'],
@@ -4176,10 +4176,10 @@ shopping: 'Shop Local',
         }
       ],
       options: [
-        { name: 'Grab Bike (오토바이)', desc: '복잡한 도심을 가장 빠르고 저렴하게 이동하는 방법. 헬멧은 기사가 제공합니다.' },
-        { name: 'Grab Car (승용차)', desc: '안전하고 시원하며 편안한 이동 수단. 4~7인 그룹에 적합합니다.' },
-        { name: 'Metro (도시철도)', desc: '사이곤 최초의 도시철도 노선으로, 1군과 인근 지역을 연결합니다.' },
-        { name: '일반 택시', desc: 'Vinasun, Mai Linh 등 신뢰할 수 있는 대형 브랜드. 길에서 직접 잡을 때 적합합니다.' }
+        { name: 'Grab Bike (오토바이)', desc: '복잡한 도심을 가장 빠르고 저렴하게 이동하는 방법. 헬멧은 기사가 제공합니다.', payment: '앱 / 현금' },
+        { name: 'Grab Car (승용차)', desc: '안전하고 시원하며 편안한 이동 수단. 4~7인 그룹에 적합합니다.', payment: '앱 / 현금' },
+        { name: 'Metro (도시철도)', desc: '사이곤 최초의 도시철도 노선으로, 1군과 인근 지역을 연결합니다.', payment: '카드 / 현금' },
+        { name: '일반 택시', desc: 'Vinasun, Mai Linh 등 신뢰할 수 있는 대형 브랜드. 길에서 직접 잡을 때 적합합니다.', payment: '현금 / 카드' }
       ],
       tableTitle: '예상 요금 (VND)',
       tableHeaders: ['이동 수단', '1-2 km', '3-5 km', '5-10 km', '결제'],
