@@ -1138,6 +1138,7 @@ export default function App() {
                             type="button"
                             key={idx}
                             aria-expanded={showFeaturePopup === idx}
+                            aria-controls="feature-detail"
                             onClick={() => setShowFeaturePopup(showFeaturePopup === idx ? null : idx)}
                             className="relative flex flex-col items-center text-center cursor-pointer group rounded-lg active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b433f]/50 transition-transform"
                           >
@@ -1153,18 +1154,31 @@ export default function App() {
                             <span className="text-[8px] font-bold text-[#0b433f] leading-tight mt-1.5 line-clamp-2 text-balance">
                               {feat.title}
                             </span>
-
-                            {/* Popup with full detail */}
-                            {showFeaturePopup === idx && (
-                              <div className="absolute bottom-12 left-1/2 -translate-x-1/2 w-36 bg-zinc-900 text-white p-2.5 rounded-lg text-[9px] leading-normal text-left shadow-xl z-30 space-y-1 border border-zinc-700">
-                                <strong className="block text-[#d16b4c] border-b border-zinc-800 pb-0.5 font-bold">{feat.title}</strong>
-                                <p className="text-zinc-300">{feat.desc}</p>
-                              </div>
-                            )}
                           </button>
                         );
                       })}
                     </div>
+
+                    {/* The detail below the row, not floating over it — the same
+                        move as the transport circles, for the same two reasons.
+                        It was w-36, 144px, centred on a column of about 90px, so
+                        on the outer two it hung past the frame and was clipped;
+                        and it was a dark slab, which is the wrong surface for a
+                        guide read outdoors, where reflected light drowns dark
+                        pixels first. */}
+                    {showFeaturePopup !== null && t.welcome.features[showFeaturePopup] && (
+                      <div
+                        id="feature-detail"
+                        className="mt-3 bg-white p-3 rounded-xl text-[10px] leading-relaxed text-left shadow-sm space-y-1 border border-[#0b433f]/20 animate-in fade-in duration-200"
+                      >
+                        <strong className="block text-[#0b433f] font-bold text-[11px]">
+                          {t.welcome.features[showFeaturePopup].title}
+                        </strong>
+                        <p className="text-zinc-700">
+                          {t.welcome.features[showFeaturePopup].desc}
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                 </div>
@@ -1172,9 +1186,12 @@ export default function App() {
                 {/* Bottom Row: Tips Banner (Leaf/Warning/Advice style) */}
                 <div className="mt-3 p-3 bg-[#e6e2d8] rounded-xl border-l-4 border-[#0b433f] flex gap-3 text-[10px] text-zinc-700 leading-relaxed items-start">
                   <Info className="w-4 h-4 text-[#0b433f] shrink-0 mt-0.5" />
-                  <div className="grid grid-cols-2 gap-2 divide-x divide-zinc-400/20">
-                    <p className="pr-1.5">{t.welcome.advice[0]}</p>
-                    <p className="pl-1.5">{t.welcome.advice[1]}</p>
+                  {/* Stacked: each of these ran to three lines in a 181px
+                      column, a paragraph in a box narrower than its sentences.
+                      The rule moves from between them to above the second. */}
+                  <div className="space-y-2 divide-y divide-zinc-400/20">
+                    <p>{t.welcome.advice[0]}</p>
+                    <p className="pt-2">{t.welcome.advice[1]}</p>
                   </div>
                 </div>
 
@@ -1202,10 +1219,22 @@ export default function App() {
 
                   {/* Bến Thành Market Stylized Map Guide */}
                   <div className="bg-[#fcfbf9] border border-zinc-300/80 rounded-2xl p-4 shadow-sm space-y-3 text-zinc-800">
-                    <div className="flex justify-between items-center border-b border-zinc-200 pb-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xl">🗺️</span>
-                        <div>
+                    {/* Stacked, not two columns on one row.
+                        A heading, a subtitle and two labelled tabs will not fit
+                        across 430px, and the frame is 430px on a desktop screen
+                        as well as on a phone — so a breakpoint fixes nothing
+                        here, it only makes the desktop case wrong too. Sharing
+                        the row gave the tabs their full width, since they carry
+                        shrink-0, and squeezed the text into the remainder: the
+                        title broke over two lines and the subtitle over four.
+
+                        Down the page instead, each part gets the full 430px.
+                        The tabs split it evenly, which also reads as the
+                        segmented control it always was. */}
+                    <div className="space-y-2 border-b border-zinc-200 pb-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="text-xl shrink-0">🗺️</span>
+                        <div className="min-w-0">
                           <h3 className="text-xs font-bold text-[#0b433f] uppercase tracking-wider">
                             {lang === 'vi' ? 'Bản Đồ Chợ Bến Thành' : lang === 'ko' ? '벤탄 시장 지도' : lang === 'ja' ? 'ベンタイン市場 地図' : 'Bến Thành Market Map'}
                           </h3>
@@ -1216,10 +1245,10 @@ export default function App() {
                       </div>
 
                       {/* Map Toggle Tabs */}
-                      <div className="flex bg-zinc-100 p-0.5 rounded-lg border border-zinc-200 shrink-0">
+                      <div className="flex bg-zinc-100 p-0.5 rounded-lg border border-zinc-200">
                         <button
                           onClick={() => setBenThanhMapTab('google')}
-                          className={`px-2 py-0.5 text-[8px] font-bold rounded-md transition-all cursor-pointer ${
+                          className={`flex-1 px-2 py-1 text-[8px] font-bold rounded-md transition-all cursor-pointer ${
                             benThanhMapTab === 'google'
                               ? 'bg-white text-[#0b433f] shadow-sm border border-zinc-200/50'
                               : 'text-zinc-500 hover:text-zinc-800'
@@ -1229,7 +1258,7 @@ export default function App() {
                         </button>
                         <button
                           onClick={() => setBenThanhMapTab('gate')}
-                          className={`px-2 py-0.5 text-[8px] font-bold rounded-md transition-all cursor-pointer ${
+                          className={`flex-1 px-2 py-1 text-[8px] font-bold rounded-md transition-all cursor-pointer ${
                             benThanhMapTab === 'gate'
                               ? 'bg-white text-[#0b433f] shadow-sm border border-zinc-200/50'
                               : 'text-zinc-500 hover:text-zinc-800'
@@ -1240,7 +1269,14 @@ export default function App() {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
+                    {/* One column, always. sm:grid-cols-2 split this in half on
+                        any viewport past 640px — but the box it splits is the
+                        430px device frame, which is that size on a desktop
+                        screen too, so the map and the bullet list each got
+                        about 200px and the tips wrapped every few words.
+                        Tailwind's breakpoints measure the window; nothing
+                        inside this frame can use them to mean "there is room". */}
+                    <div className="grid grid-cols-1 gap-4">
                       {benThanhMapTab === 'google' ? (
                         <div className="w-full aspect-square bg-zinc-100 rounded-xl overflow-hidden border border-zinc-200 shadow-inner relative group min-h-[160px]">
                           <iframe
@@ -1267,7 +1303,20 @@ export default function App() {
                           </div>
                         </div>
                       ) : (
-                        <div className="relative aspect-square w-full max-w-[150px] mx-auto bg-amber-50/50 rounded-xl border border-amber-900/10 p-2 flex flex-col justify-between items-center shadow-inner">
+                        /* Sized by its content, not locked to a 150px square.
+                           The labels are authored at 6-8px, and below lg the
+                           type floor lifts those to 11-12px — so a column of
+                           this middle row was about 50px holding a word that
+                           needs 60. "Souvenirs" ran under the dome and the gate
+                           pills touched it.
+
+                           aspect-square made it worse: it fixed the height too,
+                           so justify-between had a box that could not grow for
+                           the taller text. Without it the diagram is as tall as
+                           it needs to be at either type scale, and 280px of the
+                           430px frame — free since the two-column split came
+                           out — gives the words room to sit apart. */
+                        <div className="relative w-full max-w-[280px] mx-auto bg-amber-50/50 rounded-xl border border-amber-900/10 p-3 flex flex-col gap-2 items-center shadow-inner">
                           
                           {/* North Gate (Cổng Bắc) */}
                           <div className="text-center w-full">
@@ -1278,29 +1327,34 @@ export default function App() {
                           </div>
 
                           {/* Middle Row with East and West Gates + Center Dome */}
-                          <div className="flex justify-between items-center w-full my-1">
+                          {/* gap-3 and a dome of its own fixed size, rather than
+                              three w-1/3 columns pressed together. Thirds of a
+                              narrow row leave the side gates too little for the
+                              word under them, and with no gap the pills ended up
+                              against the dome's edge. */}
+                          <div className="flex justify-between items-center gap-3 w-full">
                             {/* West Gate (Cổng Tây) */}
-                            <div className="text-center w-1/3">
+                            <div className="text-center flex-1 min-w-0">
                               <span className="bg-amber-600 text-white text-[7px] font-bold px-1 py-0.5 rounded shadow block">
                                 {lang === 'vi' ? 'CỔNG TÂY' : lang === 'ko' ? '서문' : 'WEST'}
                               </span>
-                              <span className="block text-[6px] text-zinc-500 mt-0.5 leading-none">{lang === 'vi' ? 'Quà lưu niệm' : 'Souvenirs'}</span>
+                              <span className="block text-[6px] text-zinc-500 mt-0.5 leading-tight">{lang === 'vi' ? 'Quà lưu niệm' : 'Souvenirs'}</span>
                             </div>
 
                             {/* Center Dome (Gian trung tâm) */}
-                            <div className="text-center w-1/3 flex flex-col items-center justify-center p-1 bg-[#b85233]/10 border border-[#b85233]/30 rounded-full aspect-square relative">
+                            <div className="text-center shrink-0 w-20 h-20 flex flex-col items-center justify-center p-1 bg-[#b85233]/10 border border-[#b85233]/30 rounded-full">
                               <span className="text-[8px] font-bold text-[#b85233] block">
                                 {lang === 'vi' ? 'ẨM THỰC' : lang === 'ko' ? '푸드코트' : 'FOOD'}
                               </span>
-                              <span className="text-[6px] text-zinc-500 block leading-none font-light">{lang === 'vi' ? 'Chè, Cà phê' : 'Food court'}</span>
+                              <span className="text-[6px] text-zinc-500 block leading-tight font-light">{lang === 'vi' ? 'Chè, Cà phê' : 'Food court'}</span>
                             </div>
 
                             {/* East Gate (Cổng Đông) */}
-                            <div className="text-center w-1/3">
+                            <div className="text-center flex-1 min-w-0">
                               <span className="bg-amber-600 text-white text-[7px] font-bold px-1 py-0.5 rounded shadow block">
                                 {lang === 'vi' ? 'CỔNG ĐÔNG' : lang === 'ko' ? '동문' : 'EAST'}
                               </span>
-                              <span className="block text-[6px] text-zinc-500 mt-0.5 leading-none">{lang === 'vi' ? 'Bánh kẹo' : 'Sweets'}</span>
+                              <span className="block text-[6px] text-zinc-500 mt-0.5 leading-tight">{lang === 'vi' ? 'Bánh kẹo' : 'Sweets'}</span>
                             </div>
                           </div>
 
@@ -1375,12 +1429,18 @@ export default function App() {
                 {/* Bottom Tip Banner */}
                 <div className="mt-4 p-3 bg-[#f0ede4] rounded-xl border border-[#dcd7ca] flex gap-3 text-[10px] text-zinc-700 leading-relaxed items-start relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-1 h-full bg-[#b85233]"></div>
-                  <div className="grid grid-cols-2 gap-3 pl-1">
+                  {/* Stacked. tipsDesc alone came to seven lines in its 175px
+                      column, in English and in Vietnamese both, next to a
+                      neighbour of two — a paragraph squeezed into half a narrow
+                      frame while the other half sat nearly empty. Down the page
+                      each takes the full width, and the rule between the columns
+                      becomes a rule above the second. */}
+                  <div className="space-y-3 pl-1">
                     <div className="space-y-0.5">
                       <strong className="block text-[#b85233] font-bold">{t.atmosphere.tipsTitle}</strong>
                       <p className="text-zinc-600 leading-tight font-light">{t.atmosphere.tipsDesc}</p>
                     </div>
-                    <div className="space-y-0.5 border-l border-zinc-300/40 pl-3">
+                    <div className="space-y-0.5 border-t border-zinc-300/40 pt-3">
                       {/* No dedicated key exists for this heading, and pages.transport
                           already names the same idea in all six languages. */}
                       <strong className="block text-[#0b433f] font-bold">{t.pages.transport}</strong>
@@ -1425,10 +1485,17 @@ export default function App() {
                           type="button"
                           key={idx}
                           aria-expanded={showTransportPopup === idx}
+                          aria-controls="transport-detail"
                           onClick={() => setShowTransportPopup(showTransportPopup === idx ? null : idx)}
-                          className="relative flex flex-col items-center text-center cursor-pointer group rounded-lg active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b433f]/50 transition-transform"
+                          className="flex flex-col items-center text-center cursor-pointer group rounded-lg active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b433f]/50 transition-transform"
                         >
-                          <div className="w-14 h-14 rounded-full bg-white border border-zinc-200 shadow-sm flex items-center justify-center hover:scale-105 hover:bg-zinc-100 transition-all">
+                          <div
+                            className={`w-14 h-14 rounded-full border shadow-sm flex items-center justify-center hover:scale-105 transition-all ${
+                              showTransportPopup === idx
+                                ? 'bg-[#0b433f]/10 border-[#0b433f] ring-2 ring-[#0b433f]/25'
+                                : 'bg-white border-zinc-200 hover:bg-zinc-100'
+                            }`}
+                          >
                             {iconsList[idx]}
                           </div>
                           {/* Drop the parenthetical, keep the rest: taking only the
@@ -1437,18 +1504,50 @@ export default function App() {
                           <span className="text-[8px] font-bold text-[#0b433f] leading-tight mt-1.5">
                             {opt.name.replace(/\s*\(.*\)\s*$/, '')}
                           </span>
-
-                          {/* Detail Popup */}
-                          {showTransportPopup === idx && (
-                            <div className="absolute bottom-16 left-1/2 -translate-x-1/2 w-40 bg-zinc-900 text-white p-2.5 rounded-lg text-[9px] leading-normal text-left shadow-xl z-30 space-y-1 border border-zinc-700">
-                              <strong className="block text-[#d16b4c] border-b border-zinc-800 pb-0.5 font-bold">{opt.name}</strong>
-                              <p className="text-zinc-300">{opt.desc}</p>
-                            </div>
-                          )}
                         </button>
                       );
                     })}
                   </div>
+
+                  {/* One panel under the grid, not a bubble on each circle.
+                      The bubble was w-40 — 160px — centred on its button, and a
+                      column of this four-up grid is about 89px inside the 430px
+                      frame. On the outer columns half of it therefore hung past
+                      the frame edge and was clipped; it also sat above the
+                      circles, covering the paragraph it was meant to explain.
+                      No anchoring fixes that: the bubble is wider than the
+                      column it has to centre on.
+
+                      Below the grid there is full width for the text, nothing
+                      to overflow and nothing to cover. The selected circle
+                      takes a ring so it stays clear which one the panel is
+                      describing, now that the panel no longer points at it. */}
+                  {showTransportPopup !== null && t.transport.options[showTransportPopup] && (
+                    /* Light, not the dark slab this inherited from being a
+                       floating tooltip. Readers of this page are on the street
+                       deciding how to travel, and a screen outdoors reflects
+                       whatever light is around it. On a dark panel that
+                       reflection competes with the text and the surface turns
+                       into a mirror; on a light one it lands on a surface that
+                       was already bright and the dark text survives. It is why
+                       signage outdoors is dark-on-light almost without
+                       exception.
+
+                       It also puts this back in the same visual system as
+                       everything else on the page, which is cream and white
+                       cards throughout. */
+                    <div
+                      id="transport-detail"
+                      className="bg-white p-3 rounded-xl text-[10px] leading-relaxed text-left shadow-sm space-y-1 border border-[#0b433f]/20 animate-in fade-in duration-200"
+                    >
+                      <strong className="block text-[#0b433f] font-bold text-[11px]">
+                        {t.transport.options[showTransportPopup].name}
+                      </strong>
+                      <p className="text-zinc-700">
+                        {t.transport.options[showTransportPopup].desc}
+                      </p>
+                    </div>
+                  )}
 
                   {/* Estimated Pricing Table */}
                   <div className="space-y-1.5">
@@ -1602,9 +1701,12 @@ export default function App() {
                 {/* Bottom row advice banner wrapper */}
                 <div className="mt-5 p-3 bg-[#e6e2d8] rounded-xl border-l-4 border-[#0b433f] flex gap-3 text-[10px] text-zinc-700 leading-relaxed items-start">
                   <Info className="w-4 h-4 text-[#0b433f] shrink-0 mt-0.5" />
-                  <div className="grid grid-cols-2 gap-2 divide-x divide-zinc-400/20">
-                    <p className="pr-1.5">{t.welcome.advice[0]}</p>
-                    <p className="pl-1.5">{t.welcome.advice[1]}</p>
+                  {/* Stacked: each of these ran to three lines in a 181px
+                      column, a paragraph in a box narrower than its sentences.
+                      The rule moves from between them to above the second. */}
+                  <div className="space-y-2 divide-y divide-zinc-400/20">
+                    <p>{t.welcome.advice[0]}</p>
+                    <p className="pt-2">{t.welcome.advice[1]}</p>
                   </div>
                 </div>
 
@@ -1770,9 +1872,14 @@ export default function App() {
                                 {/* Bottom row advice tips */}
                 <div className="mt-4 p-3 bg-[#e6e2d8] rounded-xl border-l-4 border-[#0b433f] flex gap-3 text-[10px] text-zinc-700 leading-relaxed items-start">
                   <Info className="w-4 h-4 text-[#0b433f] shrink-0 mt-0.5" />
-                  <div className="grid grid-cols-2 gap-2 divide-x divide-zinc-400/20">
-                    <p className="pr-1.5">{t.stay.tips[0]}</p>
-                    <p className="pl-1.5">{t.stay.tips[1]}</p>
+                  {/* Stacked. Side by side each tip had about 187px, and both
+                      run to four lines of prose at that width in English and in
+                      Vietnamese — a column narrower than the sentence it holds.
+                      Down the page they get the full width and take two.
+                      The rule between them becomes a rule above the second. */}
+                  <div className="space-y-2 divide-y divide-zinc-400/20">
+                    <p>{t.stay.tips[0]}</p>
+                    <p className="pt-2">{t.stay.tips[1]}</p>
                   </div>
                 </div>
 
@@ -1945,9 +2052,16 @@ export default function App() {
                                 the modal this card opens. The space pays for type
                                 that can actually be read. */}
                             <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
-                              <h3 className="text-[15px] font-bold text-[#0b433f] leading-snug flex items-center gap-1.5 min-w-0">
-                                <span role="img" aria-label="culture emoji" className="text-base shrink-0">{item.emoji}</span>
-                                <span className="line-clamp-2">{item.name}</span>
+                              {/* No emoji before the name. Each card already
+                                  carries a photograph of the place; a generic
+                                  🏛️ shared by the post office, the city hall and
+                                  half the list adds nothing beside it, and the
+                                  glyph is drawn differently on every platform
+                                  and cannot take the brand colour. Dropping it
+                                  also gives the name the full width, which
+                                  matters at two clamped lines. */}
+                              <h3 className="text-[15px] font-bold text-[#0b433f] leading-snug line-clamp-2 min-w-0">
+                                {item.name}
                               </h3>
                               <span className="text-[11px] text-[#b85233] font-medium block line-clamp-1">{item.sub}</span>
                               <span className="flex items-center gap-1 text-[10px] text-zinc-500">
