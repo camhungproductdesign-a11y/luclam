@@ -12,14 +12,37 @@ export const defaultMedia: Record<string, PlaceMedia> = {
   // Pho
   "food-0-0": {
     img: "/uploads/external/070237d365a1.jpg",
-    video: "https://www.tiktok.com/@maytinhsgn/video/7626240228788833544"
+    // The TikTok that sat here was @maytinhsgn — a computer shop advertising a
+    // Lenovo desktop, attached to a phở restaurant. Presumably pasted while
+    // testing the video field and committed by accident.
+    video: ""
   },
+  // Bowls of phở, vendored CC0 from Wikimedia Commons and checked by eye. They
+  // are representative rather than photographs of these shops, which is the
+  // trade-off for showing something instead of a placeholder. Chosen to match
+  // what each listing claims: the plain bowl for the northern kitchen, the one
+  // served with a herb plate for the southern.
+  //
+  // Two candidates were rejected for the reason this guide already has a
+  // problem with: one was shot through a window onto a European street, which
+  // is a phở shop abroad, not Saigon.
+  //
+  // The Unsplash URLs that used to sit on the next two answer 404 at source, so
+  // both were rendering the placeholder anyway.
   "food-0-1": {
-    img: "https://images.unsplash.com/photo-1625220194771-7ebedd0b7d10?auto=format&fit=crop&w=800&q=80",
+    img: "/uploads/external/0bbfd3fd8d0d.jpg",
     video: ""
   },
   "food-0-2": {
-    img: "https://images.unsplash.com/photo-1634149737683-897903eeac35?auto=format&fit=crop&w=800&q=80",
+    img: "/uploads/external/56e72ea5b61d.jpg",
+    video: ""
+  },
+  "food-0-3": {
+    img: "/uploads/external/9a224a89efcf.jpg",
+    video: ""
+  },
+  "food-0-4": {
+    img: "/uploads/external/1d2edace9c5d.jpg",
     video: ""
   },
   // Banh Mi

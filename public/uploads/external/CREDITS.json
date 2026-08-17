@@ -362,5 +362,33 @@
     "host": "upload.wikimedia.org",
     "license": "CC BY 2.0 (https://creativecommons.org/licenses/by/2.0)",
     "attribution": "Ảnh: Yun Huang Yong from Harbord, Australia — CC BY 2.0, qua Wikimedia Commons"
+  },
+  {
+    "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/1/1a/Beef_Pho_%28M%29_-_Milk_No_Sugar.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "localPath": "/uploads/external/0bbfd3fd8d0d.jpg",
+    "host": "upload.wikimedia.org",
+    "license": "CC0 (http://creativecommons.org/publicdomain/zero/1.0/deed.en)",
+    "attribution": "Ảnh: Andy Li — CC0, qua Wikimedia Commons"
+  },
+  {
+    "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/4/45/Pho_Bo_by_Banh_%26_Mee_in_Kirkgate_Market.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "localPath": "/uploads/external/56e72ea5b61d.jpg",
+    "host": "upload.wikimedia.org",
+    "license": "CC0 (http://creativecommons.org/publicdomain/zero/1.0/deed.en)",
+    "attribution": "Ảnh: Andy Li — CC0, qua Wikimedia Commons"
+  },
+  {
+    "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4c/2016.10.14.133502_Noodle_soup_beef_Pho_Bac_Vietnamese_restaurant_Seattle_Washington_USA.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "localPath": "/uploads/external/9a224a89efcf.jpg",
+    "host": "upload.wikimedia.org",
+    "license": "CC0 (http://creativecommons.org/publicdomain/zero/1.0/deed.en)",
+    "attribution": "Ảnh: Hermann Luyken — CC0, qua Wikimedia Commons"
+  },
+  {
+    "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/a/a3/Pho_with_steak_with_garlic_-_Pho_2025-07-25.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "localPath": "/uploads/external/1d2edace9c5d.jpg",
+    "host": "upload.wikimedia.org",
+    "license": "CC0 (http://creativecommons.org/publicdomain/zero/1.0/deed.en)",
+    "attribution": "Ảnh: Andy Li — CC0, qua Wikimedia Commons"
   }
 ]

@@ -55,6 +55,10 @@ const CREDITS: Record<string, string> = {
   "/uploads/external/88a32c12ebb3.jpg": "Ảnh: choi kwangmo — CC0, qua Wikimedia Commons",
   "/uploads/external/0aad9df07334.jpg": "Ảnh: Andy Li — CC0, qua Wikimedia Commons",
   "/uploads/external/46b13b6114de.jpg": "Ảnh: Yun Huang Yong from Harbord, Australia — CC BY 2.0, qua Wikimedia Commons",
+  "/uploads/external/0bbfd3fd8d0d.jpg": "Ảnh: Andy Li — CC0, qua Wikimedia Commons",
+  "/uploads/external/56e72ea5b61d.jpg": "Ảnh: Andy Li — CC0, qua Wikimedia Commons",
+  "/uploads/external/9a224a89efcf.jpg": "Ảnh: Hermann Luyken — CC0, qua Wikimedia Commons",
+  "/uploads/external/1d2edace9c5d.jpg": "Ảnh: Andy Li — CC0, qua Wikimedia Commons",
 };
 
 /**
