@@ -31,6 +31,24 @@ export function authHeaders(): Record<string, string> {
   };
 }
 
-/** Message shown when the server rejects the token. */
+/**
+ * Both messages lead with what it means rather than what went wrong.
+ *
+ * The editor applies a change to the screen and to localStorage before it
+ * reaches the server, so the new content is visible whether or not the save
+ * landed. Saying only "the server refused" reads as a warning beside an edit
+ * that plainly worked — and the operator moves on believing the site is
+ * updated. public/config.json is what visitors are served; until the change is
+ * written there it exists in one browser and nowhere else.
+ */
+const LOCAL_ONLY = 'Thay đổi chỉ nằm trên máy này — khách truy cập vẫn thấy nội dung cũ.';
+
+/** Shown when the server rejects the token. */
 export const UNAUTHORIZED_MESSAGE =
-  'Máy chủ từ chối: token quản trị sai hoặc chưa nhập. Mở Creator Studio và điền lại ô "Token quản trị".';
+  `CHƯA LƯU LÊN MÁY CHỦ. ${LOCAL_ONLY}\n\n` +
+  'Máy chủ từ chối token quản trị. Mở Creator Studio, điền lại ô "Token quản trị" rồi lưu lại.';
+
+/** Shown when the save fails for any other reason: server error, server stopped, connection dropped. */
+export function saveFailedMessage(detail: string): string {
+  return `CHƯA LƯU LÊN MÁY CHỦ. ${LOCAL_ONLY}\n\nLý do: ${detail}`;
+}

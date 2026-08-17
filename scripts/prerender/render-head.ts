@@ -1,9 +1,11 @@
-import { translations, type Language } from '../../src/translations';
+import { type Language } from '../../src/translations';
+import { type ResolvedContent } from '../../src/resolveContent';
 import { pathFor, HTML_LANG, LANGUAGES, type Topic } from '../../src/routes';
 import { escapeHtml } from './render-content';
+import { parsePrice } from '../../src/parsePrice';
 
 const ORIGIN = 'https://gift.luclam.vn';
-const OG_IMAGE = `${ORIGIN}/uploads/cover_benthanh.jpg`;
+const OG_IMAGE = `${ORIGIN}/uploads/og-cover.jpg`;
 
 export type Assets = { scripts: string[]; stylesheets: string[] };
 
@@ -26,9 +28,9 @@ function hreflangTags(topic: Topic): string {
   return tags.join('\n    ');
 }
 
-function breadcrumb(lang: Language, topic: Topic): string {
+function breadcrumb(lang: Language, topic: Topic, resolved: ResolvedContent): string {
   if (topic === 'cover') return '';
-  const t = translations[lang];
+  const t = resolved[lang];
 
   return JSON.stringify({
     '@context': 'https://schema.org',
@@ -64,10 +66,10 @@ type InfoBlock = {
  * That is a copywriting deliverable for Lục Lam, not something to fabricate
  * here. See the handover note.
  */
-function infoItemList(lang: Language, topic: Topic): string {
+function infoItemList(lang: Language, topic: Topic, resolved: ResolvedContent): string {
   if (topic !== 'info') return '';
 
-  const info = translations[lang].info as unknown as InfoBlock;
+  const info = resolved[lang].info as unknown as InfoBlock;
 
   const items = info.categories.flatMap((category) =>
     category.items.map((item) => ({
@@ -84,7 +86,7 @@ function infoItemList(lang: Language, topic: Topic): string {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     '@id': `${absolute(pathFor(lang, topic))}#useful-info`,
-    name: translations[lang].pages.info,
+    name: resolved[lang].pages.info,
     numberOfItems: items.length,
     itemListElement: items.map((item, index) => ({ ...item, position: index + 1 })),
   });
@@ -160,33 +162,13 @@ type MenuItem = {
   buyLuclam?: string;
 };
 
-/**
- * Prices are authored as "155,000 VND". Structured data needs a bare number and
- * a separate currency, so parse rather than pass the string through.
- *
- * Anything that does not parse cleanly gets no `offers` block at all. A wrong
- * price in structured data is worse than an absent one — search engines and
- * assistants repeat it as fact, and nobody sees the mistake on the page.
- */
-function parsePrice(raw: string | undefined): { price: string; currency: string } | null {
-  if (!raw) return null;
+// parsePrice moved to src/parsePrice.ts so Creator Studio applies exactly the
+// same rule when it warns about a price. See the note there.
 
-  const match = raw.match(/^\s*([\d.,]+)\s*(VND|VNĐ|đ)\s*$/i);
-  if (!match) return null;
-
-  const digits = match[1].replace(/[.,]/g, '');
-  if (!/^\d+$/.test(digits)) return null;
-
-  const value = Number(digits);
-  if (!Number.isFinite(value) || value <= 0) return null;
-
-  return { price: String(value), currency: 'VND' };
-}
-
-function products(lang: Language, topic: Topic): string {
+function products(lang: Language, topic: Topic, resolved: ResolvedContent): string {
   if (topic !== 'luclam') return '';
 
-  const items = ((translations[lang] as unknown as Record<string, { menuItems?: MenuItem[] }>)
+  const items = ((resolved[lang] as unknown as Record<string, { menuItems?: MenuItem[] }>)
     .luclam?.menuItems ?? []) as MenuItem[];
   if (items.length === 0) return '';
 
@@ -224,13 +206,13 @@ function products(lang: Language, topic: Topic): string {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     '@id': `${absolute(pathFor(lang, 'luclam'))}#products`,
-    name: translations[lang].pages.luclam,
+    name: resolved[lang].pages.luclam,
     numberOfItems: listed.length,
     itemListElement: listed,
   });
 }
 
-function localBusiness(lang: Language): string {
+function localBusiness(lang: Language, resolved: ResolvedContent): string {
   // The telephone field is deliberately absent: the official number has not
   // been confirmed by Lục Lam, and a wrong number in structured data is worse
   // than none — assistants would read it out as fact. See item #7 in the spec.
@@ -238,7 +220,7 @@ function localBusiness(lang: Language): string {
     '@context': 'https://schema.org',
     '@type': ['TeaStore', 'LocalBusiness'],
     name: 'Lục Lam Art Of Tea',
-    alternateName: translations[lang].title,
+    alternateName: resolved[lang].title,
     image: OG_IMAGE,
     '@id': ORIGIN,
     url: absolute(pathFor(lang, 'cover')),
@@ -270,8 +252,15 @@ function localBusiness(lang: Language): string {
   });
 }
 
-export function renderHead(lang: Language, topic: Topic, assets: Assets): string {
-  const t = translations[lang];
+export function renderHead(
+  lang: Language,
+  topic: Topic,
+  assets: Assets,
+  resolved: ResolvedContent
+): string {
+  // The same resolved content the app renders, so a price edited in Creator
+  // Studio reaches the Product JSON-LD rather than only the screen.
+  const t = resolved[lang];
   const isCover = topic === 'cover';
 
   const title = isCover ? `${t.title} | ${t.subtitle}` : `${t.pages[topic]} | ${t.title}`;
@@ -279,11 +268,11 @@ export function renderHead(lang: Language, topic: Topic, assets: Assets): string
   const canonical = absolute(pathFor(lang, topic));
 
   const jsonLd = [
-    isCover ? localBusiness(lang) : '',
-    breadcrumb(lang, topic),
+    isCover ? localBusiness(lang, resolved) : '',
+    breadcrumb(lang, topic, resolved),
     faqPage(lang, topic),
-    infoItemList(lang, topic),
-    products(lang, topic),
+    infoItemList(lang, topic, resolved),
+    products(lang, topic, resolved),
   ]
     .filter(Boolean)
     .map((json) => `<script type="application/ld+json">${json}</script>`)

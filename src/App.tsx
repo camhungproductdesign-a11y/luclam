@@ -45,7 +45,8 @@ const CreatorStudio = React.lazy(() =>
   import('./components/CreatorStudio').then((module) => ({ default: module.CreatorStudio }))
 );
 import { defaultMedia } from './defaultMedia';
-import { authHeaders, UNAUTHORIZED_MESSAGE } from './adminToken';
+import { authHeaders, saveFailedMessage, UNAUTHORIZED_MESSAGE } from './adminToken';
+import { resolveContent } from './resolveContent';
 import { pathFor, parsePath, TOPICS, type Topic } from './routes';
 
 const supportedLanguages: Language[] = ['ja', 'vi', 'zh', 'zht', 'en', 'ko'];
@@ -55,7 +56,7 @@ const htmlLanguage: Record<Language, string> = {
 /**
  * An inline SVG rather than a file: this is the last resort for every image on
  * the site, so it must not depend on a network request or on a file being
- * decodable. It previously pointed at /uploads/cover_benthanh.jpg, which cannot
+ * decodable. It previously pointed at /uploads/cover-benthanh.jpg, which cannot
  * be decoded, so a broken image fell back to another broken image and the
  * handler ended up hiding the element entirely — the empty grey boxes.
  *
@@ -129,26 +130,22 @@ const DEFAULT_BUY_LINKS: Array<{ luclam: string; taka: string }> = [
 ];
 
 /**
- * Fare guide for the transport page. Only the figures live here — they are the
- * one part of the card that is the same in every language.
+ * The fare table used to live here, as a module constant holding names, prices
+ * and payment methods for the four modes. Every part of it has moved into
+ * translations.transport.options, and for two different reasons.
  *
- * The mode name and the accepted payment methods both come from
- * transport.options, which lists the same four modes in the same order. Payment
- * used to sit in this array as 'App / Cash', 'IC / Cash', 'Cash / Card', which
- * meant readers of all six languages were shown English there. It belongs
- * beside the name it describes, where the two cannot drift apart by index.
+ * The names and payment methods moved because they are language: readers of
+ * all six were being shown English.
  *
- * fallbackName covers a language that has not translated the modes.
+ * The figures moved because of where this file ends up. scripts/prerender
+ * generates the static pages from translations.ts, so anything held here is
+ * absent from the HTML — the fare table was rendered by the app and by nothing
+ * else, which meant crawlers and assistants had never seen a single price on
+ * the transport page. They are also the most perishable facts on the site,
+ * owned by Grab and the taxi firms rather than by Lục Lam, and being outside
+ * translations put them beyond the editor's reach as well: the numbers most
+ * likely to change were the only ones that needed a developer.
  */
-const TRANSPORT_FARES: Array<{
-  fallbackName: string;
-  prices: [string, string, string];
-}> = [
-  { fallbackName: 'Grab Bike', prices: ['15k-25k', '25k-40k', '40k-70k'] },
-  { fallbackName: 'Grab Car', prices: ['40k-70k', '70k-120k', '120k-200k'] },
-  { fallbackName: 'Metro', prices: ['7k-10k', '10k-15k', '15k-20k'] },
-  { fallbackName: 'Taxi', prices: ['20k-40k', '50k-90k', '90k-150k'] },
-];
 
 const FALLBACK_BUY_LINKS = {
   luclam: 'https://luclam.vn/collections/all',
@@ -264,13 +261,13 @@ export default function App() {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (!parsed.cover?.img || parsed.cover.img.includes('unsplash.com')) {
-          parsed.cover = { img: '/uploads/cover_benthanh.jpg', video: '' };
+          parsed.cover = { img: '/uploads/cover-benthanh.jpg', video: '' };
         }
         return parsed;
       }
-      return { cover: { img: '/uploads/cover_benthanh.jpg', video: '' } };
+      return { cover: { img: '/uploads/cover-benthanh.jpg', video: '' } };
     } catch (e) {
-      return { cover: { img: '/uploads/cover_benthanh.jpg', video: '' } };
+      return { cover: { img: '/uploads/cover-benthanh.jpg', video: '' } };
     }
   });
 
@@ -338,7 +335,7 @@ export default function App() {
             const loadedOverrides = data.overrides || {};
             const loadedMedia = data.customMedia || {};
             if (!loadedMedia.cover?.img || loadedMedia.cover.img.includes('unsplash.com')) {
-              loadedMedia.cover = { img: '/uploads/cover_benthanh.jpg', video: '' };
+              loadedMedia.cover = { img: '/uploads/cover-benthanh.jpg', video: '' };
             }
             setOverrides(loadedOverrides);
             setCustomMedia(loadedMedia);
@@ -362,7 +359,7 @@ export default function App() {
               const loadedOverrides = data.overrides || {};
               const loadedMedia = data.customMedia || {};
               if (!loadedMedia.cover?.img || loadedMedia.cover.img.includes('unsplash.com')) {
-                loadedMedia.cover = { img: '/uploads/cover_benthanh.jpg', video: '' };
+                loadedMedia.cover = { img: '/uploads/cover-benthanh.jpg', video: '' };
               }
               setOverrides(loadedOverrides);
               setCustomMedia(loadedMedia);
@@ -439,40 +436,62 @@ export default function App() {
     }
   };
 
+  /**
+   * Sends the editor's state to the server and reports whether it arrived.
+   *
+   * Both callers apply the change to React state and localStorage before this
+   * runs, which keeps the editor responsive and stops an operator losing work
+   * to a failed request. The cost is that the screen shows the new content
+   * whatever happens next, so a failure has to be said out loud — it cannot be
+   * inferred from anything visible.
+   *
+   * Only 401 used to be reported. A 500, a stopped server or a dropped
+   * connection all landed in a catch with a console.warn, and the editor looked
+   * like it had saved every single time. public/config.json is what visitors
+   * are served, so those silent failures left the operator's browser and the
+   * live site disagreeing with nothing on screen to say so.
+   */
+  const saveConfigToServer = async (payload: { overrides: any; customMedia: Record<string, { img: string; video: string }> }) => {
+    let response: Response;
+    try {
+      response = await fetch('/api/config', {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify(payload)
+      });
+    } catch (e) {
+      // Thrown when the request never completed: server stopped, network down.
+      alert(saveFailedMessage(e instanceof Error ? e.message : 'không gọi được máy chủ'));
+      return;
+    }
+
+    if (response.status === 401) {
+      alert(UNAUTHORIZED_MESSAGE);
+      return;
+    }
+    if (!response.ok) {
+      alert(saveFailedMessage(`máy chủ trả về HTTP ${response.status}`));
+    }
+  };
+
   const handleUpdateOverrides = async (newOverrides: any) => {
     setOverrides(newOverrides);
     try {
       localStorage.setItem('saigon_guide_overrides', JSON.stringify(newOverrides));
-      // Save to server
-      const response = await fetch('/api/config', {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify({ overrides: newOverrides, customMedia })
-      });
-      if (response.status === 401) {
-        alert(UNAUTHORIZED_MESSAGE);
-      }
     } catch (e) {
-      console.warn('Failed to save overrides:', e);
+      console.warn('Failed to save overrides locally:', e);
     }
+    await saveConfigToServer({ overrides: newOverrides, customMedia });
   };
 
   const handleUpdateCustomMedia = async (newCustomMedia: Record<string, { img: string; video: string }>) => {
     setCustomMedia(newCustomMedia);
     try {
       localStorage.setItem('saigon_guide_custom_media', JSON.stringify(newCustomMedia));
-      // Save to server
-      const response = await fetch('/api/config', {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify({ overrides, customMedia: newCustomMedia })
-      });
-      if (response.status === 401) {
-        alert(UNAUTHORIZED_MESSAGE);
-      }
     } catch (e) {
-      console.warn('Failed to save custom media:', e);
+      console.warn('Failed to save custom media locally:', e);
     }
+    await saveConfigToServer({ overrides, customMedia: newCustomMedia });
   };
 
   // The prompt used to live inside the setBrandClicks updater. React may run an
@@ -653,32 +672,9 @@ export default function App() {
     }
   }, [currentPage]);
 
-  // Deep merge default translations with local overrides
-  const deepMerge = (target: any, source: any): any => {
-    if (!source) return target;
-    const output = { ...target };
-    for (const key of Object.keys(source)) {
-      if (source[key] instanceof Object && key in target && !Array.isArray(source[key])) {
-        output[key] = deepMerge(target[key], source[key]);
-      } else if (Array.isArray(source[key]) && Array.isArray(target[key])) {
-        const targetArr = [...target[key]];
-        const sourceArr = source[key];
-        for (let i = 0; i < sourceArr.length; i++) {
-          if (sourceArr[i] instanceof Object && targetArr[i]) {
-            targetArr[i] = deepMerge(targetArr[i], sourceArr[i]);
-          } else {
-            targetArr[i] = sourceArr[i];
-          }
-        }
-        output[key] = targetArr;
-      } else {
-        output[key] = source[key];
-      }
-    }
-    return output;
-  };
-
-  const t = deepMerge(deepMerge(translations['en'], translations[lang] || {}), overrides[lang] || {});
+  // Shared with scripts/prerender so the generated HTML and the running app
+  // resolve content the same way. See src/resolveContent.ts.
+  const t = resolveContent(lang, overrides);
 
   /**
    * The language selector sits in its own row below md, so the strip behind it
@@ -692,6 +688,20 @@ export default function App() {
       : pagesList[currentPage] === 'luclam'
         ? 'bg-[#0b1513]'
         : 'bg-[#f6f3eb]';
+
+  /**
+   * The buttons have no fill of their own, so the ring and the label are all
+   * that separate them from the page — and on two of the ten pages that page is
+   * near-black. Both readings come from the same page name the strip uses, so
+   * the button can never end up styled for a background the strip is not
+   * painting.
+   *
+   * Only below md. From md up these sit inside the dark pill at the right edge,
+   * where the treatment is dark whatever page is open, and the md: classes on
+   * the button say so.
+   */
+  const selectorOnDark =
+    pagesList[currentPage] === 'cover' || pagesList[currentPage] === 'luclam';
 
 
   return (
@@ -930,7 +940,7 @@ export default function App() {
                 {/* Full-bleed high-contrast premium Ben Thanh aerial photograph background */}
                 <div className="absolute inset-0 transition-all duration-700">
                   <img 
-                    src={withBasePath((customMedia.cover?.img && !customMedia.cover.img.includes('unsplash.com')) ? customMedia.cover.img : "/uploads/cover_benthanh.jpg")}
+                    src={withBasePath((customMedia.cover?.img && !customMedia.cover.img.includes('unsplash.com')) ? customMedia.cover.img : "/uploads/cover-benthanh.jpg")}
                     alt="Chợ Bến Thành Sài Gòn Aerial Cover" 
                     width={1200}
                     height={1600}
@@ -1447,18 +1457,19 @@ export default function App() {
                     </h4>
                     
                     {/* One card per mode rather than a five-column table: at this
-                        width every header and figure wrapped. Names come from
-                        transport.options, which already carries them translated —
-                        the rows used to be hardcoded English. */}
+                        width every header and figure wrapped. Every part of a
+                        card — name, payment, figures — now comes from the one
+                        entry in transport.options that describes that mode, so
+                        nothing can fall out of step by index. */}
                     <div className="space-y-2">
-                      {TRANSPORT_FARES.map((fare, fidx) => (
+                      {t.transport.options.map((mode: any, fidx: number) => (
                         <div
                           key={fidx}
                           className="bg-white border border-zinc-200 rounded-xl overflow-hidden shadow-sm"
                         >
                           <div className="flex items-center justify-between gap-2 bg-[#0b433f] text-white px-3 py-1.5">
                             <span className="text-[10px] font-semibold truncate">
-                              {t.transport.options[fidx]?.name ?? fare.fallbackName}
+                              {mode.name}
                             </span>
                             {/* tableHeaders[4] is the word "Payment", translated in
                                 all six languages but rendered nowhere since the
@@ -1467,13 +1478,13 @@ export default function App() {
                                 nothing about what it is. */}
                             <span
                               className="text-[9px] text-teal-100/80 shrink-0"
-                              aria-label={`${t.transport.tableHeaders[4]}: ${t.transport.options[fidx]?.payment ?? ''}`}
+                              aria-label={`${t.transport.tableHeaders[4]}: ${mode.payment ?? ''}`}
                             >
-                              {t.transport.options[fidx]?.payment}
+                              {mode.payment}
                             </span>
                           </div>
                           <div className="grid grid-cols-3 divide-x divide-zinc-200">
-                            {fare.prices.map((price, pidx) => (
+                            {(mode.fares ?? []).map((price: string, pidx: number) => (
                               <div key={pidx} className="px-2 py-2 text-center">
                                 <span className="block text-[8px] uppercase tracking-wider text-zinc-400">
                                   {t.transport.tableHeaders[pidx + 1]}
@@ -2534,22 +2545,32 @@ export default function App() {
                 const isActive = lang === code;
                 return (
                   <div key={code} className="relative group flex items-center justify-center">
-                    {/* The inactive edge is white at low alpha rather than
-                        zinc-800. With the pill gone, two of the ten pages are
-                        near-black behind these buttons — the cover and Lục Lam —
-                        and a dark ring on a dark ground left nothing to see. A
-                        light hairline reads there, and on the cream pages the
-                        dark fill carries the contrast on its own. */}
+                    {/* No fill: the page shows through the button. What is left
+                        to carry it is the ring and the label, and those have to
+                        flip with the page — dark ink on the cream pages, light
+                        on the cover and Lục Lam. A fill would have made one set
+                        of colours work everywhere, which is exactly what taking
+                        it away costs.
+
+                        Windows has no glyph for the regional-indicator pairs, so
+                        these render as the letters US, TW, CN, JP, KR rather
+                        than flags. Letters take the text colour; the colour
+                        emoji other platforms draw ignore it and stay legible on
+                        either ground. Both readings are covered. */}
                     <button
                       onClick={() => handleLangChange(code)}
                       className={`w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center text-lg md:text-xl transition-all duration-300 cursor-pointer ${
+                        selectorOnDark ? 'text-zinc-100' : 'text-zinc-700 md:text-zinc-100'
+                      } ${
                         isActive
-                          ? 'bg-amber-500/20 border-2 border-[#d16b4c] scale-110 shadow-lg shadow-amber-500/25 ring-2 ring-amber-500/10'
-                          : 'bg-zinc-900/70 border border-white/20 shadow-md hover:bg-zinc-800/90 hover:scale-105 hover:border-white/35'
+                          ? 'border-2 border-[#d16b4c] bg-[#d16b4c]/10 scale-110 ring-2 ring-[#d16b4c]/15 md:bg-amber-500/20'
+                          : selectorOnDark
+                            ? 'border border-white/30 hover:bg-white/10 hover:scale-105 hover:border-white/50'
+                            : 'border border-zinc-900/25 hover:bg-zinc-900/5 hover:scale-105 hover:border-zinc-900/45 md:border-white/30 md:hover:bg-white/10 md:hover:border-white/50'
                       }`}
                       title={label}
                     >
-                      <span className="leading-none drop-shadow-sm">{flag}</span>
+                      <span className="leading-none">{flag}</span>
                     </button>
                     
                     {/* Tooltip on Hover */}

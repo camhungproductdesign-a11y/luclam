@@ -1,5 +1,6 @@
-import { translations, type Language } from '../../src/translations';
+import { type Language } from '../../src/translations';
 import { pathFor, TOPICS, type Topic } from '../../src/routes';
+import { type ResolvedContent } from '../../src/resolveContent';
 
 export function escapeHtml(value: string): string {
   return value
@@ -75,8 +76,15 @@ function renderNode(node: unknown, depth: number): string {
   return '';
 }
 
-export function renderContent(lang: Language, topic: Topic): string {
-  const t = translations[lang];
+export function renderContent(
+  lang: Language,
+  topic: Topic,
+  resolved: ResolvedContent
+): string {
+  // Resolved rather than raw: English fills any gap, then the editor's
+  // overrides from public/config.json go on top — the same content the running
+  // app shows. Reading translations directly here is what let the two diverge.
+  const t = resolved[lang];
   const source = t as unknown as Record<string, unknown>;
 
   // The cover block is only a headline and a tagline — far too thin for the
@@ -97,7 +105,7 @@ export function renderContent(lang: Language, topic: Topic): string {
     .map(
       (other) =>
         `<li><a href="${pathFor(other, topic)}" hreflang="${other}">${escapeHtml(
-          translations[other].title
+          resolved[other].title
         )}</a></li>`
     )
     .join('');

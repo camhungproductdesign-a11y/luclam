@@ -4,6 +4,7 @@ import { ALL_ROUTES, pathFor, HTML_LANG, LANGUAGES, TOPICS, type Topic } from '.
 import type { Language } from '../../src/translations';
 import { renderContent } from './render-content';
 import { renderHead, type Assets } from './render-head';
+import { resolveAllLanguages, type Overrides } from '../../src/resolveContent';
 
 const DIST = path.join(process.cwd(), 'dist');
 const ORIGIN = 'https://gift.luclam.vn';
@@ -143,14 +144,57 @@ ${entries.join('\n')}
   return entries.length;
 }
 
+/**
+ * The editor's overrides, as Creator Studio last wrote them.
+ *
+ * These pages used to be generated from translations.ts alone, so an edit
+ * reached readers — who run the app, which fetches this file — and never
+ * reached crawlers, who read the HTML. A price changed in Creator Studio
+ * stayed old in the Product JSON-LD for as long as nobody noticed.
+ *
+ * A missing or unreadable file is not an error: a fresh checkout has no
+ * overrides, and the generated pages are simply the translations as written.
+ * A malformed one is worth saying out loud, though — silently ignoring it
+ * would ship a build that quietly drops every edit.
+ */
+async function loadOverrides(): Promise<Overrides> {
+  const configPath = path.join(process.cwd(), 'public', 'config.json');
+  let raw: string;
+  try {
+    raw = await fs.readFile(configPath, 'utf-8');
+  } catch {
+    console.log('Không có public/config.json — sinh trang từ bản dịch gốc.');
+    return {};
+  }
+
+  try {
+    const parsed = JSON.parse(raw);
+    const overrides = (parsed?.overrides ?? {}) as Overrides;
+    const langs = Object.keys(overrides);
+    console.log(
+      langs.length
+        ? `Đã nạp override từ public/config.json cho: ${langs.join(', ')}`
+        : 'public/config.json không có override nào.'
+    );
+    return overrides;
+  } catch (e) {
+    throw new Error(
+      `public/config.json không phải JSON hợp lệ, nên build sẽ bỏ mất mọi chỉnh sửa: ${
+        e instanceof Error ? e.message : String(e)
+      }`
+    );
+  }
+}
+
 async function main() {
   // Read before the loop: the root route overwrites dist/index.html.
   const assets = await readAssets();
+  const resolved = resolveAllLanguages(await loadOverrides());
   let written = 0;
 
   for (const route of ALL_ROUTES) {
-    const head = renderHead(route.lang, route.topic, assets);
-    const body = renderContent(route.lang, route.topic);
+    const head = renderHead(route.lang, route.topic, assets, resolved);
+    const body = renderContent(route.lang, route.topic, resolved);
     const html = renderPage(route.lang, head, body, assets.scripts);
 
     const outputDir = path.join(DIST, route.path);

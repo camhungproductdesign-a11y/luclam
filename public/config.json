@@ -1,5 +1,18 @@
 {
-  "overrides": {},
+  "overrides": {
+    "vi": {
+      "luclam": {
+        "menuItems": [
+          {
+            "price": "155,000 VND"
+          },
+          {
+            "price": "175,000 VND"
+          }
+        ]
+      }
+    }
+  },
   "customMedia": {
     "food-4-0": {
       "img": "https://file.hstatic.net/200000432665/file/11_01cbf04e827e45b784d8f19354047388_1024x1024.png",
@@ -15,7 +28,7 @@
     },
     "culture-2": {
       "img": "/uploads/external/7abe2e9e3c93.jpg",
-      "video": ""
+      "video": "https://www.tiktok.com/@hoamoclan2212/video/7641101449178483989"
     },
     "culture-5": {
       "img": "/uploads/external/355e36c2d702.jpg",
@@ -100,6 +113,14 @@
     "shopping-1": {
       "img": "/uploads/external/0d4c09ff3ef0.jpg",
       "video": ""
+    },
+    "cover": {
+      "img": "/uploads/cover-benthanh.jpg",
+      "video": ""
+    },
+    "culture-0": {
+      "img": "",
+      "video": "https://www.tiktok.com/@hoamoclan2212/video/7641101449178483989"
     }
   }
 }
