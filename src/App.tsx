@@ -1123,24 +1123,34 @@ export default function App() {
                       </p>
                     </div>
 
-                    {/* Right: Coffee & Croissant design visual reconstruction using styled UI */}
+                    {/* A photograph, where this used to be blurred circles and a
+                        line icon behind a gradient. The drawing was meant to
+                        suggest coffee and read as a failed image instead — the
+                        one card on the page with nothing real in it.
+
+                        Cà phê muối rather than cà phê sữa đá: iced milk coffee
+                        is on every corner in Vietnam, while salt coffee and
+                        coconut coffee are what a visitor comes back talking
+                        about. The photograph is of salt coffee specifically —
+                        the salted cream sitting on the dark coffee is the whole
+                        point of the drink, and a generic cup would not show it. */}
                     <div className="relative bg-[#e6e2d8] rounded-xl overflow-hidden min-h-[clamp(100px,15cqh,140px)] flex flex-col justify-end p-3 shadow-sm group">
-                      {/* Gradient overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
-                      
-                      {/* Geometric Representation of coffee & croissant art elements */}
-                      <div className="absolute inset-0 flex items-center justify-center opacity-65 group-hover:scale-105 transition-transform">
-                        <div className="w-16 h-16 rounded-full bg-amber-800/40 blur-sm absolute -top-2 -left-2"></div>
-                        <div className="w-24 h-24 rounded-full bg-yellow-600/20 absolute -right-6 -bottom-6"></div>
-                        
-                        {/* Styled vectors */}
-                        <Coffee className="w-14 h-14 text-amber-900/30 rotate-12" />
-                      </div>
+                      <Picture
+                        src="/uploads/external/0aad9df07334.jpg"
+                        alt="Cà phê muối Sài Gòn"
+                        onError={useFallbackImage}
+                        width={960}
+                        height={720}
+                        loading="lazy"
+                        decoding="async"
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent z-10"></div>
 
                       {/* Text indicator */}
                       <div className="relative z-20 space-y-0.5">
                         <span className="text-[8px] uppercase tracking-widest text-amber-400 block font-bold">SAIGON COFFEE</span>
-                        <span className="text-[10px] font-serif text-white font-bold block">Ca Phe Sua Da</span>
+                        <span className="text-[10px] font-serif text-white font-bold block">Cà Phê Muối &amp; Cà Phê Dừa</span>
                       </div>
                     </div>
 

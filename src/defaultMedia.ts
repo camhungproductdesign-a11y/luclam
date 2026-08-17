@@ -102,8 +102,11 @@ export const defaultMedia: Record<string, PlaceMedia> = {
     img: "/uploads/external/b08281fd0cd8.jpg",
     video: ""
   },
+  // The Unsplash URL that used to sit here answers 404 at source, so this entry
+  // rendered the placeholder. Replaced with the building itself: CC BY 2.0, via
+  // Wikimedia Commons; see public/uploads/external/CREDITS.json.
   "culture-3": {
-    img: "https://images.unsplash.com/photo-1596422846543-75c6fc1f7f43?auto=format&fit=crop&w=800&q=80",
+    img: "/uploads/external/46b13b6114de.jpg",
     video: ""
   },
   "culture-4": {

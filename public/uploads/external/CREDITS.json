@@ -348,5 +348,19 @@
     "host": "upload.wikimedia.org",
     "license": "CC0 (https://creativecommons.org/publicdomain/zero/1.0/)",
     "attribution": "Ảnh: choi kwangmo — CC0, qua Wikimedia Commons"
+  },
+  {
+    "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/2/20/C%C3%A0_Ph%C3%AA_Mu%E1%BB%91i_-_The_Big_Bowl_2024-07-08.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "localPath": "/uploads/external/0aad9df07334.jpg",
+    "host": "upload.wikimedia.org",
+    "license": "CC0 (http://creativecommons.org/publicdomain/zero/1.0/deed.en)",
+    "attribution": "Ảnh: Andy Li — CC0, qua Wikimedia Commons"
+  },
+  {
+    "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/5/54/Ho_Chi_Minh_City_Opera_House_%283157990551%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "localPath": "/uploads/external/46b13b6114de.jpg",
+    "host": "upload.wikimedia.org",
+    "license": "CC BY 2.0 (https://creativecommons.org/licenses/by/2.0)",
+    "attribution": "Ảnh: Yun Huang Yong from Harbord, Australia — CC BY 2.0, qua Wikimedia Commons"
   }
 ]
