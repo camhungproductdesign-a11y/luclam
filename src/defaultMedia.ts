@@ -110,6 +110,13 @@ export const defaultMedia: Record<string, PlaceMedia> = {
     img: "/uploads/external/e9ecdbb6aaef.jpg",
     video: ""
   },
+  // Street performers on Nguyễn Huệ at night — the living statues the entry is
+  // about, not a daytime view of the boulevard. CC0, choi kwangmo, via
+  // Wikimedia Commons; see public/uploads/external/CREDITS.json.
+  "culture-15": {
+    img: "/uploads/external/88a32c12ebb3.jpg",
+    video: ""
+  },
 
   // --- SHOPPING ---
   "shopping-0": {

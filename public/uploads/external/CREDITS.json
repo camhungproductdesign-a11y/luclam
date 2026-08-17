@@ -341,5 +341,12 @@
     "host": "images.unsplash.com",
     "license": "Unsplash License — dùng được cho mục đích thương mại, không bắt buộc ghi nguồn nhưng nên có",
     "attribution": "Ảnh: Unsplash"
+  },
+  {
+    "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/d/db/20180413_215356Nguy%E1%BB%85n_Hu%E1%BB%87_Walking_Street.jpg",
+    "localPath": "/uploads/external/88a32c12ebb3.jpg",
+    "host": "upload.wikimedia.org",
+    "license": "CC0 (https://creativecommons.org/publicdomain/zero/1.0/)",
+    "attribution": "Ảnh: choi kwangmo — CC0, qua Wikimedia Commons"
   }
 ]
