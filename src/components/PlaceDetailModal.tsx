@@ -23,6 +23,7 @@ import {
   Settings
 } from 'lucide-react';
 import { useMediaUrl } from '../hooks/useMediaUrl';
+import { Picture } from './Picture';
 import { saveMedia } from '../indexedDBStore';
 import { creditFor } from '../mediaCredits';
 
@@ -333,7 +334,7 @@ export function PlaceDetailModal({
 
           {/* Main Visual Display */}
           {resolvedImg && !heroFailed ? (
-            <img
+            <Picture
               src={resolvedImg}
               alt={place.name}
               width={1280}

@@ -40,6 +40,7 @@ import {
 import { Language, translations } from './translations';
 import { useMediaUrl } from './hooks/useMediaUrl';
 import { withBasePath } from './basePath';
+import { Picture } from './components/Picture';
 import { PlaceDetailModal } from './components/PlaceDetailModal';
 const CreatorStudio = React.lazy(() =>
   import('./components/CreatorStudio').then((module) => ({ default: module.CreatorStudio }))
@@ -207,9 +208,9 @@ function ThumbnailPreview({ url }: { url: string | undefined }) {
     );
   }
   return (
-    <img 
-      src={resolved} 
-      alt="" 
+    <Picture
+      src={resolved}
+      alt=""
       width={64}
       height={64}
       loading="lazy"
@@ -939,8 +940,8 @@ export default function App() {
                 
                 {/* Full-bleed high-contrast premium Ben Thanh aerial photograph background */}
                 <div className="absolute inset-0 transition-all duration-700">
-                  <img 
-                    src={withBasePath((customMedia.cover?.img && !customMedia.cover.img.includes('unsplash.com')) ? customMedia.cover.img : "/uploads/cover-benthanh.jpg")}
+                  <Picture
+                    src={(customMedia.cover?.img && !customMedia.cover.img.includes('unsplash.com')) ? customMedia.cover.img : "/uploads/cover-benthanh.jpg"}
                     alt="Chợ Bến Thành Sài Gòn Aerial Cover" 
                     width={1200}
                     height={1600}
@@ -1571,8 +1572,8 @@ export default function App() {
                               mark carries its own 21% margin. The padding gives the
                               first one room without shrinking the second, which
                               object-contain already leaves smaller. */}
-                          <img
-                            src={withBasePath(app.logo)}
+                          <Picture
+                            src={app.logo}
                             alt={`${app.name} logo`}
                             onError={useFallbackImage}
                             width={96}
@@ -1632,8 +1633,8 @@ export default function App() {
                     
                     {/* Left block (7 cols): Main colonial boutique hotel room artwork */}
                     <div className="col-span-7 bg-[#dfdacd] border border-zinc-300 rounded-xl relative overflow-hidden group shadow-sm">
-                      <img 
-                        src="/uploads/external/9734d76f9fad.jpg" 
+                      <Picture
+                        src="/uploads/external/9734d76f9fad.jpg"
                         alt="Boutique Hotel Room Saigon" 
                         onError={useFallbackImage}
                         width={800}
@@ -1675,8 +1676,8 @@ export default function App() {
                             key={sidx}
                             className="flex-1 bg-[#e6e2d8] border border-zinc-300 rounded-lg p-1.5 flex flex-col justify-end relative overflow-hidden group shadow-sm"
                           >
-                            <img 
-                              src={rightImages[sidx]} 
+                            <Picture
+                              src={rightImages[sidx]}
                               alt="Wellness illustration" 
                               onError={useFallbackImage}
                               width={400}
@@ -1721,7 +1722,7 @@ export default function App() {
                         >
                           {/* Top Image Banner */}
                           <div className="h-28 relative overflow-hidden bg-zinc-100">
-                            <img
+                            <Picture
                               src={catBanners[cidx]}
                               alt={cat.title}
                               onError={useFallbackImage}
@@ -2114,8 +2115,8 @@ export default function App() {
                           >
                             <div className="flex gap-3.5 items-center">
                               {item.image ? (
-                                <img 
-                                  src={item.image} 
+                                <Picture
+                                  src={item.image}
                                   alt={item.name} 
                                   width={48}
                                   height={48}
@@ -2257,8 +2258,8 @@ export default function App() {
                                 <ExternalLink className="w-2 h-2" />
                               </a>
                             </div>
-                            <img 
-                              src="/uploads/external/c561cd48f545.jpg" 
+                            <Picture
+                              src="/uploads/external/c561cd48f545.jpg"
                               alt="Lục Lam Flagship" 
                               onError={useFallbackImage}
                               width={800}
