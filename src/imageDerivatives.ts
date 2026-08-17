@@ -34,6 +34,7 @@ export const IMAGE_DERIVATIVES: Record<string, number[]> = {
   "/uploads/external/5c7e7cbb99df.jpg": [640, 960],
   "/uploads/external/5d49c81dc807.jpg": [640, 800],
   "/uploads/external/5eae9e5b58fa.jpg": [640, 800],
+  "/uploads/external/5fe6aafe9f6e.jpg": [640, 960],
   "/uploads/external/63d97446637f.jpg": [640, 960],
   "/uploads/external/63e097cd5edc.jpg": [640, 800],
   "/uploads/external/6976f3dac1e0.jpg": [640, 800],

@@ -65,6 +65,7 @@ const CREDITS: Record<string, string> = {
   "/uploads/external/3c187490bf80.jpg": "Ảnh: Phương Huy — CC0, qua Wikimedia Commons",
   "/uploads/external/445a26698d7c.jpg": "Ảnh: Hiep Nguyen hiepng — CC0, qua Wikimedia Commons",
   "/uploads/external/c22f445fad1d.jpg": "Ảnh: trungydang — CC BY 3.0, qua Wikimedia Commons",
+  "/uploads/external/5fe6aafe9f6e.jpg": "Ảnh: Daderot — CC0, qua Wikimedia Commons",
 };
 
 /**

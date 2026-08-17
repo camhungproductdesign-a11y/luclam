@@ -163,6 +163,14 @@ export const defaultMedia: Record<string, PlaceMedia> = {
   // Street performers on Nguyễn Huệ at night — the living statues the entry is
   // about, not a daytime view of the boulevard. CC0, choi kwangmo, via
   // Wikimedia Commons; see public/uploads/external/CREDITS.json.
+  // Flower market. This is the flower section of Bến Thành rather than Hồ Thị
+  // Kỷ itself — Commons files the only images under that name to a food tour
+  // that passed through, and they are a charcoal grill and a selfie in the
+  // alley. A Saigon flower market it is; that market it is not.
+  "culture-17": {
+    img: "/uploads/external/5fe6aafe9f6e.jpg",
+    video: ""
+  },
   "culture-15": {
     img: "/uploads/external/88a32c12ebb3.jpg",
     video: ""
