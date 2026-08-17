@@ -59,6 +59,12 @@ const CREDITS: Record<string, string> = {
   "/uploads/external/56e72ea5b61d.jpg": "Ảnh: Andy Li — CC0, qua Wikimedia Commons",
   "/uploads/external/9a224a89efcf.jpg": "Ảnh: Hermann Luyken — CC0, qua Wikimedia Commons",
   "/uploads/external/1d2edace9c5d.jpg": "Ảnh: Andy Li — CC0, qua Wikimedia Commons",
+  "/uploads/external/c6c447a725a8.jpg": "Ảnh: Andy Li — CC0, qua Wikimedia Commons",
+  "/uploads/external/a38f69f72eb6.jpg": "Ảnh: Phương Huy — CC0, qua Wikimedia Commons",
+  "/uploads/external/821d9077c0c7.jpg": "Ảnh: Tokeisan at Vietnamese Wikipedia — Public domain, qua Wikimedia Commons",
+  "/uploads/external/3c187490bf80.jpg": "Ảnh: Phương Huy — CC0, qua Wikimedia Commons",
+  "/uploads/external/445a26698d7c.jpg": "Ảnh: Hiep Nguyen hiepng — CC0, qua Wikimedia Commons",
+  "/uploads/external/c22f445fad1d.jpg": "Ảnh: trungydang — CC BY 3.0, qua Wikimedia Commons",
 };
 
 /**

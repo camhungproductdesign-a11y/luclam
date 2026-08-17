@@ -58,7 +58,11 @@ export const defaultMedia: Record<string, PlaceMedia> = {
     img: "/uploads/external/a4419c1d52ed.jpg",
     video: ""
   },
-  // Com Tam
+  "food-1-3": {
+    img: "/uploads/external/c6c447a725a8.jpg",
+    video: ""
+  },
+  // Cafe — nhom 2 la Saigon Coffee, khong phai com tam
   "food-2-0": {
     img: "/uploads/external/fa2e55bb77b9.jpg",
     video: ""
@@ -71,7 +75,11 @@ export const defaultMedia: Record<string, PlaceMedia> = {
     img: "/uploads/external/b79df3e27783.jpg",
     video: ""
   },
-  // Cafe
+  "food-2-3": {
+    img: "/uploads/external/a38f69f72eb6.jpg",
+    video: ""
+  },
+  // Com Tam — nhom 3, khong phai cafe
   "food-3-0": {
     img: "/uploads/external/9644f86a7b5e.jpg",
     video: "https://assets.mixkit.co/videos/preview/mixkit-coffee-dripping-from-a-filter-43093-large.mp4"
@@ -84,7 +92,15 @@ export const defaultMedia: Record<string, PlaceMedia> = {
     img: "/uploads/external/e6e6279b9ff6.jpg",
     video: ""
   },
-  // Seafood / Beer
+  "food-3-3": {
+    img: "/uploads/external/821d9077c0c7.jpg",
+    video: ""
+  },
+  "food-3-4": {
+    img: "/uploads/external/3c187490bf80.jpg",
+    video: ""
+  },
+  // Food Complexes — khu am thuc, khong phai hai san
   "food-4-0": {
     img: "/uploads/external/5d49c81dc807.jpg",
     video: ""
@@ -95,6 +111,14 @@ export const defaultMedia: Record<string, PlaceMedia> = {
   },
   "food-4-2": {
     img: "/uploads/external/33679cf1e5a9.jpg",
+    video: ""
+  },
+  "food-4-3": {
+    img: "/uploads/external/445a26698d7c.jpg",
+    video: ""
+  },
+  "food-4-4": {
+    img: "/uploads/external/b81340493a2a.jpg",
     video: ""
   },
 
@@ -146,7 +170,7 @@ export const defaultMedia: Record<string, PlaceMedia> = {
 
   // --- SHOPPING ---
   "shopping-0": {
-    img: "/uploads/external/24f78b813a4f.jpg",
+    img: "/uploads/external/c22f445fad1d.jpg",
     video: ""
   },
   "shopping-1": {
