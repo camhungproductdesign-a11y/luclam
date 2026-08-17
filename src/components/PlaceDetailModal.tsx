@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { findEmbedHeight, isTikTokOrigin } from '../embedHeight';
 import { 
   X, 
   ArrowLeft,
@@ -66,19 +67,32 @@ const NO_PHOTO_LABEL = {
   zht: '暫無照片',
 } as const;
 
+/** The @handle out of a TikTok URL, so the credit can be rendered as our own text. */
+const tiktokHandle = (url: string): string => (url.match(/tiktok\.com\/(@[\w.-]+)/i)?.[1] ?? '');
+
 const getEmbedDetails = (url: string | undefined) => {
-  if (!url) return { type: 'none' as const, embedUrl: '' };
+  if (!url) return { type: 'none' as const, embedUrl: '', handle: '', sourceUrl: '' };
 
   // TikTok Video Match
   const tiktokMatch = url.match(/tiktok\.com\/.*\/video\/(\d+)/i);
   if (tiktokMatch && tiktokMatch[1]) {
-    return { type: 'tiktok' as const, embedUrl: `https://www.tiktok.com/embed/v2/${tiktokMatch[1]}` };
+    return {
+      type: 'tiktok' as const,
+      embedUrl: `https://www.tiktok.com/embed/v2/${tiktokMatch[1]}`,
+      handle: tiktokHandle(url),
+      sourceUrl: url,
+    };
   }
 
   // YouTube match
   const ytMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i);
   if (ytMatch && ytMatch[1]) {
-    return { type: 'youtube' as const, embedUrl: `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1&mute=1&loop=1&playlist=${ytMatch[1]}` };
+    return {
+      type: 'youtube' as const,
+      embedUrl: `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1&mute=1&loop=1&playlist=${ytMatch[1]}`,
+      handle: '',
+      sourceUrl: url,
+    };
   }
 
   // General fallback if it contains tiktok.com but different format
@@ -87,12 +101,17 @@ const getEmbedDetails = (url: string | undefined) => {
     if (parts.length > 1) {
       const id = parts[1].split('?')[0];
       if (/^\d+$/.test(id)) {
-        return { type: 'tiktok' as const, embedUrl: `https://www.tiktok.com/embed/v2/${id}` };
+        return {
+          type: 'tiktok' as const,
+          embedUrl: `https://www.tiktok.com/embed/v2/${id}`,
+          handle: tiktokHandle(url),
+          sourceUrl: url,
+        };
       }
     }
   }
 
-  return { type: 'direct' as const, embedUrl: url };
+  return { type: 'direct' as const, embedUrl: url, handle: '', sourceUrl: url };
 };
 
 export function PlaceDetailModal({ 
@@ -119,6 +138,8 @@ export function PlaceDetailModal({
   // only the second case was handled — so a dead link rendered the browser's
   // broken-image glyph with the alt text sprawled across the hero.
   const [heroFailed, setHeroFailed] = useState(false);
+  // null until TikTok's embed reports its own height; see the effect below.
+  const [tiktokHeight, setTiktokHeight] = useState<number | null>(null);
   const lastHeroSrc = useRef(resolvedImg);
   if (lastHeroSrc.current !== resolvedImg) {
     lastHeroSrc.current = resolvedImg;
@@ -139,7 +160,23 @@ export function PlaceDetailModal({
   React.useEffect(() => {
     setTiktokUrl('');
     setTiktokError('');
+    setTiktokHeight(null);
   }, [place.id]);
+
+  // Sizes the TikTok frame to the height the embed reports. See
+  // src/embedHeight.ts for why the payload is read loosely.
+  React.useEffect(() => {
+    if (!isOpen || embedDetails.type !== 'tiktok') return;
+
+    const onMessage = (event: MessageEvent) => {
+      if (!isTikTokOrigin(event.origin)) return;
+      const height = findEmbedHeight(event.data);
+      if (height) setTiktokHeight(Math.ceil(height));
+    };
+
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, [isOpen, embedDetails.type, embedDetails.embedUrl]);
 
   if (!isOpen) return null;
 
@@ -501,14 +538,74 @@ export function PlaceDetailModal({
                   </div>
                   
                   {embedDetails.type === 'tiktok' ? (
-                    <div className="relative w-full max-w-[320px] mx-auto aspect-[9/16] rounded-2xl overflow-hidden shadow-lg border border-zinc-200/50 bg-black">
-                      <iframe
-                        src={embedDetails.embedUrl}
-                        className="absolute inset-0 w-full h-full border-0"
-                        allow="autoplay; encrypted-media; picture-in-picture"
-                        allowFullScreen
-                        title="TikTok Video Embed"
-                      />
+                    /* Height, not an aspect ratio, and generous rather than
+                       measured.
+
+                       A TikTok embed is more than its video: below the clip come
+                       the handle, the caption with its hashtags, the track name
+                       and a call-to-action bar. Sizing the frame 9/16 fitted the
+                       clip alone, so TikTok's own layout overflowed inside the
+                       iframe and scrolled there — the scrollbar, the clipped
+                       caption, the button sitting over the text.
+
+                       Two boxes, and they are deliberately different sizes. The
+                       outer one is the clip's own 9/16 and crops; the iframe
+                       inside is given far more room than that.
+
+                       A TikTok embed is the clip plus a caption, hashtags, a
+                       track credit and a call-to-action bar, and it publishes no
+                       height for the whole assembly. Matching the iframe to the
+                       outer box made TikTok's layout overflow and scroll inside
+                       itself; making the outer box tall enough for the assembly
+                       left a blank slab under short captions, because caption
+                       length decides the total and captions vary. Neither can be
+                       fixed by a better number — the number is not knowable from
+                       out here.
+
+                       So the iframe gets 1000px, which is more than the assembly
+                       ever needs, and therefore never scrolls; and the crop
+                       shows the clip alone, which is what was wanted from this
+                       and is always exactly 9/16. The chrome is still rendered,
+                       just outside the visible box.
+
+                       What the crop hides, the line below restores in our own
+                       markup: the handle, linking to the original. That is
+                       better than TikTok's own credit for this site, because
+                       text we render is in the HTML a crawler reads, while
+                       everything inside the iframe is invisible to it.
+
+                       lazy because this is a third-party player: it stays
+                       unfetched until scrolled into view, and the modal only
+                       mounts on a click, so no page load carries it. */
+                    <div className="w-full max-w-[325px] mx-auto space-y-1.5">
+                      <div className="relative w-full aspect-[9/16] rounded-2xl overflow-hidden shadow-lg border border-zinc-200/50 bg-black">
+                        <iframe
+                          src={embedDetails.embedUrl}
+                          className="absolute inset-x-0 top-0 w-full border-0"
+                          style={{ height: tiktokHeight ?? 1000 }}
+                          allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                          allowFullScreen
+                          loading="lazy"
+                          scrolling="no"
+                          title="TikTok Video Embed"
+                        />
+                      </div>
+                      {embedDetails.sourceUrl && (
+                        <a
+                          href={embedDetails.sourceUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="block text-[9px] text-zinc-500 hover:text-zinc-800 transition-colors truncate"
+                        >
+                          {embedDetails.handle
+                            ? `${embedDetails.handle} — ${lang === 'vi' ? 'xem trên TikTok' : lang === 'ja' ? 'TikTok で見る' : 'watch on TikTok'}`
+                            : lang === 'vi'
+                              ? 'Xem video gốc trên TikTok'
+                              : lang === 'ja'
+                                ? 'TikTok で元動画を見る'
+                                : 'Watch the original on TikTok'}
+                        </a>
+                      )}
                     </div>
                   ) : embedDetails.type === 'youtube' ? (
                     <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-lg border border-zinc-200/50 bg-black">
