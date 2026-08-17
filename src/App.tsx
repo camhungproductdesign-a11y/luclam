@@ -2157,12 +2157,16 @@ export default function App() {
                               opens; clamped to a line and 65% width they only ever
                               broke mid-word here. */}
                           <div className="flex-1 min-w-0 flex flex-col justify-center gap-1">
-                            <div className="flex gap-2 items-start min-w-0">
-                              <span className="text-base shrink-0" role="img" aria-label="shopping emoji">{item.emoji}</span>
-                              <div className="min-w-0 space-y-0.5">
-                                <h3 className="text-[15px] font-bold text-[#0b433f] leading-snug line-clamp-2">{item.name}</h3>
-                                <span className="text-[11px] text-amber-700 font-medium block line-clamp-1">{item.sub}</span>
-                              </div>
+                            {/* No emoji before the name, as on the culture list.
+                                Each card already carries a photograph of the
+                                place; a glyph drawn differently on every
+                                platform, unable to take the brand colour, adds
+                                nothing beside it. Dropping the row that held it
+                                also returns the width to the name, which is
+                                clamped at two lines. */}
+                            <div className="min-w-0 space-y-0.5">
+                              <h3 className="text-[15px] font-bold text-[#0b433f] leading-snug line-clamp-2">{item.name}</h3>
+                              <span className="text-[11px] text-amber-700 font-medium block line-clamp-1">{item.sub}</span>
                             </div>
                             <span className="flex items-center gap-1 text-[10px] text-zinc-500">
                               <Clock className="w-3 h-3 text-[#0b433f] shrink-0" />
