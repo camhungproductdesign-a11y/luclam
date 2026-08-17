@@ -1140,7 +1140,7 @@ export default function App() {
                         alt="Cà phê muối Sài Gòn"
                         onError={useFallbackImage}
                         width={960}
-                        height={720}
+                        height={1280}
                         loading="lazy"
                         decoding="async"
                         className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"

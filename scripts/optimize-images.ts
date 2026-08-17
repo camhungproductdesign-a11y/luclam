@@ -74,12 +74,24 @@ async function optimise(relativePath: string, manifest: Record<string, number[]>
   let derivatives = 0;
 
   for (const width of widths) {
+    // rotate() with no argument applies the EXIF orientation.
+    //
+    // A camera records "this is portrait" as a tag rather than by storing the
+    // pixels that way, and sharp drops metadata unless asked to keep it — so
+    // without this the derivative comes out with the sideways pixels and no tag
+    // to correct them, while the JPEG beside it still displays upright. Now
+    // that <picture> offers AVIF first, that lands the wrong one on the reader.
+    //
+    // No image in the repo currently trips it. It is here so the next one that
+    // arrives with a tag does not.
     await sharp(original)
+      .rotate()
       .resize({ width })
       .avif({ quality: 55 })
       .toFile(path.join(UPLOADS, `${base}-${width}.avif`));
 
     await sharp(original)
+      .rotate()
       .resize({ width })
       .webp({ quality: 72 })
       .toFile(path.join(UPLOADS, `${base}-${width}.webp`));
