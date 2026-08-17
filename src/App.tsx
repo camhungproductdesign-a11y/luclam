@@ -1150,7 +1150,13 @@ export default function App() {
                       {/* Text indicator */}
                       <div className="relative z-20 space-y-0.5">
                         <span className="text-[8px] uppercase tracking-widest text-amber-400 block font-bold">SAIGON COFFEE</span>
-                        <span className="text-[10px] font-serif text-white font-bold block">Cà Phê Muối &amp; Cà Phê Dừa</span>
+                        {/* Translated, like the video card beside it already
+                            was. The drink names were hardcoded Vietnamese and
+                            showed on all six pages — an English reader was told
+                            "Cà Phê Muối", which names the thing without saying
+                            what it is. Each language gets its own reading; the
+                            Vietnamese page keeps the Vietnamese. */}
+                        <span className="text-[10px] font-serif text-white font-bold block">{t.welcome.coffeeTitle}</span>
                       </div>
                     </div>
 
