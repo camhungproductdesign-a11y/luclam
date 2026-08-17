@@ -525,10 +525,33 @@ export default function App() {
   };
 
   // Helper to retrieve active media (custom takes precedence over defaults)
+  /**
+   * Merges the override over the default field by field, rather than letting
+   * the presence of an override replace the pair.
+   *
+   * The editor writes both keys whenever either changes — assignMediaToPlace
+   * starts from { img: '', video: '' } — so adding a TikTok link to a place
+   * stored an empty img beside it. Returning that record whole then hid the
+   * default photograph, and the card fell back to the placeholder graphic. The
+   * Saigon Central Post Office lost its picture that way: the file was intact
+   * on disk and referenced correctly, and an empty string was standing in front
+   * of it.
+   *
+   * The trade-off is that an override can no longer clear a default down to
+   * nothing, since an empty value now means "not set" rather than "set to
+   * empty". Nothing in the interface asks for that, and the other reading has
+   * cost this project real content twice — nineteen places were shadowed the
+   * same way once before.
+   */
   const getPlaceMedia = (placeId: string) => {
+    const fallback = defaultMedia[placeId] || { img: '', video: '' };
     const custom = customMedia[placeId];
-    if (custom) return custom;
-    return defaultMedia[placeId] || { img: '', video: '' };
+    if (!custom) return fallback;
+
+    return {
+      img: custom.img || fallback.img,
+      video: custom.video || fallback.video,
+    };
   };
 
   const handleOpenDetail = (type: 'food' | 'culture' | 'shopping' | 'product', catIdxOrIdx: number, itemIdx?: number, placeData?: any) => {
