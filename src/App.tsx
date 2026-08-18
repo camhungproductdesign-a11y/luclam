@@ -597,6 +597,46 @@ export default function App() {
     });
   };
 
+  /**
+   * How wide one page is, and how many of them the frame is showing.
+   *
+   * Measured from the first section rather than assumed from a breakpoint: the
+   * spread is expressed in CSS (`lg:w-1/2`), and reading it back means the
+   * arithmetic follows the layout instead of restating it. A second copy of
+   * "1024px means two pages" is a second thing to get wrong.
+   */
+  const spreadMetrics = () => {
+    const el = phoneScreenRef.current;
+    if (!el) return null;
+    const frame = el.clientWidth;
+    const page = (el.firstElementChild as HTMLElement | null)?.clientWidth || frame;
+    if (page <= 0 || frame <= 0) return null;
+    return { frame, page, perView: Math.max(1, Math.round(frame / page)) };
+  };
+
+  /** Where the scroll must sit for a page to be on screen. */
+  const offsetFor = (index: number) => {
+    const m = spreadMetrics();
+    if (!m) return 0;
+    return Math.floor(index / m.perView) * m.frame;
+  };
+
+  /**
+   * Which page a scroll position means.
+   *
+   * A spread holds two pages, so a position maps to a pair rather than to one
+   * page. If the reader's current page is already in that pair, it stays
+   * selected — otherwise clicking "Useful Info" would scroll to the 9-10 spread
+   * and the highlight would slide back to "Lục Lam Stop" on its own.
+   */
+  const pageAtScroll = (scrollLeft: number, current: number) => {
+    const m = spreadMetrics();
+    if (!m) return current;
+    const left = Math.round(scrollLeft / m.frame) * m.perView;
+    if (current >= left && current < left + m.perView) return current;
+    return Math.min(left, pagesList.length - 1);
+  };
+
   // Keep phone screen scroll position in sync with page transitions
   const navigateToPage = (index: number) => {
     if (index < 0 || index >= pagesList.length) return;
@@ -609,13 +649,12 @@ export default function App() {
     }
 
     if (phoneScreenRef.current) {
-      const pageWidth = phoneScreenRef.current.clientWidth;
       // The smooth scroll travels across every page in between, firing the
       // scroll handler the whole way. State and URL are already correct, so
       // flag the animation and let the handler stand down until it settles.
       programmaticScrollRef.current = true;
       phoneScreenRef.current.scrollTo({
-        left: index * pageWidth,
+        left: offsetFor(index),
         behavior: 'smooth'
       });
     }
@@ -624,10 +663,9 @@ export default function App() {
   // Sync state if user swipes inside the mockup (scroll listener)
   const handlePhoneScroll = () => {
     if (!phoneScreenRef.current) return;
-    const pageWidth = phoneScreenRef.current.clientWidth;
-    if (pageWidth <= 0) return;
+    if (!spreadMetrics()) return;
 
-    const index = Math.round(phoneScreenRef.current.scrollLeft / pageWidth);
+    const index = pageAtScroll(phoneScreenRef.current.scrollLeft, currentPage);
     if (index < 0 || index >= pagesList.length) return;
 
     // Writing the URL on every frame of a scroll rewrites it once per page
@@ -639,7 +677,7 @@ export default function App() {
       programmaticScrollRef.current = false;
       if (!phoneScreenRef.current) return;
 
-      const settled = Math.round(phoneScreenRef.current.scrollLeft / pageWidth);
+      const settled = pageAtScroll(phoneScreenRef.current.scrollLeft, currentPage);
       if (settled < 0 || settled >= pagesList.length) return;
 
       // Reconcile against where the scroll actually stopped rather than where it
@@ -672,20 +710,21 @@ export default function App() {
 
     const el = phoneScreenRef.current;
     if (!el) return;
-    const pageWidth = el.clientWidth;
-    if (pageWidth <= 0) return;
+    const target = offsetFor(currentPage);
+    if (!spreadMetrics()) return;
 
-    if (Math.round(el.scrollLeft / pageWidth) === currentPage) return;
+    if (Math.abs(el.scrollLeft - target) < 1) return;
     programmaticScrollRef.current = true;
-    el.scrollLeft = currentPage * pageWidth;
+    el.scrollLeft = target;
   }, [currentPage]);
 
   // Handle window resizing to keep page alignment in scroll mockup
   useEffect(() => {
     const handleResize = () => {
       if (phoneScreenRef.current) {
-        const pageWidth = phoneScreenRef.current.clientWidth;
-        phoneScreenRef.current.scrollLeft = currentPage * pageWidth;
+        // Crossing the lg breakpoint changes how many pages the frame holds, so
+        // the offset has to be recomputed rather than scaled.
+        phoneScreenRef.current.scrollLeft = offsetFor(currentPage);
       }
     };
     window.addEventListener('resize', handleResize);
@@ -960,13 +999,13 @@ export default function App() {
       <main className="flex-1 flex items-center justify-center p-0 lg:p-8 relative overflow-y-auto">
         
         {/* Device Container Mockup frame on desktop */}
-        <div className="w-full max-w-full lg:max-w-[430px] h-full lg:h-[860px] bg-zinc-900 border-0 lg:border-[12px] lg:border-zinc-800 lg:rounded-[55px] lg:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] flex flex-col relative overflow-hidden transition-all duration-300">
+        <div className="w-full max-w-full lg:max-w-[900px] h-full lg:h-[860px] bg-zinc-900 border-0 lg:border-8 lg:border-zinc-800 lg:rounded-3xl lg:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] flex flex-col relative overflow-hidden transition-all duration-300">
           
-          {/* Notch indicator on desktop */}
-          <div className="hidden lg:block absolute top-0 left-1/2 -translate-x-1/2 w-40 h-[24px] bg-zinc-800 rounded-b-2xl z-40">
-            <div className="w-2.5 h-2.5 rounded-full bg-zinc-900 absolute right-12 top-2"></div>
-            <div className="w-12 h-1 bg-zinc-900 rounded absolute left-12 top-2.5"></div>
-          </div>
+          {/* The fold, where the notch used to be. Two pages share one frame
+              above lg, so the seam between them is what the eye needs — a phone
+              notch on a spread would be claiming to be a device it is not.
+              pointer-events-none because it sits over the scrolling pages. */}
+          <div className="hidden lg:block absolute inset-y-0 left-1/2 w-px -translate-x-1/2 z-30 pointer-events-none bg-gradient-to-b from-transparent via-black/30 to-transparent"></div>
 
           {/* Safe viewport window inside device frame */}
           <div className="flex-1 flex flex-col relative overflow-hidden bg-[#f6f3eb]">
@@ -983,7 +1022,7 @@ export default function App() {
               {/* ==========================================================================
                   PAGE 01: COVER PAGE
                   ========================================================================== */}
-              <section className="w-full h-full shrink-0 snap-start text-[#f6f3eb] flex flex-col justify-between page-section p-6 relative overflow-y-auto overflow-x-hidden bg-zinc-950">
+              <section className="w-full lg:w-1/2 h-full shrink-0 snap-start text-[#f6f3eb] flex flex-col justify-between page-section p-6 relative overflow-y-auto overflow-x-hidden bg-zinc-950">
                 
                 {/* Full-bleed high-contrast premium Ben Thanh aerial photograph background */}
                 <div className="absolute inset-0 transition-all duration-700">
@@ -1098,7 +1137,7 @@ export default function App() {
               {/* Sized container so the clamps below scale against this page's own
                   height. vh would read the browser window, which on desktop is
                   taller than the 860px device frame this page lives in. */}
-              <section className="[container-type:size] w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-5 overflow-y-auto">
+              <section className="[container-type:size] w-full lg:w-1/2 h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-5 overflow-y-auto">
                 <div className="space-y-[clamp(0.65rem,2.4cqh,1.25rem)]">
 
                   {/* Minimal page header decoration */}
@@ -1263,7 +1302,7 @@ export default function App() {
               {/* ==========================================================================
                   PAGE 03: CITY GUIDE / DISTRICTS WITH MAP
                   ========================================================================== */}
-              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
+              <section className="w-full lg:w-1/2 h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
                 <div className="space-y-4">
                   
                   {/* Minimal page header decoration */}
@@ -1520,7 +1559,7 @@ export default function App() {
               {/* ==========================================================================
                   PAGE 04: TRANSPORTATION
                   ========================================================================== */}
-              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
+              <section className="w-full lg:w-1/2 h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
                 <div className="space-y-4">
                   
                   {/* Minimal page header decoration */}
@@ -1776,7 +1815,7 @@ export default function App() {
               {/* ==========================================================================
                   PAGE 05: STAY & REJUVENATE (CARE)
                   ========================================================================== */}
-              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
+              <section className="w-full lg:w-1/2 h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
                 <div className="space-y-4">
                   
                   {/* Minimal page header decoration */}
@@ -1944,7 +1983,7 @@ export default function App() {
               {/* ==========================================================================
                   PAGE 06: FOOD (Legends Must-Eat)
                   ========================================================================== */}
-              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto" id="food-page-section">
+              <section className="w-full lg:w-1/2 h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto" id="food-page-section">
                 <div className="space-y-4">
                   <PageHeading number="06" title={t.pages.food} kicker="Must-Eat Legends" />
 
@@ -2031,7 +2070,7 @@ export default function App() {
               {/* ==========================================================================
                   PAGE 07: CULTURE & LANDMARKS
                   ========================================================================== */}
-              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
+              <section className="w-full lg:w-1/2 h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
                 <div className="space-y-4">
                   <PageHeading number="07" title={t.pages.culture} kicker="Heritage & Check-in" />
 
@@ -2131,7 +2170,7 @@ export default function App() {
               {/* ==========================================================================
                   PAGE 08: SHOPPING & SOUVENIRS
                   ========================================================================== */}
-              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
+              <section className="w-full lg:w-1/2 h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
                 <div className="space-y-4">
                   <PageHeading number="08" title={t.pages.shopping} kicker="Shop Local Vibes" />
 
@@ -2191,7 +2230,7 @@ export default function App() {
               {/* ==========================================================================
                   PAGE 09: LỤC LAM TRẠM DỪNG CHÂN (Signature Experience)
                   ========================================================================== */}
-              <section className="w-full h-full shrink-0 snap-start bg-[#0b1513] text-[#f6f3eb] flex flex-col justify-between page-section p-6 overflow-y-auto">
+              <section className="w-full lg:w-1/2 h-full shrink-0 snap-start bg-[#0b1513] text-[#f6f3eb] flex flex-col justify-between page-section p-6 overflow-y-auto">
                 <div className="space-y-5">
                   {/* Eyebrow in English by design, like the other eight pages.
                       This one was the only Vietnamese hold-out. */}
@@ -2621,7 +2660,7 @@ export default function App() {
               {/* ==========================================================================
                   PAGE 10: USEFUL INFO (Safety, Cash & SIM)
                   ========================================================================== */}
-              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
+              <section className="w-full lg:w-1/2 h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
                 <div className="space-y-4">
                   <PageHeading number="10" title={t.pages.info} kicker="Security & Backup" />
 
@@ -2777,7 +2816,7 @@ export default function App() {
                 it legible, so they stay. */}
             <div
               id="sticky-flag-selector"
-              className="z-[45] flex flex-row gap-1.5 p-1.5 rounded-full md:bg-black/75 md:backdrop-blur-md md:border md:border-zinc-800/80 md:shadow-2xl md:absolute md:top-[35%] md:right-2 md:-translate-y-1/2 md:flex-col md:gap-2 md:rounded-2xl md:animate-in md:slide-in-from-right md:duration-500"
+              className="z-[45] lg:hidden flex flex-row gap-1.5 p-1.5 rounded-full md:bg-black/75 md:backdrop-blur-md md:border md:border-zinc-800/80 md:shadow-2xl md:absolute md:top-[35%] md:right-2 md:-translate-y-1/2 md:flex-col md:gap-2 md:rounded-2xl md:animate-in md:slide-in-from-right md:duration-500"
               title="Chọn ngôn ngữ / Select Language"
             >
               <div className="hidden md:block text-[8px] font-bold text-center text-zinc-300 uppercase py-0.5 tracking-wider select-none border-b border-zinc-800/60">
@@ -2835,7 +2874,7 @@ export default function App() {
             {/* ==========================================================================
                 MOBILE VIEWPORT BOTTOM TABS NAVIGATOR (Syncs scroll snaps)
                 ========================================================================== */}
-            <nav className="border-t border-zinc-200/80 bg-white/95 backdrop-blur-sm flex overflow-x-auto shrink-0 select-none max-w-full pb-1 pt-1.5 px-3 gap-1 z-30 scrollbar-none">
+            <nav className="lg:hidden border-t border-zinc-200/80 bg-white/95 backdrop-blur-sm flex overflow-x-auto shrink-0 select-none max-w-full pb-1 pt-1.5 px-3 gap-1 z-30 scrollbar-none">
               {pagesList.map((pageName, idx) => {
                 const navIcons = [
                   <BookOpen className="w-3.5 h-3.5 shrink-0" />,
