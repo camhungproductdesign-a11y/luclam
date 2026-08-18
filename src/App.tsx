@@ -34,6 +34,7 @@ import {
   Settings
 } from 'lucide-react';
 import { COMPANY, STORES } from './company';
+import { faqFor } from './faq';
 import { PageHeading } from './components/PageHeading';
 
 // ==========================================================================
@@ -2631,6 +2632,43 @@ export default function App() {
                         </div>
                       );
                     })}
+                  </div>
+
+                  {/* The questions, as text a reader can actually see.
+
+                      The FAQPage markup for these has been shipping for a while
+                      and described nothing: the questions appeared in no page,
+                      and this app removes the prerendered block on mount
+                      (see the effect near the top of this file), so a crawler
+                      that runs JavaScript — Googlebot and most assistant
+                      crawlers do — found the claim with no content behind it.
+
+                      <details> rather than a wall of text: nine answers would
+                      bury the safety and SIM information above, and the content
+                      stays in the DOM either way, which is what a crawler
+                      reads. */}
+                  <div className="space-y-2 pt-1">
+                    <h4 className="text-[10px] font-bold text-zinc-800 uppercase tracking-wider flex items-center gap-1.5">
+                      <Info className="w-4 h-4 text-[#0b433f] shrink-0" />
+                      <span>{t.faqHeading}</span>
+                    </h4>
+
+                    <div className="space-y-1.5">
+                      {faqFor(lang, t).map((entry, idx) => (
+                        <details
+                          key={idx}
+                          className="bg-white rounded-xl border border-zinc-200/60 shadow-sm overflow-hidden"
+                        >
+                          <summary className="text-[9px] font-bold text-[#0b433f] p-3 cursor-pointer list-none flex justify-between items-center gap-2 marker:hidden">
+                            <span>{entry.q}</span>
+                            <ChevronRight className="w-3 h-3 shrink-0 text-zinc-400" />
+                          </summary>
+                          <p className="text-[9px] text-zinc-500 leading-normal font-light px-3 pb-3">
+                            {entry.a}
+                          </p>
+                        </details>
+                      ))}
+                    </div>
                   </div>
 
                   {/* Lục Lam's own details. The Organization structured data on

@@ -1,7 +1,7 @@
-import { type Language } from '../../src/translations';
-import { LANGUAGES, HTML_LANG } from '../../src/routes';
-import { parsePrice } from '../../src/parsePrice';
-import { COMPANY, STORES } from '../../src/company';
+import { type Language } from './translations';
+import { LANGUAGES, HTML_LANG } from './routes';
+import { parsePrice } from './parsePrice';
+import { COMPANY, STORES } from './company';
 
 /**
  * The FAQ for one language, with its facts filled in from live data.

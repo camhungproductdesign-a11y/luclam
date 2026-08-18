@@ -3,6 +3,7 @@ import { pathFor, TOPICS, type Topic } from '../../src/routes';
 import { type ResolvedContent } from '../../src/resolveContent';
 import { type PlaceImage } from './place-images';
 import { COMPANY, STORES } from '../../src/company';
+import { faqFor } from '../../src/faq';
 
 export function escapeHtml(value: string): string {
   return value
@@ -105,6 +106,33 @@ function renderImages(images: PlaceImage[]): string {
 }
 
 /**
+ * The questions, as text on the page.
+ *
+ * The FAQPage markup describing these has been emitted for a while; the
+ * questions themselves were never rendered anywhere, so it described nothing.
+ * Google's rule is that the markup match visible content, and an assistant
+ * reading the page would have found the claim unsupported.
+ *
+ * dl/dt/dd rather than headings: it is a list of pairs, and that is what the
+ * element is for.
+ */
+function renderFaq(lang: Language, topic: Topic, t: any): string {
+  if (topic !== 'info') return '';
+
+  const entries = faqFor(lang, t);
+  if (entries.length === 0) return '';
+
+  const pairs = entries
+    .map(
+      (entry) =>
+        `<dt>${escapeHtml(entry.q)}</dt><dd>${escapeHtml(entry.a)}</dd>`
+    )
+    .join('');
+
+  return `<section><h2>${escapeHtml(t.faqHeading ?? 'FAQ')}</h2><dl>${pairs}</dl></section>`;
+}
+
+/**
  * The company's own details, on the page that already answers practical
  * questions.
  *
@@ -190,6 +218,7 @@ export function renderContent(
     '<article>',
     `<h1>${heading}</h1>`,
     renderNode(topicData, 1),
+    renderFaq(lang, topic, t),
     renderContact(topic, t),
     renderImages(images),
     '</article>',

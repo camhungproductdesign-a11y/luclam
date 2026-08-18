@@ -37,6 +37,39 @@ function countOccurrences(haystack: string, needle: RegExp): number {
   return (haystack.match(needle) ?? []).length;
 }
 
+/**
+ * The page as a reader sees it: tags gone, scripts and styles gone, entities
+ * turned back into the characters the structured data holds.
+ */
+function visibleText(html: string): string {
+  const body = html.split('<body>')[1] ?? html;
+  return body
+    .replace(/<script[\s\S]*?<\/script>/g, ' ')
+    .replace(/<style[\s\S]*?<\/style>/g, ' ')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    // Last, or an escaped entity would be decoded twice.
+    .replace(/&amp;/g, '&')
+    .replace(/\s+/g, ' ');
+}
+
+/** Every Question name anywhere in a JSON-LD block. */
+function questionsIn(node: unknown, found: string[] = []): string[] {
+  if (Array.isArray(node)) {
+    for (const item of node) questionsIn(item, found);
+  } else if (node && typeof node === 'object') {
+    const record = node as Record<string, unknown>;
+    if (record['@type'] === 'Question' && typeof record.name === 'string') {
+      found.push(record.name);
+    }
+    for (const value of Object.values(record)) questionsIn(value, found);
+  }
+  return found;
+}
+
 async function main() {
   for (const route of ALL_ROUTES) {
     const file = path.join(DIST, route.path, 'index.html');
@@ -74,14 +107,31 @@ async function main() {
       `${label}: thiếu khối #static-content`
     );
 
+    const readable = visibleText(html);
+
     for (const match of html.matchAll(
       /<script type="application\/ld\+json">([\s\S]*?)<\/script>/g
     )) {
+      let parsed: unknown;
       try {
-        JSON.parse(match[1]);
+        parsed = JSON.parse(match[1]);
       } catch (error) {
         failures.push(`${label}: JSON-LD không parse được — ${(error as Error).message}`);
         continue;
+      }
+
+      // Every question the markup claims must be readable on the same page.
+      //
+      // The FAQPage block shipped for a while describing content that existed
+      // nowhere — not in this HTML, not in the app. Google's rule is that the
+      // markup describe what a reader can see, and an assistant that quotes an
+      // answer is quoting a page that never said it. The failure was silent
+      // because structured data is invisible by definition, so it gets a gate.
+      for (const question of questionsIn(parsed)) {
+        check(
+          readable.includes(question),
+          `${label}: FAQPage hỏi "${question.slice(0, 48)}…" nhưng câu này không hiện trên trang`
+        );
       }
 
       // This asserted the absence of a telephone until Lục Lam confirmed the

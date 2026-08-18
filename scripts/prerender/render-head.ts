@@ -4,7 +4,7 @@ import { pathFor, HTML_LANG, LANGUAGES, type Topic } from '../../src/routes';
 import { escapeHtml } from './render-content';
 import { parsePrice } from '../../src/parsePrice';
 import { describe } from './describe';
-import { faqFor } from './faq';
+import { faqFor } from '../../src/faq';
 import { COMPANY, STORES, FLAGSHIP_HOURS } from '../../src/company';
 
 const ORIGIN = 'https://gift.luclam.vn';
@@ -98,10 +98,18 @@ function infoItemList(lang: Language, topic: Topic, resolved: ResolvedContent): 
 /**
  * The page's questions and answers, for the format an assistant quotes most
  * directly. Questions are written per language in translations.ts; the facts in
- * the answers are filled from live data. See ./faq.ts.
+ * the answers are filled from live data. See src/faq.ts.
+ *
+ * On the info page, not the cover. This markup used to sit on the six home
+ * pages while the questions themselves appeared nowhere at all — not in the
+ * static block, not in the app — which breaks Google's rule that FAQ markup
+ * describe content the reader can see, and is worse than useless for an
+ * assistant, which reads the rendered page and would find nothing behind the
+ * claim. The questions are practical ones — hours, fares, where to buy tea —
+ * so the useful-info page is where they belong, next to the contact block.
  */
 function faqPage(lang: Language, topic: Topic, resolved: ResolvedContent): string {
-  if (topic !== 'cover') return '';
+  if (topic !== 'info') return '';
 
   const questions = faqFor(lang, resolved[lang]);
   if (questions.length === 0) return '';
