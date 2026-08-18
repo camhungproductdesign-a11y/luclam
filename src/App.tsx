@@ -34,6 +34,7 @@ import {
   Settings
 } from 'lucide-react';
 import { COMPANY, STORES } from './company';
+import { PageHeading } from './components/PageHeading';
 
 // ==========================================================================
 // Translation Data for Saigon Pocket Guide
@@ -1079,12 +1080,12 @@ export default function App() {
                 <div className="space-y-[clamp(0.65rem,2.4cqh,1.25rem)]">
 
                   {/* Minimal page header decoration */}
-                  <div className="flex justify-between items-center border-b-[1.5px] border-[#b85233] pb-1.5 pt-2">
-                    <span className="text-[11px] font-bold text-[#0b433f] tracking-widest uppercase">
-                      02 | {t.pages.welcome}
-                    </span>
-                    <span className="text-[11px] font-serif italic text-zinc-500">Welcome to Saigon</span>
-                  </div>
+                  <PageHeading
+                    number="02"
+                    title={t.pages.welcome}
+                    kicker="Welcome to Saigon"
+                    padTop="pt-2"
+                  />
 
                   {/* Welcome core headings */}
                   <div className="space-y-2">
@@ -1244,12 +1245,7 @@ export default function App() {
                 <div className="space-y-4">
                   
                   {/* Minimal page header decoration */}
-                  <div className="flex justify-between items-center border-b-[1.5px] border-[#b85233] pb-1.5 pt-4">
-                    <span className="text-[11px] font-bold text-[#0b433f] tracking-widest uppercase">
-                      03 | {t.pages.atmosphere}
-                    </span>
-                    <span className="text-[11px] font-serif italic text-zinc-500">Explore Saigon Map</span>
-                  </div>
+                  <PageHeading number="03" title={t.pages.atmosphere} kicker="Explore Saigon Map" />
 
                   <p className="text-xs leading-relaxed text-zinc-600 font-light">
                     {t.atmosphere.description}
@@ -1498,12 +1494,7 @@ export default function App() {
                 <div className="space-y-4">
                   
                   {/* Minimal page header decoration */}
-                  <div className="flex justify-between items-center border-b-[1.5px] border-[#b85233] pb-1.5 pt-4">
-                    <span className="text-[11px] font-bold text-[#0b433f] tracking-widest uppercase">
-                      04 | {t.pages.transport}
-                    </span>
-                    <span className="text-[11px] font-serif italic text-zinc-500">Transit in Ho Chi Minh</span>
-                  </div>
+                  <PageHeading number="04" title={t.pages.transport} kicker="Transit in Ho Chi Minh" />
 
                   <p className="text-xs leading-relaxed text-zinc-600 font-light">
                     {t.transport.intro}
@@ -1759,12 +1750,7 @@ export default function App() {
                 <div className="space-y-4">
                   
                   {/* Minimal page header decoration */}
-                  <div className="flex justify-between items-center border-b-[1.5px] border-[#b85233] pb-1.5 pt-4">
-                    <span className="text-[11px] font-bold text-[#0b433f] tracking-widest uppercase">
-                      05 | {t.pages.stay}
-                    </span>
-                    <span className="text-[11px] font-serif italic text-zinc-500">Wellness & Hotels</span>
-                  </div>
+                  <PageHeading number="05" title={t.pages.stay} kicker="Wellness & Hotels" />
 
                   <p className="text-xs leading-relaxed text-zinc-600 font-light">
                     {t.stay.intro}
@@ -1930,12 +1916,7 @@ export default function App() {
                   ========================================================================== */}
               <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto" id="food-page-section">
                 <div className="space-y-4">
-                  <div className="flex justify-between items-center border-b-[1.5px] border-[#b85233] pb-1.5 pt-4">
-                    <span className="text-[11px] font-bold text-[#0b433f] tracking-widest uppercase">
-                      06 | {t.pages.food}
-                    </span>
-                    <span className="text-[11px] font-serif italic text-zinc-500">Must-Eat Legends</span>
-                  </div>
+                  <PageHeading number="06" title={t.pages.food} kicker="Must-Eat Legends" />
 
                   <p className="text-xs leading-relaxed text-zinc-600 font-light">
                     {t.food.intro}
@@ -2022,12 +2003,7 @@ export default function App() {
                   ========================================================================== */}
               <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
                 <div className="space-y-4">
-                  <div className="flex justify-between items-center border-b-[1.5px] border-[#b85233] pb-1.5 pt-4">
-                    <span className="text-[11px] font-bold text-[#0b433f] tracking-widest uppercase">
-                      07 | {t.pages.culture}
-                    </span>
-                    <span className="text-[11px] font-serif italic text-zinc-500">Heritage & Check-in</span>
-                  </div>
+                  <PageHeading number="07" title={t.pages.culture} kicker="Heritage & Check-in" />
 
                   <p className="text-xs leading-relaxed text-zinc-600 font-light">
                     {t.culture.intro}
@@ -2127,12 +2103,7 @@ export default function App() {
                   ========================================================================== */}
               <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
                 <div className="space-y-4">
-                  <div className="flex justify-between items-center border-b-[1.5px] border-[#b85233] pb-1.5 pt-4">
-                    <span className="text-[11px] font-bold text-[#0b433f] tracking-widest uppercase">
-                      08 | {t.pages.shopping}
-                    </span>
-                    <span className="text-[11px] font-serif italic text-zinc-500">Shop Local Vibes</span>
-                  </div>
+                  <PageHeading number="08" title={t.pages.shopping} kicker="Shop Local Vibes" />
 
                   <p className="text-xs leading-relaxed text-zinc-600 font-light">
                     {t.shopping.intro}
@@ -2192,15 +2163,15 @@ export default function App() {
                   ========================================================================== */}
               <section className="w-full h-full shrink-0 snap-start bg-[#0b1513] text-[#f6f3eb] flex flex-col justify-between page-section p-6 overflow-y-auto">
                 <div className="space-y-5">
-                  <div className="flex justify-between items-center border-b-[1.5px] border-amber-500/30 pb-1.5 pt-4">
-                    <span className="text-[11px] font-bold text-amber-400 tracking-widest uppercase flex items-center gap-1">
-                      <Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
-                      <span>09 | {t.pages.luclam}</span>
-                    </span>
-                    {/* English by design, like the eyebrow on the other eight
-                        pages. This one was the only Vietnamese hold-out. */}
-                    <span className="text-[11px] font-serif italic text-amber-500/90">Cultural Rest Stop</span>
-                  </div>
+                  {/* Eyebrow in English by design, like the other eight pages.
+                      This one was the only Vietnamese hold-out. */}
+                  <PageHeading
+                    number="09"
+                    title={t.pages.luclam}
+                    kicker="Cultural Rest Stop"
+                    tone="dark"
+                    icon={<Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />}
+                  />
 
                   {/* Stunning Shimmering Indochine Intro Card */}
                   <div className="bg-gradient-to-br from-[#0c2b27] via-[#081e1b] to-black rounded-2xl p-4.5 border border-amber-500/20 shadow-xl relative overflow-hidden">
@@ -2617,12 +2588,7 @@ export default function App() {
                   ========================================================================== */}
               <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
                 <div className="space-y-4">
-                  <div className="flex justify-between items-center border-b-[1.5px] border-[#b85233] pb-1.5 pt-4">
-                    <span className="text-[11px] font-bold text-[#0b433f] tracking-widest uppercase">
-                      10 | {t.pages.info}
-                    </span>
-                    <span className="text-[11px] font-serif italic text-zinc-500">Security & Backup</span>
-                  </div>
+                  <PageHeading number="10" title={t.pages.info} kicker="Security & Backup" />
 
                   <p className="text-xs leading-relaxed text-zinc-600 font-light">
                     {t.info.intro}
