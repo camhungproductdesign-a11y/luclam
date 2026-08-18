@@ -33,6 +33,7 @@ import {
   ShieldAlert,
   Settings
 } from 'lucide-react';
+import { COMPANY, STORES } from './company';
 
 // ==========================================================================
 // Translation Data for Saigon Pocket Guide
@@ -2659,6 +2660,57 @@ export default function App() {
                         </div>
                       );
                     })}
+                  </div>
+
+                  {/* Lục Lam's own details. The Organization structured data on
+                      this page names four shops, a phone number and a
+                      registration number; Google expects structured data to
+                      describe what the page actually shows, so this is where a
+                      reader sees the same facts.
+
+                      tel: and mailto: rather than plain text — a visitor on a
+                      phone taps to call. The addresses stay in Vietnamese in
+                      every language: they get shown to a driver or typed into a
+                      map, and a translated street name serves neither. */}
+                  <div className="space-y-2 pt-1">
+                    <h4 className="text-[10px] font-bold text-zinc-800 uppercase tracking-wider flex items-center gap-1.5">
+                      <PhoneCall className="w-4 h-4 text-[#b85233] shrink-0" />
+                      <span>{t.contact.heading}</span>
+                    </h4>
+
+                    <div className="bg-white rounded-xl p-3 border border-zinc-200/60 shadow-sm space-y-1.5">
+                      <p className="text-[9px] font-bold text-[#0b433f]">{COMPANY.legalName}</p>
+                      <div className="grid grid-cols-[auto_1fr] gap-x-2 gap-y-1 text-[9px] leading-normal">
+                        <span className="text-zinc-400 uppercase tracking-wide">{t.contact.phone}</span>
+                        <a href={`tel:${COMPANY.telephone}`} className="text-[#0b433f] underline underline-offset-2 break-all">
+                          {COMPANY.telephoneDisplay}
+                        </a>
+                        <span className="text-zinc-400 uppercase tracking-wide">{t.contact.email}</span>
+                        <a href={`mailto:${COMPANY.email}`} className="text-[#0b433f] underline underline-offset-2 break-all">
+                          {COMPANY.email}
+                        </a>
+                        <span className="text-zinc-400 uppercase tracking-wide">{t.contact.office}</span>
+                        <span className="text-zinc-600 font-light">
+                          {`${COMPANY.headOffice.street}, ${COMPANY.headOffice.ward}, ${COMPANY.headOffice.city}`}
+                        </span>
+                        <span className="text-zinc-400 uppercase tracking-wide">{t.contact.licence}</span>
+                        <span className="text-zinc-600 font-light tabular-nums">{COMPANY.registration}</span>
+                      </div>
+                    </div>
+
+                    <h5 className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider pt-1">
+                      {t.contact.stores}
+                    </h5>
+                    <div className="space-y-1.5">
+                      {STORES.map((store) => (
+                        <div key={store.id} className="bg-white rounded-xl p-2.5 border border-zinc-200/60 shadow-sm">
+                          <p className="text-[9px] font-bold text-[#0b433f]">{store.city}</p>
+                          <p className="text-[9px] text-zinc-500 leading-normal font-light">
+                            {`${store.street}, ${store.locality}`}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
 

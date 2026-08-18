@@ -2,6 +2,7 @@ import { type Language } from '../../src/translations';
 import { pathFor, TOPICS, type Topic } from '../../src/routes';
 import { type ResolvedContent } from '../../src/resolveContent';
 import { type PlaceImage } from './place-images';
+import { COMPANY, STORES } from '../../src/company';
 
 export function escapeHtml(value: string): string {
   return value
@@ -103,6 +104,48 @@ function renderImages(images: PlaceImage[]): string {
   return figures;
 }
 
+/**
+ * The company's own details, on the page that already answers practical
+ * questions.
+ *
+ * Structured data is supposed to describe what the page shows, and the
+ * Organization block now names four shops, a phone number, an email and a
+ * registration number that appeared nowhere in the markup. This puts them where
+ * a reader can see them too — and where an assistant quoting the schema can
+ * point at the sentence it came from.
+ *
+ * Addresses stay in Vietnamese in every language. A visitor shows one to a
+ * driver or types it into a map, and a translated street name serves neither.
+ */
+function renderContact(topic: Topic, t: any): string {
+  if (topic !== 'info' || !t.contact) return '';
+  const c = t.contact;
+
+  const shops = STORES.map(
+    (store) =>
+      `<li><strong>${escapeHtml(store.city)}</strong> — ${escapeHtml(
+        `${store.street}, ${store.locality}`
+      )}</li>`
+  ).join('');
+
+  return (
+    `<section><h2>${escapeHtml(c.heading)}</h2>` +
+    `<p>${escapeHtml(COMPANY.legalName)}</p>` +
+    `<p>${escapeHtml(c.phone)}: <a href="tel:${COMPANY.telephone}">${escapeHtml(
+      COMPANY.telephoneDisplay
+    )}</a></p>` +
+    `<p>${escapeHtml(c.email)}: <a href="mailto:${COMPANY.email}">${escapeHtml(
+      COMPANY.email
+    )}</a></p>` +
+    `<p>${escapeHtml(c.office)}: ${escapeHtml(
+      `${COMPANY.headOffice.street}, ${COMPANY.headOffice.ward}, ${COMPANY.headOffice.city}`
+    )}</p>` +
+    `<p>${escapeHtml(c.licence)}: ${escapeHtml(COMPANY.registration)}</p>` +
+    `<h3>${escapeHtml(c.stores)}</h3><ul>${shops}</ul>` +
+    `</section>`
+  );
+}
+
 export function renderContent(
   lang: Language,
   topic: Topic,
@@ -147,6 +190,7 @@ export function renderContent(
     '<article>',
     `<h1>${heading}</h1>`,
     renderNode(topicData, 1),
+    renderContact(topic, t),
     renderImages(images),
     '</article>',
     `<nav aria-label="${escapeHtml(t.pages.info)}"><ul>${topicNav}</ul></nav>`,

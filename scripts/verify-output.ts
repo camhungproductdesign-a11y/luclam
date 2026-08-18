@@ -1,4 +1,5 @@
 import fs from 'fs/promises';
+import { COMPANY } from '../src/company';
 import path from 'path';
 import { ALL_ROUTES, LANGUAGES, TOPICS } from '../src/routes';
 
@@ -83,13 +84,18 @@ async function main() {
         continue;
       }
 
-      // Scoped to the JSON-LD key, not the whole page: English body copy
-      // legitimately mentions the Central Post Office's telephone booths.
-      // A guessed number in structured data is worse than none, because an
-      // assistant reads it out as fact. See item #7.
+      // This asserted the absence of a telephone until Lục Lam confirmed the
+      // number, and it did its job — the build refused the moment one appeared.
+      // Now that there is a confirmed number, absence is no longer the thing
+      // worth guarding: the risk is a different number, since an assistant
+      // reads whatever is here out as fact. So the rule inverts to "if a
+      // telephone is present it must be the one in src/company.ts", which fails
+      // just as loudly on a typo or a stale copy.
+      const telephones = [...match[1].matchAll(/"telephone"\s*:\s*"([^"]*)"/g)].map((m) => m[1]);
+      const wrong = telephones.filter((number) => number !== COMPANY.telephone);
       check(
-        !/"telephone"\s*:/.test(match[1]),
-        `${label}: JSON-LD có trường telephone chưa được xác nhận`
+        wrong.length === 0,
+        `${label}: JSON-LD có số điện thoại lạ: ${wrong.join(', ')} (đúng phải là ${COMPANY.telephone})`
       );
     }
   }

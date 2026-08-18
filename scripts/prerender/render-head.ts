@@ -5,6 +5,7 @@ import { escapeHtml } from './render-content';
 import { parsePrice } from '../../src/parsePrice';
 import { describe } from './describe';
 import { faqFor } from './faq';
+import { COMPANY, STORES, FLAGSHIP_HOURS } from '../../src/company';
 
 const ORIGIN = 'https://gift.luclam.vn';
 const OG_IMAGE = `${ORIGIN}/uploads/og-cover.jpg`;
@@ -181,27 +182,36 @@ function products(lang: Language, topic: Topic, resolved: ResolvedContent): stri
 }
 
 function localBusiness(lang: Language, resolved: ResolvedContent): string {
-  // The telephone field is deliberately absent: the official number has not
-  // been confirmed by Lục Lam, and a wrong number in structured data is worse
-  // than none — assistants would read it out as fact. See item #7 in the spec.
+  // telephone was empty here until Lục Lam confirmed the number, because a
+  // wrong one in structured data is worse than none — an assistant reads it out
+  // as fact. It comes from src/company.ts now, along with everything else the
+  // company told us, so the copy, the schema and the FAQ cannot disagree.
+  const flagship = STORES[0];
+
   return JSON.stringify({
     '@context': 'https://schema.org',
     '@type': ['TeaStore', 'LocalBusiness'],
-    name: 'Lục Lam Art Of Tea',
+    name: COMPANY.brand,
     alternateName: resolved[lang].title,
     image: OG_IMAGE,
     '@id': ORIGIN,
     url: absolute(pathFor(lang, 'cover')),
     priceRange: '$$',
+    telephone: COMPANY.telephone,
+    email: COMPANY.email,
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'Tầng B2, Takashimaya, 92-94 Nam Kỳ Khởi Nghĩa',
-      addressLocality: 'Quận 1',
-      addressRegion: 'Thành phố Hồ Chí Minh',
+      streetAddress: flagship.street,
+      addressLocality: flagship.locality,
+      addressRegion: flagship.region,
       postalCode: '700000',
       addressCountry: 'VN',
     },
-    geo: { '@type': 'GeoCoordinates', latitude: 10.7733, longitude: 106.7011 },
+    geo: flagship.geo
+      ? { '@type': 'GeoCoordinates', latitude: flagship.geo.latitude, longitude: flagship.geo.longitude }
+      : undefined,
+    // Only the flagship's hours are known. The other three shops carry an
+    // address and no times rather than times that were guessed.
     openingHoursSpecification: {
       '@type': 'OpeningHoursSpecification',
       dayOfWeek: [
@@ -213,10 +223,66 @@ function localBusiness(lang: Language, resolved: ResolvedContent): string {
         'Saturday',
         'Sunday',
       ],
-      opens: '09:30',
-      closes: '22:00',
+      opens: FLAGSHIP_HOURS.opens,
+      closes: FLAGSHIP_HOURS.closes,
     },
-    sameAs: ['https://www.facebook.com/luclamartoftea'],
+    parentOrganization: { '@id': `${ORIGIN}#organization` },
+    sameAs: ['https://www.facebook.com/luclamartoftea', COMPANY.website],
+  });
+}
+
+/**
+ * The company behind the shops, and all four of them.
+ *
+ * The site knew one address — the Takashimaya counter — while Lục Lam trades
+ * from four: that one, Hội An, and two on Trần Phú in Đà Nẵng. Somebody asking
+ * an assistant where to buy this tea was being told about a quarter of the
+ * answer.
+ */
+function organization(lang: Language, resolved: ResolvedContent): string {
+  return JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    '@id': `${ORIGIN}#organization`,
+    name: COMPANY.brand,
+    legalName: COMPANY.legalName,
+    alternateName: resolved[lang].title,
+    // Vietnam's business registration number; taxID is the field Google reads.
+    taxID: COMPANY.registration,
+    url: COMPANY.website,
+    logo: OG_IMAGE,
+    telephone: COMPANY.telephone,
+    email: COMPANY.email,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: COMPANY.headOffice.street,
+      addressLocality: COMPANY.headOffice.ward,
+      addressRegion: COMPANY.headOffice.city,
+      addressCountry: COMPANY.headOffice.country,
+    },
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'customer service',
+      telephone: COMPANY.telephone,
+      email: COMPANY.email,
+      availableLanguage: ['vi', 'en', 'ja', 'ko', 'zh'],
+    },
+    location: STORES.map((store) => ({
+      '@type': 'Store',
+      '@id': `${ORIGIN}#store-${store.id}`,
+      name: `${COMPANY.brand} — ${store.city}`,
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: store.street,
+        addressLocality: store.locality,
+        addressRegion: store.region,
+        addressCountry: 'VN',
+      },
+      ...(store.geo
+        ? { geo: { '@type': 'GeoCoordinates', latitude: store.geo.latitude, longitude: store.geo.longitude } }
+        : {}),
+    })),
+    sameAs: ['https://www.facebook.com/luclamartoftea', COMPANY.website],
   });
 }
 
@@ -240,6 +306,7 @@ export function renderHead(
 
   const jsonLd = [
     isCover ? localBusiness(lang, resolved) : '',
+    isCover ? organization(lang, resolved) : '',
     breadcrumb(lang, topic, resolved),
     faqPage(lang, topic, resolved),
     infoItemList(lang, topic, resolved),

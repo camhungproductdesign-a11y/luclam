@@ -1,6 +1,7 @@
 import { type Language } from '../../src/translations';
 import { LANGUAGES, HTML_LANG } from '../../src/routes';
 import { parsePrice } from '../../src/parsePrice';
+import { COMPANY, STORES } from '../../src/company';
 
 /**
  * The FAQ for one language, with its facts filled in from live data.
@@ -74,6 +75,13 @@ export function faqFor(lang: Language, t: any): Array<{ q: string; a: string }> 
     teas: joinNames(t.luclam?.menuItems ?? [], 3, (m) => strip(m.name)),
     priceFrom: cheapest(t.luclam?.menuItems ?? []),
     languages: LANGUAGE_NAMES[lang],
+    // Addresses stay in Vietnamese in every language: a visitor shows them to a
+    // driver or types them into a map, and a translated street name serves
+    // neither.
+    stores: STORES.map((store) => `${store.city} — ${store.street}, ${store.locality}`).join('; '),
+    storeCount: String(STORES.length),
+    phone: COMPANY.telephoneDisplay,
+    email: COMPANY.email,
   };
 
   return entries
