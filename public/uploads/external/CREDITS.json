@@ -1,21 +1,21 @@
 [
   {
     "originalUrl": "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=800&q=80",
-    "localPath": "/uploads/external/070237d365a1.jpg",
+    "localPath": "/uploads/external/pho-hoa-pasteur.jpg",
     "host": "images.unsplash.com",
     "license": "Unsplash License — dùng được cho mục đích thương mại, không bắt buộc ghi nguồn nhưng nên có",
     "attribution": "Ảnh: Unsplash"
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Binh_Tay_Market%2C_Ho_Chi_Minh_City%2C_Vietnam%2826152581294%29.jpg/960px-Binh_Tay_Market%2C_Ho_Chi_Minh_City%2C_Vietnam%2826152581294%29.jpg",
-    "localPath": "/uploads/external/0d4c09ff3ef0.jpg",
+    "localPath": "/uploads/external/binh-tay-market.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC BY 2.0 (https://creativecommons.org/licenses/by/2.0)",
     "attribution": "Ảnh: senngokujidai4434 — CC BY 2.0, qua Wikimedia Commons"
   },
   {
     "originalUrl": "https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?auto=format&fit=crop&w=800&q=80",
-    "localPath": "/uploads/external/1257bbfbccfb.jpg",
+    "localPath": "/uploads/external/spa-herbal-wash.jpg",
     "host": "images.unsplash.com",
     "license": "Unsplash License — dùng được cho mục đích thương mại, không bắt buộc ghi nguồn nhưng nên có",
     "attribution": "Ảnh: Unsplash"
@@ -29,7 +29,7 @@
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Th%E1%BA%A3o_C%E1%BA%A7m_vi%C3%AAn%2C_quan_1%2C_saigon%2C_vietnam_-_panoramio.jpg/960px-Th%E1%BA%A3o_C%E1%BA%A7m_vi%C3%AAn%2C_quan_1%2C_saigon%2C_vietnam_-_panoramio.jpg",
-    "localPath": "/uploads/external/22b49173df55.jpg",
+    "localPath": "/uploads/external/saigon-zoo-botanical-gardens.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC BY 3.0 (https://creativecommons.org/licenses/by/3.0)",
     "attribution": "Ảnh: trungydang — CC BY 3.0, qua Wikimedia Commons"
@@ -64,21 +64,21 @@
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/C%E1%BB%95ng_ch%C3%B9a_V%C4%A9nh_Nghi%C3%AAm.jpg/960px-C%E1%BB%95ng_ch%C3%B9a_V%C4%A9nh_Nghi%C3%AAm.jpg",
-    "localPath": "/uploads/external/34ecd151e0c4.jpg",
+    "localPath": "/uploads/external/vinh-nghiem-pagoda.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC BY-SA 3.0 (https://creativecommons.org/licenses/by-sa/3.0)",
     "attribution": "Ảnh: Bùi Thụy Đào Nguyên — CC BY-SA 3.0, qua Wikimedia Commons"
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Vietnam_History_Museum_HCMC.JPG/960px-Vietnam_History_Museum_HCMC.JPG",
-    "localPath": "/uploads/external/355e36c2d702.jpg",
+    "localPath": "/uploads/external/hcmc-museum-of-history.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC BY-SA 3.0 (https://creativecommons.org/licenses/by-sa/3.0)",
     "attribution": "Ảnh: Nguyễn Thanh Quang — CC BY-SA 3.0, qua Wikimedia Commons"
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Ph%C6%B0%E1%BB%9Bc_H%E1%BA%A3i_T%E1%BB%B1.jpg/960px-Ph%C6%B0%E1%BB%9Bc_H%E1%BA%A3i_T%E1%BB%B1.jpg",
-    "localPath": "/uploads/external/3853e8267bed.jpg",
+    "localPath": "/uploads/external/jade-emperor-pagoda.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC BY-SA 3.0 (https://creativecommons.org/licenses/by-sa/3.0)",
     "attribution": "Ảnh: Bùi Thụy Đào Nguyên — CC BY-SA 3.0, qua Wikimedia Commons"
@@ -99,7 +99,7 @@
   },
   {
     "originalUrl": "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
-    "localPath": "/uploads/external/3e82fbf24e8d.jpg",
+    "localPath": "/uploads/external/boutique-hotels.jpg",
     "host": "images.unsplash.com",
     "license": "Unsplash License — dùng được cho mục đích thương mại, không bắt buộc ghi nguồn nhưng nên có",
     "attribution": "Ảnh: Unsplash"
@@ -113,7 +113,7 @@
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/B%E1%BA%A3o_t%C3%A0ng_M%E1%BB%B9_thu%E1%BA%ADt_Th%C3%A0nh_ph%E1%BB%91_H%E1%BB%93_Ch%C3%AD_Minh.jpg/960px-B%E1%BA%A3o_t%C3%A0ng_M%E1%BB%B9_thu%E1%BA%ADt_Th%C3%A0nh_ph%E1%BB%91_H%E1%BB%93_Ch%C3%AD_Minh.jpg",
-    "localPath": "/uploads/external/5c7e7cbb99df.jpg",
+    "localPath": "/uploads/external/hcmc-museum-of-fine-arts.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC BY-SA 3.0 (https://creativecommons.org/licenses/by-sa/3.0)",
     "attribution": "Ảnh: Bùi Thụy Đào Nguyên — CC BY-SA 3.0, qua Wikimedia Commons"
@@ -134,21 +134,21 @@
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/C%C3%B4ng_Vi%C3%AAn_23_Th%C3%A1ng_9_-_Ho_Chi_Minh_City%2C_Vietnam_-_DSC01084.JPG/960px-C%C3%B4ng_Vi%C3%AAn_23_Th%C3%A1ng_9_-_Ho_Chi_Minh_City%2C_Vietnam_-_DSC01084.JPG",
-    "localPath": "/uploads/external/63d97446637f.jpg",
+    "localPath": "/uploads/external/september-23rd-park.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC0 (http://creativecommons.org/publicdomain/zero/1.0/deed.en)",
     "attribution": "Ảnh: Daderot — CC0, qua Wikimedia Commons"
   },
   {
     "originalUrl": "https://images.unsplash.com/photo-1509722747041-616f39b57569?auto=format&fit=crop&w=800&q=80",
-    "localPath": "/uploads/external/63e097cd5edc.jpg",
+    "localPath": "/uploads/external/banh-mi-bay-ho.jpg",
     "host": "images.unsplash.com",
     "license": "Unsplash License — dùng được cho mục đích thương mại, không bắt buộc ghi nguồn nhưng nên có",
     "attribution": "Ảnh: Unsplash"
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4a/Ayuntamiento%2C_Ciudad_Ho_Chi_Minh%2C_Vietnam%2C_2013-08-14%2C_DD_01.JPG",
-    "localPath": "/uploads/external/7abe2e9e3c93.jpg",
+    "localPath": "/uploads/external/ho-chi-minh-city-hall.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC BY-SA 3.0 (https://creativecommons.org/licenses/by-sa/3.0)",
     "attribution": "Ảnh: Diego Delso — CC BY-SA 3.0, qua Wikimedia Commons"
@@ -162,7 +162,7 @@
   },
   {
     "originalUrl": "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80",
-    "localPath": "/uploads/external/9644f86a7b5e.jpg",
+    "localPath": "/uploads/external/cong-ca-phe.jpg",
     "host": "images.unsplash.com",
     "license": "Unsplash License — dùng được cho mục đích thương mại, không bắt buộc ghi nguồn nhưng nên có",
     "attribution": "Ảnh: Unsplash"
@@ -176,35 +176,35 @@
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/T%C3%A2n_%C4%90%E1%BB%8Bnh_Church_20190922.jpg/500px-T%C3%A2n_%C4%90%E1%BB%8Bnh_Church_20190922.jpg",
-    "localPath": "/uploads/external/9ab1e824c884.jpg",
+    "localPath": "/uploads/external/tan-dinh-pink-church.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0)",
     "attribution": "Ảnh: Suicasmo — CC BY-SA 4.0, qua Wikimedia Commons"
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Thien_Hau_Pagoda_%2810017896294%29.jpg/960px-Thien_Hau_Pagoda_%2810017896294%29.jpg",
-    "localPath": "/uploads/external/a1e4941a7477.jpg",
+    "localPath": "/uploads/external/ba-thien-hau-temple.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC0 (http://creativecommons.org/publicdomain/zero/1.0/deed.en)",
     "attribution": "Ảnh: Gary Todd from Xinzheng, China — CC0, qua Wikimedia Commons"
   },
   {
     "originalUrl": "https://images.unsplash.com/photo-1550507992-eb63ffee0847?auto=format&fit=crop&w=800&q=80",
-    "localPath": "/uploads/external/a4419c1d52ed.jpg",
+    "localPath": "/uploads/external/banh-mi-hong-hoa.jpg",
     "host": "images.unsplash.com",
     "license": "Unsplash License — dùng được cho mục đích thương mại, không bắt buộc ghi nguồn nhưng nên có",
     "attribution": "Ảnh: Unsplash"
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Bas%C3%ADlica_de_Nuestra_Se%C3%B1ora%2C_Ciudad_Ho_Chi_Minh%2C_Vietnam%2C_2013-08-14%2C_DD_05.JPG/500px-Bas%C3%ADlica_de_Nuestra_Se%C3%B1ora%2C_Ciudad_Ho_Chi_Minh%2C_Vietnam%2C_2013-08-14%2C_DD_05.JPG",
-    "localPath": "/uploads/external/a953a61daafc.jpg",
+    "localPath": "/uploads/external/saigon-notre-dame-cathedral.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC BY-SA 3.0 (https://creativecommons.org/licenses/by-sa/3.0)",
     "attribution": "Ảnh: Diego Delso — CC BY-SA 3.0, qua Wikimedia Commons"
   },
   {
     "originalUrl": "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=800&q=80",
-    "localPath": "/uploads/external/aec1207e6554.jpg",
+    "localPath": "/uploads/external/ca-phe-vot-phan-dinh-phung.jpg",
     "host": "images.unsplash.com",
     "license": "Unsplash License — dùng được cho mục đích thương mại, không bắt buộc ghi nguồn nhưng nên có",
     "attribution": "Ảnh: Unsplash"
@@ -218,7 +218,7 @@
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Gi%E1%BA%BFng_tr%E1%BB%9Di_Ga_B%E1%BA%BFn_Th%C3%A0nh_25-12-2024.jpg/960px-Gi%E1%BA%BFng_tr%E1%BB%9Di_Ga_B%E1%BA%BFn_Th%C3%A0nh_25-12-2024.jpg",
-    "localPath": "/uploads/external/b122cc5cb524.jpg",
+    "localPath": "/uploads/external/ben-thanh-metro-station.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC0 (http://creativecommons.org/publicdomain/zero/1.0/deed.en)",
     "attribution": "Ảnh: MekkongHero — CC0, qua Wikimedia Commons"
@@ -232,14 +232,14 @@
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Bui_Vien_Walking_Street_1.jpg/960px-Bui_Vien_Walking_Street_1.jpg",
-    "localPath": "/uploads/external/b81340493a2a.jpg",
+    "localPath": "/uploads/external/bui-vien-walking-street.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0)",
     "attribution": "Ảnh: Christophe95 — CC BY-SA 4.0, qua Wikimedia Commons"
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Lo_ren_river.jpg/960px-Lo_ren_river.jpg",
-    "localPath": "/uploads/external/bdd4700146f1.jpg",
+    "localPath": "/uploads/external/can-gio-mangrove-biosphere-reserve.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC BY-SA 3.0 (https://creativecommons.org/licenses/by-sa/3.0)",
     "attribution": "Ảnh: Tho nau — CC BY-SA 3.0, qua Wikimedia Commons"
@@ -267,49 +267,49 @@
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/W_C%E1%BB%A7_Chi_%C4%90%E1%BB%8Ba_%C4%91%E1%BA%A1o_C%E1%BB%A7_Chi_ng%E1%BB%A5y_trang.JPG/960px-W_C%E1%BB%A7_Chi_%C4%90%E1%BB%8Ba_%C4%91%E1%BA%A1o_C%E1%BB%A7_Chi_ng%E1%BB%A5y_trang.JPG",
-    "localPath": "/uploads/external/ddaaa1e2c3e1.jpg",
+    "localPath": "/uploads/external/cu-chi-tunnels.jpg",
     "host": "upload.wikimedia.org",
     "license": "Public domain",
     "attribution": "Ảnh: Phương Huy (thảo luận) — Public domain, qua Wikimedia Commons"
   },
   {
     "originalUrl": "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80",
-    "localPath": "/uploads/external/de0c1acc0e4c.jpg",
+    "localPath": "/uploads/external/hidden-cafes-tea.jpg",
     "host": "images.unsplash.com",
     "license": "Unsplash License — dùng được cho mục đích thương mại, không bắt buộc ghi nguồn nhưng nên có",
     "attribution": "Ảnh: Unsplash"
   },
   {
     "originalUrl": "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=800&q=80",
-    "localPath": "/uploads/external/df6ae223bb5a.jpg",
+    "localPath": "/uploads/external/the-new-playground.jpg",
     "host": "images.unsplash.com",
     "license": "Unsplash License — dùng được cho mục đích thương mại, không bắt buộc ghi nguồn nhưng nên có",
     "attribution": "Ảnh: Unsplash"
   },
   {
     "originalUrl": "https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=800&q=80",
-    "localPath": "/uploads/external/e6e6279b9ff6.jpg",
+    "localPath": "/uploads/external/ca-phe-vy.jpg",
     "host": "images.unsplash.com",
     "license": "Unsplash License — dùng được cho mục đích thương mại, không bắt buộc ghi nguồn nhưng nên có",
     "attribution": "Ảnh: Unsplash"
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/5/54/C%C3%B4ng_vi%C3%AAn_Tao_%C4%90%C3%A0n.jpg",
-    "localPath": "/uploads/external/eacab32897a9.jpg",
+    "localPath": "/uploads/external/tao-dan-park.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC BY-SA 2.0 (https://creativecommons.org/licenses/by-sa/2.0)",
     "attribution": "Ảnh: nosarose — CC BY-SA 2.0, qua Wikimedia Commons"
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Landmark81_582018_NhonHuynh.jpg/960px-Landmark81_582018_NhonHuynh.jpg",
-    "localPath": "/uploads/external/fa19227bacc9.jpg",
+    "localPath": "/uploads/external/landmark-81.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0)",
     "attribution": "Ảnh: Huỳnh Vĩ Nhơn — CC BY-SA 4.0, qua Wikimedia Commons"
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/d/db/20180413_215356Nguy%E1%BB%85n_Hu%E1%BB%87_Walking_Street.jpg",
-    "localPath": "/uploads/external/88a32c12ebb3.jpg",
+    "localPath": "/uploads/external/nguyen-hue-street-performances.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC0 (https://creativecommons.org/publicdomain/zero/1.0/)",
     "attribution": "Ảnh: choi kwangmo — CC0, qua Wikimedia Commons"
@@ -323,182 +323,182 @@
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/5/54/Ho_Chi_Minh_City_Opera_House_%283157990551%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
-    "localPath": "/uploads/external/46b13b6114de.jpg",
+    "localPath": "/uploads/external/saigon-opera-house.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC BY 2.0 (https://creativecommons.org/licenses/by/2.0)",
     "attribution": "Ảnh: Yun Huang Yong from Harbord, Australia — CC BY 2.0, qua Wikimedia Commons"
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/1/1a/Beef_Pho_%28M%29_-_Milk_No_Sugar.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
-    "localPath": "/uploads/external/0bbfd3fd8d0d.jpg",
+    "localPath": "/uploads/external/pho-viet-nam.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC0 (http://creativecommons.org/publicdomain/zero/1.0/deed.en)",
     "attribution": "Ảnh: Andy Li — CC0, qua Wikimedia Commons"
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/4/45/Pho_Bo_by_Banh_%26_Mee_in_Kirkgate_Market.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
-    "localPath": "/uploads/external/56e72ea5b61d.jpg",
+    "localPath": "/uploads/external/pho-dau.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC0 (http://creativecommons.org/publicdomain/zero/1.0/deed.en)",
     "attribution": "Ảnh: Andy Li — CC0, qua Wikimedia Commons"
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4c/2016.10.14.133502_Noodle_soup_beef_Pho_Bac_Vietnamese_restaurant_Seattle_Washington_USA.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
-    "localPath": "/uploads/external/9a224a89efcf.jpg",
+    "localPath": "/uploads/external/pho-le.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC0 (http://creativecommons.org/publicdomain/zero/1.0/deed.en)",
     "attribution": "Ảnh: Hermann Luyken — CC0, qua Wikimedia Commons"
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/a/a3/Pho_with_steak_with_garlic_-_Pho_2025-07-25.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
-    "localPath": "/uploads/external/1d2edace9c5d.jpg",
+    "localPath": "/uploads/external/pho-phu-vuong.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC0 (http://creativecommons.org/publicdomain/zero/1.0/deed.en)",
     "attribution": "Ảnh: Andy Li — CC0, qua Wikimedia Commons"
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/8/89/Special_Baguette_%28B%C3%A1nh_m%C3%AC%29_-_Banh_Mi_Ancient_Saigon_2024-12-20.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
-    "localPath": "/uploads/external/c6c447a725a8.jpg",
+    "localPath": "/uploads/external/banh-mi-nhu-lan.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC0 (http://creativecommons.org/publicdomain/zero/1.0/deed.en)",
     "attribution": "Ảnh: Andy Li — CC0, qua Wikimedia Commons"
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/a/ad/Cafe_Qu%E1%BB%91c_H%C3%B9ng_ng4th9n2022_%28c%C3%A0_ph%C3%AA_phin_%C4%91ang_pha%29_%282%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
-    "localPath": "/uploads/external/a38f69f72eb6.jpg",
+    "localPath": "/uploads/external/cheo-leo-cafe.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC0 (http://creativecommons.org/publicdomain/zero/1.0/deed.en)",
     "attribution": "Ảnh: Phương Huy — CC0, qua Wikimedia Commons"
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/4/40/C%C6%A1m_t%E1%BA%A5m_s%C6%B0%E1%BB%9Dn_c%C3%A2y.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
-    "localPath": "/uploads/external/821d9077c0c7.jpg",
+    "localPath": "/uploads/external/com-tam-nguyen-van-cu.jpg",
     "host": "upload.wikimedia.org",
     "license": "Public domain",
     "attribution": "Ảnh: Tokeisan at Vietnamese Wikipedia — Public domain, qua Wikimedia Commons"
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e2/C%C6%A1m_t%E1%BA%A5m_SG_l%E1%BB%81_%C4%91%C6%B0%E1%BB%9Dng_%28c%C6%A1m_s%C6%B0%E1%BB%9Dn%2C_mi%E1%BA%BFng_s%C6%B0%E1%BB%9Dn_n%C6%B0%E1%BB%9Bng_m%E1%BA%ADt_ong%29_ng30th7n2022_%284%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
-    "localPath": "/uploads/external/3c187490bf80.jpg",
+    "localPath": "/uploads/external/com-tam-kieu-giang.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC0 (http://creativecommons.org/publicdomain/zero/1.0/deed.en)",
     "attribution": "Ảnh: Phương Huy — CC0, qua Wikimedia Commons"
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/6/62/Street_Food_Life_%28Unsplash%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
-    "localPath": "/uploads/external/445a26698d7c.jpg",
+    "localPath": "/uploads/external/vinh-khanh-food-street.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC0 (http://creativecommons.org/publicdomain/zero/1.0/deed.en)",
     "attribution": "Ảnh: Hiep Nguyen hiepng — CC0, qua Wikimedia Commons"
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/e/ed/B%E1%BA%BFn_Th%C3%A0nh_market%2C_Ph%C6%B0%E1%BB%9Dng_B%E1%BA%BFn_Th%C3%A0nh%2C_Qu%E1%BA%ADn_1%2C_TPHCM%2C_Vi%E1%BB%87t_Nam_Ch%E1%BB%A3_B%E1%BA%BFn_Th%C3%A0nh_-_panoramio.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
-    "localPath": "/uploads/external/c22f445fad1d.jpg",
+    "localPath": "/uploads/external/ben-thanh-market.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC BY 3.0 (https://creativecommons.org/licenses/by/3.0)",
     "attribution": "Ảnh: trungydang — CC BY 3.0, qua Wikimedia Commons"
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/7/72/Flowers_in_Ben_Thanh_Market_-_Ho_Chi_Minh_City%2C_Vietnam_-_DSC01124.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
-    "localPath": "/uploads/external/5fe6aafe9f6e.jpg",
+    "localPath": "/uploads/external/ho-thi-ky-flower-market.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC0 (http://creativecommons.org/publicdomain/zero/1.0/deed.en)",
     "attribution": "Ảnh: Daderot — CC0, qua Wikimedia Commons"
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b0/B%C6%B0u_%C4%91i%E1%BB%87n_Trung_t%C3%A2m_S%C3%A0i_G%C3%B2n%2C_2018.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
-    "localPath": "/uploads/external/d8e432383a80.jpg",
+    "localPath": "/uploads/external/saigon-central-post-office.jpg",
     "host": "upload.wikimedia.org",
     "license": "Public domain",
     "attribution": "Ảnh: Anne and David from Kent, England UK — Public domain, qua Wikimedia Commons"
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/7/7d/20190923_Independence_Palace-10.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
-    "localPath": "/uploads/external/4315c3094d30.jpg",
+    "localPath": "/uploads/external/independence-palace.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC0",
     "attribution": "Ảnh: Balon Greyjoy — CC0, qua Wikimedia Commons"
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/4/43/Bombardero_A-37%2C_Museo_de_los_Vestigios_de_la_Guerra_de_Vietnam%2C_Ciudad_Ho_Chi_Minh%2C_Vietnam%2C_2013-08-14%2C_DD_01.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
-    "localPath": "/uploads/external/07e5d5530756.jpg",
+    "localPath": "/uploads/external/war-remnants-museum.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC BY-SA 3.0",
     "attribution": "Ảnh: Diego Delso — CC BY-SA 3.0, qua Wikimedia Commons"
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/8/81/C%C6%A1m_t%E1%BA%A5m_s%C6%B0%E1%BB%9Dn_b%C3%AC_ch%E1%BA%A3.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
-    "localPath": "/uploads/external/efb5de76d2ab.jpg",
+    "localPath": "/uploads/external/com-tam-ba-ghien.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC BY-SA 2.0",
     "attribution": "Ảnh: Alpha from Melbourne, Australia — CC BY-SA 2.0, qua Wikimedia Commons"
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/5/5e/C%C6%A1m_t%E1%BA%A5m_SG_%28c%C6%A1m_s%C6%B0%E1%BB%9Dn%29_ng27th9n2020_%282%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
-    "localPath": "/uploads/external/dea9d1957905.jpg",
+    "localPath": "/uploads/external/com-tam-thuan-kieu.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC0",
     "attribution": "Ảnh: Phương Huy — CC0, qua Wikimedia Commons"
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/4/45/C%C6%A1m_t%E1%BA%A5m_SG_%28c%C6%A1m_s%C6%B0%E1%BB%9Dn%29_ng27th9n2020_%283%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
-    "localPath": "/uploads/external/253070044ab3.jpg",
+    "localPath": "/uploads/external/com-tam-moc.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC0",
     "attribution": "Ảnh: Phương Huy — CC0, qua Wikimedia Commons"
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/3/3f/B%C3%A1nh_M%C3%AC_with_Spicy_Miso_Aubergine%2C_Kimchi_-_Earl%27s_Sandwiches_2023-09-25.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
-    "localPath": "/uploads/external/fbaa80ad4819.jpg",
+    "localPath": "/uploads/external/banh-mi-huynh-hoa.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC0",
     "attribution": "Ảnh: Andy Li — CC0, qua Wikimedia Commons"
   },
   {
     "originalUrl": "https://go2joy.s3.ap-southeast-1.amazonaws.com/blog/wp-content/uploads/2022/08/23150553/pho-di-bo-nguyen-hue-o-dau.jpg",
-    "localPath": "/uploads/external/38a3f7052e91.jpg",
+    "localPath": "/uploads/external/nguyen-hue-walking-street-at-night.jpg",
     "host": "go2joy.s3.ap-southeast-1.amazonaws.com",
     "license": "CHƯA RÕ QUYỀN — lấy từ trang thương mại, chưa xin phép chủ ảnh",
     "attribution": "Nguồn: go2joy.s3.ap-southeast-1.amazonaws.com"
   },
   {
     "originalUrl": "https://file.hstatic.net/200000432665/file/11_01cbf04e827e45b784d8f19354047388_1024x1024.png",
-    "localPath": "/uploads/external/728d7a93aa89.jpg",
+    "localPath": "/uploads/external/takashimaya-saigon-centre.jpg",
     "host": "file.hstatic.net",
     "license": "Lục Lam's own Haravan store — hình của chính thương hiệu",
     "attribution": "Nguồn: file.hstatic.net"
   },
   {
     "originalUrl": "https://saucefish.com/wp-content/uploads/2025/04/5-top-eats-at-ben-thanh-market.png",
-    "localPath": "/uploads/external/206f3b4ff2a4.jpg",
+    "localPath": "/uploads/external/ben-thanh-market-food-court.jpg",
     "host": "saucefish.com",
     "license": "CHƯA RÕ QUYỀN — lấy từ trang thương mại, chưa xin phép chủ ảnh",
     "attribution": "Nguồn: saucefish.com"
   },
   {
     "originalUrl": "https://static.chotot.com/storage/chotot-kinhnghiem/nha/2025/11/4a0c8374-chung-cu-42-nguyen-hue-1.jpeg",
-    "localPath": "/uploads/external/b34c8495e0b1.jpg",
+    "localPath": "/uploads/external/42-nguyen-hue-cafe-apartment.jpg",
     "host": "static.chotot.com",
     "license": "CHƯA RÕ QUYỀN — lấy từ trang thương mại, chưa xin phép chủ ảnh",
     "attribution": "Nguồn: static.chotot.com"
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/f/f2/Motorbike_jam_Saigon_Vietnam.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
-    "localPath": "/uploads/external/1e328445627c.jpg",
+    "localPath": "/uploads/external/motorbike-city-tour.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC BY 2.0",
     "attribution": "Ảnh: Mike — CC BY 2.0, qua Wikimedia Commons"
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/7/76/Bu%C3%BDt_109_%E1%BB%9F_Tr%E1%BA%A1m_trung_chuy%E1%BB%83n_H%C3%A0m_Nghi.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
-    "localPath": "/uploads/external/aab844ef460a.jpg",
+    "localPath": "/uploads/external/double-decker-bus-tour.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC BY-SA 4.0",
     "attribution": "Ảnh: CrystalizedMetal — CC BY-SA 4.0, qua Wikimedia Commons"
   },
   {
     "originalUrl": "https://upload.wikimedia.org/wikipedia/commons/a/a0/Lotus_Water_Puppet_Theater_2025.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
-    "localPath": "/uploads/external/2b7d6ca205f0.jpg",
+    "localPath": "/uploads/external/rong-vang-water-puppet-theatre.jpg",
     "host": "upload.wikimedia.org",
     "license": "CC BY 4.0",
     "attribution": "Ảnh: David Stanley — CC BY 4.0, qua Wikimedia Commons"

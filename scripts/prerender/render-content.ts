@@ -1,6 +1,7 @@
 import { type Language } from '../../src/translations';
 import { pathFor, TOPICS, type Topic } from '../../src/routes';
 import { type ResolvedContent } from '../../src/resolveContent';
+import { type PlaceImage } from './place-images';
 
 export function escapeHtml(value: string): string {
   return value
@@ -76,10 +77,37 @@ function renderNode(node: unknown, depth: number): string {
   return '';
 }
 
+/**
+ * The topic's photographs, each named by the place it shows.
+ *
+ * A figure with a caption rather than a bare img: the caption states which
+ * place the picture belongs to, which is the association a crawler otherwise
+ * has to guess at, and it carries the licence line the images are used under.
+ *
+ * loading="lazy" and the intrinsic dimensions are for the reader who lands on
+ * this markup with JavaScript off — the SPA replaces it on mount.
+ */
+function renderImages(images: PlaceImage[]): string {
+  if (images.length === 0) return '';
+
+  const figures = images
+    .map(
+      (image) =>
+        `<figure><img src="${image.src}" alt="${escapeHtml(image.alt)}" width="${image.width}" height="${image.height}" loading="lazy" decoding="async" />` +
+        `<figcaption>${escapeHtml(image.caption)}${
+          image.credit ? ` — <small>${escapeHtml(image.credit)}</small>` : ''
+        }</figcaption></figure>`
+    )
+    .join('');
+
+  return figures;
+}
+
 export function renderContent(
   lang: Language,
   topic: Topic,
-  resolved: ResolvedContent
+  resolved: ResolvedContent,
+  images: PlaceImage[] = []
 ): string {
   // Resolved rather than raw: English fills any gap, then the editor's
   // overrides from public/config.json go on top — the same content the running
@@ -119,6 +147,7 @@ export function renderContent(
     '<article>',
     `<h1>${heading}</h1>`,
     renderNode(topicData, 1),
+    renderImages(images),
     '</article>',
     `<nav aria-label="${escapeHtml(t.pages.info)}"><ul>${topicNav}</ul></nav>`,
     `<nav aria-label="Languages"><ul>${languageNav}</ul></nav>`,

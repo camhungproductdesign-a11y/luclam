@@ -5,6 +5,7 @@ import type { Language } from '../../src/translations';
 import { renderContent } from './render-content';
 import { renderHead, type Assets } from './render-head';
 import { resolveAllLanguages, type Overrides } from '../../src/resolveContent';
+import { imagesFor, type PlaceImage } from './place-images';
 
 const DIST = path.join(process.cwd(), 'dist');
 const ORIGIN = 'https://gift.luclam.vn';
@@ -107,10 +108,28 @@ ${body}
 `;
 }
 
-async function writeSitemap(): Promise<number> {
+async function writeSitemap(imagesByTopic: Map<Topic, PlaceImage[]>): Promise<{ urls: number; images: number }> {
+  let imageCount = 0;
+
   // One <url> per topic, with the six languages as alternates. Listing every
   // language as its own <url> would repeat the same alternate set six times.
   const entries = TOPICS.map((topic: Topic) => {
+    // The photographs on that topic, declared for Google Images. A picture in
+    // the markup is discoverable; one named here is discoverable without
+    // waiting for the page to be crawled, and carries its caption with it.
+    const images = imagesByTopic.get(topic) ?? [];
+    imageCount += images.length;
+
+    const imageTags = images
+      .map(
+        (image) =>
+          `      <image:image>\n` +
+          `        <image:loc>${ORIGIN}${image.src}</image:loc>\n` +
+          `        <image:title>${escapeXml(image.alt)}</image:title>\n` +
+          `      </image:image>`
+      )
+      .join('\n');
+
     const alternates = LANGUAGES.map(
       (lang) =>
         `      <xhtml:link rel="alternate" hreflang="${HTML_LANG[lang]}" href="${ORIGIN}${pathFor(
@@ -129,19 +148,30 @@ async function writeSitemap(): Promise<number> {
     <changefreq>weekly</changefreq>
     <priority>${topic === 'cover' ? '1.0' : '0.8'}</priority>
 ${alternates}
-${xDefault}
+${xDefault}${imageTags ? `\n${imageTags}` : ''}
   </url>`;
   });
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 ${entries.join('\n')}
 </urlset>
 `;
 
   await fs.writeFile(path.join(DIST, 'sitemap.xml'), xml, 'utf-8');
-  return entries.length;
+  return { urls: entries.length, images: imageCount };
+}
+
+/** Sitemap values are XML text, not HTML — escapeHtml would leave a bare &. */
+function escapeXml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
 }
 
 /**
@@ -192,9 +222,18 @@ async function main() {
   const resolved = resolveAllLanguages(await loadOverrides());
   let written = 0;
 
+  let withImages = 0;
+  // The sitemap names each image once per topic, so keep one language's set —
+  // the files are the same whichever page shows them.
+  const imagesByTopic = new Map<Topic, PlaceImage[]>();
+
   for (const route of ALL_ROUTES) {
+    const images = await imagesFor(route.lang, route.topic, resolved[route.lang]);
+    if (images.length) withImages += images.length;
+    if (route.lang === 'en' && images.length) imagesByTopic.set(route.topic, images);
+
     const head = renderHead(route.lang, route.topic, assets, resolved);
-    const body = renderContent(route.lang, route.topic, resolved);
+    const body = renderContent(route.lang, route.topic, resolved, images);
     const html = renderPage(route.lang, head, body, assets.scripts);
 
     const outputDir = path.join(DIST, route.path);
@@ -203,14 +242,14 @@ async function main() {
     written += 1;
   }
 
-  const sitemapEntries = await writeSitemap();
+  const sitemap = await writeSitemap(imagesByTopic);
 
   // GitHub Pages serves 404.html for paths that match no file. Ship the
   // Vietnamese homepage there so the SPA can still boot and route.
   await fs.copyFile(path.join(DIST, 'index.html'), path.join(DIST, '404.html'));
 
   console.log(
-    `Đã sinh ${written} trang, sitemap.xml (${sitemapEntries} URL + alternates) và 404.html`
+    `Đã sinh ${written} trang, ${withImages} thẻ ảnh, sitemap.xml (${sitemap.urls} URL + alternates, ${sitemap.images} ảnh) và 404.html`
   );
 }
 
