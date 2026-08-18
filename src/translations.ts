@@ -768,31 +768,31 @@ shopping: 'お買い物',
           name: 'Red Lava (レッドラヴァ ハーブティー)',
           desc: 'ハイビスカス（ローゼル）、鮮やかなオレンジ、シナモンのブレンド。甘酸っぱく香り高いビタミンCたっぷりのハーブティー。',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/frame_vu_ng_tet__12__bdc76c1b293c45c5ae8e8711482ea43a_large.png'
+          image: '/uploads/external/f999d37a9141.png'
         },
         {
           name: 'Velvet Rose (ベルベットローズ ティー)',
           desc: '厳選されたフレンチローズとジャスミンの優雅なハーモニー。華やかな香りで心を潤し、美肌効果をもたらす人気ティー。',
           price: '175,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/105_fbb0f752824b4b008cd70dabecbcdeb3_large.png'
+          image: '/uploads/external/08f6bea23e45.png'
         },
         {
           name: 'Violet Jasmine (バイオレットジャスミン ティー)',
           desc: '高山オーガニック緑茶に天然ジャスミンの花香を熟成。澄んだ高貴な香りが心身を爽やかに包み込みます。',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/106_d09a9c06a44742e58bd5765025c6ded7_large.png'
+          image: '/uploads/external/36b26e2fbdad.png'
         },
         {
           name: 'Golden Peach (ゴールデンピーチ ハーブティー)',
           desc: '芳醇な黄桃の甘香と天然ハチミツ、ハーブの優しくフルーティーな調和。心満たされる爽快な味わい。',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/103_37d008a17e654d88822f5e985a659700_large.png'
+          image: '/uploads/external/1f59277c65ac.png'
         },
         {
           name: 'Zen Relaxing (ゼンリラクシング ティー)',
           desc: 'カモミール、ハスの実の芯、ラベンダーの優しいハーモニー。旅の緊張をほぐし、心地よい眠りへと誘います。',
           price: '185,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/107_13b87a4b48264fef9e08be066a6e9d4d_large.png'
+          image: '/uploads/external/4a7899959ecc.png'
         }
       ],
       voucherHeading: '旅行者様限定・特別クーポン',
@@ -1598,31 +1598,31 @@ shopping: 'Mua sắm',
           name: 'Trà Red Lava (Nham Thạch Đỏ)',
           desc: 'Sự kết hợp rực rỡ giữa hoa atiso đỏ (hibiscus), cam lát sấy và quế thơm. Vị chua thanh, nồng nã, giàu vitamin C giúp xua tan mệt mỏi hành trình.',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/frame_vu_ng_tet__12__bdc76c1b293c45c5ae8e8711482ea43a_large.png'
+          image: '/uploads/external/f999d37a9141.png'
         },
         {
           name: 'Trà Velvet Rose (Hồng Nhung)',
           desc: 'Nụ hoa hồng Pháp chọn lọc kết hợp cùng nụ nhài và cúc la mã. Hương thơm nồng nàn quyến rũ, nuôi dưỡng làn da và giúp tâm trí thư thái.',
           price: '175,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/105_fbb0f752824b4b008cd70dabecbcdeb3_large.png'
+          image: '/uploads/external/08f6bea23e45.png'
         },
         {
           name: 'Trà Violet Jasmine (Lài Tím)',
           desc: 'Trà xanh hữu cơ ướp hoa lài tự nhiên tinh khiết. Hương hoa thanh tao quyến rũ giúp tâm trí nhẹ nhàng, tươi mát sảng khoái.',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/106_d09a9c06a44742e58bd5765025c6ded7_large.png'
+          image: '/uploads/external/36b26e2fbdad.png'
         },
         {
           name: 'Trà Golden Peach (Đào Hoàng Kim)',
           desc: 'Thảo mộc vị đào hoàng kim dịu ngọt hòa quyện cùng mật ong thiên nhiên. Vị ngọt hậu thanh mát, đượm hương trái cây nhiệt đới.',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/103_37d008a17e654d88822f5e985a659700_large.png'
+          image: '/uploads/external/1f59277c65ac.png'
         },
         {
           name: 'Trà Zen Relaxing (Thư Giãn Định Tâm)',
           desc: 'Sự kết hợp dịu nhẹ giữa hoa cúc La Mã, tâm sen và oải hương. Liệu pháp tự nhiên giảm căng thẳng, xoa dịu thần kinh và mang lại giấc ngủ an lành.',
           price: '185,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/107_13b87a4b48264fef9e08be066a6e9d4d_large.png'
+          image: '/uploads/external/4a7899959ecc.png'
         }
       ],
       voucherHeading: 'Quà Tặng Đặc Quyền Cho Du Khách',
@@ -2428,31 +2428,31 @@ shopping: '特色购物',
           name: 'Red Lava (红熔岩草本茶)',
           desc: '精选红宝石洛神花（玫瑰茄）、鲜橙片与桂皮的完美融汇。酸甜馥郁，富含天然维C与抗氧化成分，舒缓旅途劳顿。',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/frame_vu_ng_tet__12__bdc76c1b293c45c5ae8e8711482ea43a_large.png'
+          image: '/uploads/external/f999d37a9141.png'
         },
         {
           name: 'Velvet Rose (丝绒玫瑰茶)',
           desc: '严选法国粉玫瑰花蕾，搭配清雅茉莉与甘菊。花香缭绕优雅，滋润肌肤并舒缓身心压力。',
           price: '175,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/105_fbb0f752824b4b008cd70dabecbcdeb3_large.png'
+          image: '/uploads/external/08f6bea23e45.png'
         },
         {
           name: 'Violet Jasmine (紫罗兰茉莉茶)',
           desc: '高山有机绿茶吸融鲜采茉莉花香，辅以紫罗兰天然芳草。清甜回甘，令人神清气爽。',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/106_d09a9c06a44742e58bd5765025c6ded7_large.png'
+          image: '/uploads/external/36b26e2fbdad.png'
         },
         {
           name: 'Golden Peach (金桃草本茶)',
           desc: '多汁黄桃果香与天然野蜂蜜及草本精香揉合。口感甘甜清爽，是暖心夏日的沁凉首选。',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/103_37d008a17e654d88822f5e985a659700_large.png'
+          image: '/uploads/external/1f59277c65ac.png'
         },
         {
           name: 'Zen Relaxing (禅意舒缓茶)',
           desc: '天然洋甘菊、莲子芯与薰衣草的精妙拼配。有助于安神定志、平抚焦虑，引导您进入甜美梦乡。',
           price: '185,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/107_13b87a4b48264fef9e08be066a6e9d4d_large.png'
+          image: '/uploads/external/4a7899959ecc.png'
         }
       ],
       voucherHeading: '旅行者独家尊享礼遇',
@@ -3258,31 +3258,31 @@ shopping: '特色購物',
           name: 'Red Lava (紅熔岩草本茶)',
           desc: '精選紅寶石洛神花（玫瑰茄）、鮮橙片與桂皮的完美融匯。酸甜馥鬱，富含天然維C與抗氧化成分，舒緩旅途勞頓。',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/frame_vu_ng_tet__12__bdc76c1b293c45c5ae8e8711482ea43a_large.png'
+          image: '/uploads/external/f999d37a9141.png'
         },
         {
           name: 'Velvet Rose (絲絨玫瑰茶)',
           desc: '嚴選法國粉玫瑰花蕾，搭配清雅茉莉與甘菊。花香繚繞優雅，滋潤肌膚並舒緩身心壓力。',
           price: '175,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/105_fbb0f752824b4b008cd70dabecbcdeb3_large.png'
+          image: '/uploads/external/08f6bea23e45.png'
         },
         {
           name: 'Violet Jasmine (紫羅蘭茉莉茶)',
           desc: '高山有機綠茶吸融鮮採茉莉花香，輔以紫羅蘭天然芳草。清甜回甘，令人神清氣爽。',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/106_d09a9c06a44742e58bd5765025c6ded7_large.png'
+          image: '/uploads/external/36b26e2fbdad.png'
         },
         {
           name: 'Golden Peach (金桃草本茶)',
           desc: '多汁黃桃果香與天然野蜂蜜及草本精香揉合。口感甘甜清爽，是暖心夏日的沁涼首選。',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/103_37d008a17e654d88822f5e985a659700_large.png'
+          image: '/uploads/external/1f59277c65ac.png'
         },
         {
           name: 'Zen Relaxing (禪意舒緩茶)',
           desc: '天然洋甘菊、蓮子芯與薰衣草的精妙複配。有助於安神定志、平撫焦慮，引導您進入甜美夢鄉。',
           price: '185,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/107_13b87a4b48264fef9e08be066a6e9d4d_large.png'
+          image: '/uploads/external/4a7899959ecc.png'
         }
       ],
       voucherHeading: '旅行者獨家尊享禮遇',
@@ -4088,31 +4088,31 @@ shopping: 'Shop Local',
           name: 'Red Lava Herbal Tea',
           desc: 'Vibrant fusion of hibiscus flowers, dried orange slices, and cinnamon. Tangy, aromatic, rich in Vitamin C and antioxidants.',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/frame_vu_ng_tet__12__bdc76c1b293c45c5ae8e8711482ea43a_large.png'
+          image: '/uploads/external/f999d37a9141.png'
         },
         {
           name: 'Velvet Rose Tea',
           desc: 'Selected French rosebuds harmonized with jasmine and chamomile. Elegant floral notes that soothe the spirit and nurture healthy skin.',
           price: '175,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/105_fbb0f752824b4b008cd70dabecbcdeb3_large.png'
+          image: '/uploads/external/08f6bea23e45.png'
         },
         {
           name: 'Violet Jasmine Tea',
           desc: 'Organic green tea infused with natural jasmine blossoms and purple botanical accents. Delicate floral aroma for peaceful relaxation.',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/106_d09a9c06a44742e58bd5765025c6ded7_large.png'
+          image: '/uploads/external/36b26e2fbdad.png'
         },
         {
           name: 'Golden Peach Herbal Tea',
           desc: 'Succulent golden peach notes blended with natural wild honey and herbs. Naturally sweet and refreshing aftertaste.',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/103_37d008a17e654d88822f5e985a659700_large.png'
+          image: '/uploads/external/1f59277c65ac.png'
         },
         {
           name: 'Zen Relaxing Tea',
           desc: 'Soothing blend of chamomile flowers, lotus plumule, and lavender notes. Reduces stress and promotes peaceful, restorative sleep.',
           price: '185,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/107_13b87a4b48264fef9e08be066a6e9d4d_large.png'
+          image: '/uploads/external/4a7899959ecc.png'
         }
       ],
       voucherHeading: 'Exclusive Gift for Travelers',
@@ -4767,31 +4767,31 @@ shopping: 'Shop Local',
           name: 'Red Lava (레드 라바 허브티)',
           desc: '히비스커스 꽃과 오렌지, 시나몬이 빚어내는 정열적인 수색의 대표 허브티. 상큼한 비타민 C가 풍부하여 여행 피로를 풀어줍니다.',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/frame_vu_ng_tet__12__bdc76c1b293c45c5ae8e8711482ea43a_large.png'
+          image: '/uploads/external/f999d37a9141.png'
         },
         {
           name: 'Velvet Rose (벨벳 로즈 티)',
           desc: '우아한 프랑스 장미 꽃봉오리와 자스민의 은은한 조화. 마음을 평온하게 해주고 피부 미용에 탁월한 프리미엄 블렌딩.',
           price: '175,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/105_fbb0f752824b4b008cd70dabecbcdeb3_large.png'
+          image: '/uploads/external/08f6bea23e45.png'
         },
         {
           name: 'Violet Jasmine (바이올렛 자스민 티)',
           desc: '유기농 녹차에 천연 자스민 꽃향기를 머금은 감성 차. 깊고 청아한 꽃향기로 마음에 기분 좋은 청량감을 선사합니다.',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/106_d09a9c06a44742e58bd5765025c6ded7_large.png'
+          image: '/uploads/external/36b26e2fbdad.png'
         },
         {
           name: 'Golden Peach (골든 피치 허브티)',
           desc: '달콤한 황도 복숭아 향과 천연 꿀, 은은한 허브의 조화. 마신 뒤 은은하게 남아 피로를 잊게 해주는 머스트 해브 힐링 차.',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/103_37d008a17e654d88822f5e985a659700_large.png'
+          image: '/uploads/external/1f59277c65ac.png'
         },
         {
           name: 'Zen Relaxing (젠 리랙싱 티)',
           desc: '카모마일, 연심(연꽃 씨앗 심), 은은한 라벤더가 선사하는 평온함. 여행 중 지친 신경을 이완시키고 꿀잠을 도와줍니다.',
           price: '185,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/107_13b87a4b48264fef9e08be066a6e9d4d_large.png'
+          image: '/uploads/external/4a7899959ecc.png'
         }
       ],
       voucherHeading: '외국인 여행객 독점 특별 혜택',

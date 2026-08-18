@@ -14,11 +14,22 @@ const SOURCES = [
 ];
 
 /**
- * Only these two hosts. cdn.hstatic.net is Lục Lam's own Haravan store and
- * assets.mixkit.co serves videos that are far too heavy to vendor — both stay
- * hotlinked on purpose.
+ * cdn.hstatic.net is Lục Lam's own Haravan store, which is why it was left
+ * hotlinked at first: hosting someone else's bandwidth is the usual reason to
+ * vendor, and that reason did not apply.
+ *
+ * It applies for a different reason. Those five URLs are the tea product
+ * photographs, and while they live off-domain they cannot go in this site's
+ * image sitemap, they never reach the prerendered HTML — the product pages
+ * carried zero <img> tags — and Product.image points a crawler at a hostname
+ * that is not this site. Google credits the images to the CDN and this site
+ * gets nothing for its only commercial pages.
+ *
+ * assets.mixkit.co still stays hotlinked: those are videos, far too heavy to
+ * vendor, and video files earn none of the above.
  */
-const TARGET_HOSTS = /https:\/\/(?:images\.unsplash\.com|upload\.wikimedia\.org)\/[^"'\s)\\]+/g;
+const TARGET_HOSTS =
+  /https:\/\/(?:images\.unsplash\.com|upload\.wikimedia\.org|cdn\.hstatic\.net)\/[^"'\s)\\]+/g;
 
 // Wikimedia blocks requests without a descriptive User-Agent.
 const USER_AGENT =
@@ -41,6 +52,10 @@ function fileNameFor(url: string): string {
 }
 
 function licenseFor(host: string): string {
+  // Lục Lam's own product photographs, from Lục Lam's own store.
+  if (host === 'cdn.hstatic.net') {
+    return 'Ảnh sản phẩm của Lục Lam — tài sản của công ty, tự do dùng trên site này';
+  }
   if (host === 'images.unsplash.com') {
     return 'Unsplash License — dùng được cho mục đích thương mại, không bắt buộc ghi nguồn nhưng nên có';
   }
@@ -48,6 +63,7 @@ function licenseFor(host: string): string {
 }
 
 function attributionFor(host: string): string {
+  if (host === 'cdn.hstatic.net') return 'Ảnh: Lục Lam';
   if (host === 'images.unsplash.com') return 'Ảnh: Unsplash';
   return '';
 }

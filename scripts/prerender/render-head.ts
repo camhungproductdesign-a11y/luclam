@@ -161,7 +161,12 @@ function products(lang: Language, topic: Topic, resolved: ResolvedContent): stri
     };
 
     if (item.desc) product.description = item.desc;
-    if (item.image) product.image = item.image;
+    // Absolute: a crawler may read this JSON-LD away from the page it came
+    // from, and a bare "/uploads/…" has nothing to resolve against then. It was
+    // a full URL before only because it pointed at someone else's CDN.
+    if (item.image) {
+      product.image = item.image.startsWith('/') ? absolute(item.image) : item.image;
+    }
 
     if (offer) {
       product.offers = {

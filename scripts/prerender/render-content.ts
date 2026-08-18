@@ -39,8 +39,15 @@ const SKIP_KEYS = new Set([
  * objects with title/desc, others use label/detail. So this follows the shape
  * of the data rather than a fixed schema, which keeps it working when a topic
  * gains a field.
+ *
+ * `level` is the heading level to use here, carried down explicitly rather than
+ * derived from how deep the recursion happens to be. Deriving it skipped ranks:
+ * the data nests object → array → object, so two levels of recursion passed
+ * between one heading and the next, and the Lục Lam page came out h1 → h3 → h5
+ * with no h2 and no h4. An array is a list of siblings, not a level of
+ * hierarchy, so only objects advance it.
  */
-function renderNode(node: unknown, depth: number): string {
+function renderNode(node: unknown, level: number): string {
   if (typeof node === 'string') {
     const text = node.trim();
     if (!text) return '';
@@ -54,23 +61,36 @@ function renderNode(node: unknown, depth: number): string {
   }
 
   if (Array.isArray(node)) {
-    const items = node.map((item) => renderNode(item, depth + 1)).filter(Boolean);
+    const items = node.map((item) => renderNode(item, level)).filter(Boolean);
     if (items.length === 0) return '';
     return `<ul>${items.map((item) => `<li>${item}</li>`).join('')}</ul>`;
   }
 
   if (node && typeof node === 'object') {
-    const headingLevel = Math.min(depth + 2, 6);
+    const entries = Object.entries(node as Record<string, unknown>);
 
-    return Object.entries(node as Record<string, unknown>)
+    // Only advance the rank if this object actually puts a heading at it.
+    // Advancing unconditionally left a hole wherever a branch had no title of
+    // its own: the atmosphere topic is a bare object of zones, so nothing
+    // occupied h2 and its zones landed on h3 straight after the h1.
+    const emitsHeading = entries.some(
+      ([key, value]) =>
+        !SKIP_KEYS.has(key) &&
+        HEADING_KEYS.has(key) &&
+        typeof value === 'string' &&
+        value.trim()
+    );
+    const nested = emitsHeading ? Math.min(level + 1, 6) : level;
+
+    return entries
       .map(([key, value]) => {
         if (SKIP_KEYS.has(key)) return '';
         if (typeof value === 'string' && HEADING_KEYS.has(key)) {
           const text = value.trim();
           if (!text) return '';
-          return `<h${headingLevel}>${escapeHtml(text)}</h${headingLevel}>`;
+          return `<h${level}>${escapeHtml(text)}</h${level}>`;
         }
-        return renderNode(value, depth + 1);
+        return renderNode(value, nested);
       })
       .filter(Boolean)
       .join('');
@@ -217,7 +237,8 @@ export function renderContent(
   return [
     '<article>',
     `<h1>${heading}</h1>`,
-    renderNode(topicData, 1),
+    // 2, because the h1 above is level 1.
+    renderNode(topicData, 2),
     renderFaq(lang, topic, t),
     renderContact(topic, t),
     renderImages(images),

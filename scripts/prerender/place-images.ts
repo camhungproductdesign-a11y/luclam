@@ -49,8 +49,18 @@ async function measure(src: string) {
   return size;
 }
 
-/** Every place on a topic, as id and the name to describe its picture with. */
-function placesOn(topic: Topic, t: any): Array<{ id: string; name: string }> {
+/**
+ * Every place on a topic, as id and the name to describe its picture with.
+ *
+ * `img` is set only where the item carries its own picture rather than getting
+ * one through defaultMedia. The five teas are the case: the app reads
+ * `item.image` straight off the resolved translations for them and uses the
+ * place id only to find the product video. Routing them through defaultMedia
+ * here found nothing, so the six Lục Lam pages — the only pages that sell
+ * anything — went out with no <img> at all and no sitemap entry, while
+ * Product.image pointed at a CDN on another hostname.
+ */
+function placesOn(topic: Topic, t: any): Array<{ id: string; name: string; img?: string }> {
   switch (topic) {
     case 'food':
       return (t.food?.categories ?? []).flatMap((c: any, ci: number) =>
@@ -63,7 +73,11 @@ function placesOn(topic: Topic, t: any): Array<{ id: string; name: string }> {
     case 'stay':
       return (t.stay?.categories ?? []).map((c: any, i: number) => ({ id: `stay-${i}`, name: c.title }));
     case 'luclam':
-      return (t.luclam?.menuItems ?? []).map((it: any, i: number) => ({ id: `luclam-${i}`, name: it.name }));
+      return (t.luclam?.menuItems ?? []).map((it: any, i: number) => ({
+        id: `luclam-${i}`,
+        name: it.name,
+        img: it.image,
+      }));
     default:
       return [];
   }
@@ -77,7 +91,7 @@ export async function imagesFor(
   const out: PlaceImage[] = [];
 
   for (const place of placesOn(topic, t)) {
-    const src = imageFor(place.id);
+    const src = place.img || imageFor(place.id);
     // Only what is served from here: a hotlink in the markup would hand a third
     // party a say in whether this page renders.
     if (!src.startsWith('/uploads/')) continue;
