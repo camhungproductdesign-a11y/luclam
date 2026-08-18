@@ -248,7 +248,17 @@ async function main() {
   // sitemap.xml is for crawlers; llms.txt is the same map written for an
   // assistant, which will not fetch sixty pages to find the one that answers a
   // question. See ./llms.ts.
+  //
+  // Written to public/ as well as dist/, and that is not belt and braces. The
+  // dev server does not serve dist/, so /llms.txt there fell through to the SPA
+  // fallback and answered 200 with a page of HTML — which is worse than a 404,
+  // because a tool fetching it gets a valid response containing no H1 and no
+  // links and reports the file as malformed rather than missing. public/ is
+  // served verbatim in dev and copied into dist/ by vite build, so one file now
+  // answers the same way in both. dist/ is still written directly because the
+  // prerender runs after vite build, so that copy has already happened.
   const llms = renderLlmsTxt(resolved);
+  await fs.writeFile(path.join(process.cwd(), 'public', 'llms.txt'), llms, 'utf-8');
   await fs.writeFile(path.join(DIST, 'llms.txt'), llms, 'utf-8');
   const llmsInfo = llmsStats(llms);
 

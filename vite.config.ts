@@ -48,6 +48,8 @@ export default defineConfig(() => {
               ignored: [
                 '**/public/config.json',
                 '**/public/uploads/**',
+                // Rewritten by every build, and served rather than imported.
+                '**/public/llms.txt',
                 '**/scripts/**',
                 '**/dist/**',
               ],
