@@ -229,3 +229,38 @@
   .text-\[12px\]   { font-size: 14px; }
 }
 
+/* --------------------------------------------------------------------------
+   Desktop type floor
+
+   The rule above stops at 1023px because of an assumption that is no longer
+   true: that on a desktop this design sat inside a 430px phone mockup, drawn
+   small on purpose. It does not any more — a page fills the screen.
+
+   Measured on the culture page before this block existed: desktop rendered text
+   at 8, 9, 10 and 11px while the same page on a phone rendered it at 12, 12.5,
+   13 and 13.5px. The desktop version had *smaller* text than the phone, on a
+   screen held twice as far from the reader's face. That is the whole of "the
+   components are hard to look at on desktop"; it was never really a layout
+   problem.
+
+   Half a pixel above the mobile tier at each rung, for that extra viewing
+   distance, and the same ceiling so nothing lifted here outgrows text-sm. The
+   ladder's ordering is preserved, so the hierarchy each page was drawn with
+   survives intact.
+   -------------------------------------------------------------------------- */
+@media (min-width: 1024px) {
+  .text-\[6px\]    { font-size: 11.5px; }
+  .text-\[6\.5px\] { font-size: 11.5px; }
+  .text-\[7px\]    { font-size: 12px; }
+  .text-\[7\.5px\] { font-size: 12px; }
+  .text-\[8px\]    { font-size: 12.5px; }
+  .text-\[8\.5px\] { font-size: 12.5px; }
+  .text-\[9px\]    { font-size: 13px; }
+  .text-\[9\.5px\] { font-size: 13px; }
+  .text-\[10px\]   { font-size: 13.5px; }
+  .text-\[10\.5px\]{ font-size: 13.5px; }
+  .text-\[11px\]   { font-size: 14px; }
+  .text-\[11\.5px\]{ font-size: 14.5px; }
+  .text-\[12px\]   { font-size: 14.5px; }
+}
+
