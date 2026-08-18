@@ -3,6 +3,7 @@ import { type ResolvedContent } from '../../src/resolveContent';
 import { pathFor, HTML_LANG, LANGUAGES, type Topic } from '../../src/routes';
 import { escapeHtml } from './render-content';
 import { parsePrice } from '../../src/parsePrice';
+import { describe } from './describe';
 
 const ORIGIN = 'https://gift.luclam.vn';
 const OG_IMAGE = `${ORIGIN}/uploads/og-cover.jpg`;
@@ -264,7 +265,10 @@ export function renderHead(
   const isCover = topic === 'cover';
 
   const title = isCover ? `${t.title} | ${t.subtitle}` : `${t.pages[topic]} | ${t.title}`;
-  const description = isCover ? t.subtitle : `${t.pages[topic]} — ${t.subtitle}`;
+  // Built from the page's own content. See describe.ts for what the previous
+  // `${t.pages[topic]} — ${t.subtitle}` cost: sixty snippets averaging 35
+  // characters, none naming anything on the page it described.
+  const description = describe(lang, topic, t);
   const canonical = absolute(pathFor(lang, topic));
 
   const jsonLd = [
