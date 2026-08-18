@@ -4,6 +4,7 @@ import { pathFor, HTML_LANG, LANGUAGES, type Topic } from '../../src/routes';
 import { escapeHtml } from './render-content';
 import { parsePrice } from '../../src/parsePrice';
 import { describe } from './describe';
+import { faqFor } from './faq';
 
 const ORIGIN = 'https://gift.luclam.vn';
 const OG_IMAGE = `${ORIGIN}/uploads/og-cover.jpg`;
@@ -94,15 +95,15 @@ function infoItemList(lang: Language, topic: Topic, resolved: ResolvedContent): 
 }
 
 /**
- * Genuine question-answer pairs. These three shipped on the live site and are
- * real questions; they are facts about the shop that hold in any language, so
- * the answer text is built from structured values rather than translated prose.
+ * The page's questions and answers, for the format an assistant quotes most
+ * directly. Questions are written per language in translations.ts; the facts in
+ * the answers are filled from live data. See ./faq.ts.
  */
-function faqPage(lang: Language, topic: Topic): string {
+function faqPage(lang: Language, topic: Topic, resolved: ResolvedContent): string {
   if (topic !== 'cover') return '';
 
-  const questions = FAQ_BY_LANGUAGE[lang];
-  if (!questions || questions.length === 0) return '';
+  const questions = faqFor(lang, resolved[lang]);
+  if (questions.length === 0) return '';
 
   return JSON.stringify({
     '@context': 'https://schema.org',
@@ -116,44 +117,10 @@ function faqPage(lang: Language, topic: Topic): string {
   });
 }
 
-const ADDRESS = 'Tầng B2, Takashimaya, 92-94 Nam Kỳ Khởi Nghĩa, Quận 1, Thành phố Hồ Chí Minh';
-const ADDRESS_EN = 'B2 floor, Takashimaya, 92-94 Nam Ky Khoi Nghia, District 1, Ho Chi Minh City';
-
-/**
- * Vietnamese entries are the three that already shipped in index.html.
- * English is a direct rendering of the same facts. The other four languages
- * are intentionally absent — see infoItemList above.
- */
-const FAQ_BY_LANGUAGE: Partial<Record<Language, Array<{ q: string; a: string }>>> = {
-  vi: [
-    {
-      q: 'Lục Lam tại Thành phố Hồ Chí Minh nằm ở đâu?',
-      a: `Lục Lam nằm tại ${ADDRESS}.`,
-    },
-    {
-      q: 'Lục Lam mở cửa lúc mấy giờ?',
-      a: 'Lục Lam mở cửa từ 09:30 đến 22:00 mỗi ngày.',
-    },
-    {
-      q: 'Chợ Bến Thành nằm ở đâu?',
-      a: 'Chợ Bến Thành nằm tại Phường Bến Thành, Quận 1, Thành phố Hồ Chí Minh.',
-    },
-  ],
-  en: [
-    {
-      q: 'Where is Lục Lam located in Ho Chi Minh City?',
-      a: `Lục Lam is on the ${ADDRESS_EN}.`,
-    },
-    {
-      q: 'What are Lục Lam’s opening hours?',
-      a: 'Lục Lam is open from 09:30 to 22:00 every day.',
-    },
-    {
-      q: 'Where is Bến Thành Market?',
-      a: 'Bến Thành Market is in Bến Thành Ward, District 1, Ho Chi Minh City.',
-    },
-  ],
-};
+// ADDRESS, ADDRESS_EN and FAQ_BY_LANGUAGE lived here: three questions, in two
+// of the six languages, with the address written out twice. They are in
+// translations.ts and ./faq.ts now, where all six languages get the same
+// eight and the facts come from the data the pages already render.
 
 type MenuItem = {
   name: string;
@@ -274,7 +241,7 @@ export function renderHead(
   const jsonLd = [
     isCover ? localBusiness(lang, resolved) : '',
     breadcrumb(lang, topic, resolved),
-    faqPage(lang, topic),
+    faqPage(lang, topic, resolved),
     infoItemList(lang, topic, resolved),
     products(lang, topic, resolved),
   ]
