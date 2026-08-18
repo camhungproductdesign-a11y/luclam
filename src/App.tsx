@@ -2339,23 +2339,26 @@ export default function App() {
 
                   {/* Shimming Branch Locator */}
                   <div className="space-y-3 pt-2">
-                    <div className="flex justify-between items-center border-l-2 border-amber-500 pl-2">
+                    {/* Same shape as the page headers: a localised title beside a
+                        short fixed badge. The badge is pinned so the title wraps
+                        instead of both being squeezed into broken words. */}
+                    <div className="flex flex-wrap justify-between items-center gap-x-2 gap-y-1 border-l-2 border-amber-500 pl-2">
                       <h4 className="text-[11px] font-bold text-amber-400 tracking-wider uppercase">
                         {lang === 'vi' ? 'Hệ Thống Cửa Hàng Lục Lam' : lang === 'ko' ? '룩람 오프라인 매장' : lang === 'ja' ? 'Lục Lam 店舗ネットワーク' : 'Lục Lam Branch Locator'}
                       </h4>
-                      <span className="text-[7px] font-mono bg-amber-950 text-amber-300 border border-amber-500/20 px-1.5 py-0.5 rounded font-bold">4 BRANCHES</span>
+                      <span className="text-[7px] font-mono bg-amber-950 text-amber-300 border border-amber-500/20 px-1.5 py-0.5 rounded font-bold shrink-0 whitespace-nowrap">4 BRANCHES</span>
                     </div>
 
                     <div className="space-y-2 text-zinc-800">
                       {/* Saigon branch */}
                       <div className="bg-[#0c2b27]/40 rounded-xl p-3 border border-amber-500/10 space-y-1 shadow-inner">
-                        <div className="flex justify-between items-start">
-                          <span className="text-[8px] bg-[#0b433f] border border-emerald-400/20 text-white font-bold px-1.5 py-0.5 rounded">SAIGON</span>
+                        <div className="flex flex-wrap justify-between items-start gap-x-2 gap-y-1">
+                          <span className="text-[8px] bg-[#0b433f] border border-emerald-400/20 text-white font-bold px-1.5 py-0.5 rounded shrink-0">SAIGON</span>
                           <a 
                             href="https://maps.app.goo.gl/8tExfsHC1m2E4bxH7" 
                             target="_blank" 
                             rel="noreferrer"
-                            className="inline-flex items-center gap-1 text-[8px] text-amber-400 hover:underline font-bold"
+                            className="inline-flex items-center gap-1 text-[8px] text-amber-400 hover:underline font-bold shrink-0 whitespace-nowrap"
                           >
                             <span>Google Maps</span>
                             <ExternalLink className="w-2.5 h-2.5" />
@@ -2367,21 +2370,21 @@ export default function App() {
 
                       {/* Da Nang branches */}
                       <div className="bg-amber-950/20 rounded-xl p-3 border border-amber-500/15 space-y-2.5">
-                        <div className="flex justify-between items-start">
-                          <span className="text-[8px] bg-amber-600 text-white font-bold px-1.5 py-0.5 rounded">ĐÀ NẴNG (3 Locations)</span>
-                          <span className="text-[8px] text-amber-400 font-bold italic animate-pulse">New Concept Open!</span>
+                        <div className="flex flex-wrap justify-between items-start gap-x-2 gap-y-1">
+                          <span className="text-[8px] bg-amber-600 text-white font-bold px-1.5 py-0.5 rounded shrink-0">ĐÀ NẴNG (3 Locations)</span>
+                          <span className="text-[8px] text-amber-400 font-bold italic animate-pulse shrink-0 whitespace-nowrap">New Concept Open!</span>
                         </div>
                         
                         <div className="divide-y divide-zinc-800/60 space-y-2.5 pt-0.5">
                           {/* 1. Lục Lam Flagship */}
                           <div className="space-y-1.5 pt-1">
-                            <div className="flex justify-between items-center">
+                            <div className="flex flex-wrap justify-between items-center gap-x-2 gap-y-1">
                               <span className="text-[10px] font-bold text-amber-200">1. Lục Lam Flagship</span>
                               <a 
                                 href="https://www.google.com/maps/search/?api=1&query=Luc+Lam+202+Tran+Phu+Hai+Chau+Da+Nang" 
                                 target="_blank" 
                                 rel="noreferrer"
-                                className="text-[8px] text-amber-400 hover:underline font-bold flex items-center gap-0.5"
+                                className="text-[8px] text-amber-400 hover:underline font-bold flex items-center gap-0.5 shrink-0 whitespace-nowrap"
                               >
                                 <span>Directions</span>
                                 <ExternalLink className="w-2 h-2" />
@@ -2403,13 +2406,13 @@ export default function App() {
 
                           {/* 2. Lục Lam Premium */}
                           <div className="space-y-1.5 pt-2">
-                            <div className="flex justify-between items-center">
+                            <div className="flex flex-wrap justify-between items-center gap-x-2 gap-y-1">
                               <span className="text-[10px] font-bold text-amber-200">2. Lục Lam Premium</span>
                               <a 
                                 href="https://www.google.com/maps/search/?api=1&query=Luc+Lam+104+Tran+Phu+Hai+Chau+Da+Nang" 
                                 target="_blank" 
                                 rel="noreferrer"
-                                className="text-[8px] text-amber-400 hover:underline font-bold flex items-center gap-0.5"
+                                className="text-[8px] text-amber-400 hover:underline font-bold flex items-center gap-0.5 shrink-0 whitespace-nowrap"
                               >
                                 <span>Directions</span>
                                 <ExternalLink className="w-2 h-2" />
@@ -2420,13 +2423,13 @@ export default function App() {
 
                           {/* 3. Lục Lam New Concept */}
                           <div className="space-y-1.5 pt-2">
-                            <div className="flex justify-between items-center">
+                            <div className="flex flex-wrap justify-between items-center gap-x-2 gap-y-1">
                               <span className="text-[10px] font-bold text-amber-200">3. Lục Lam New Concept</span>
                               <a 
                                 href="https://www.google.com/maps/search/?api=1&query=Luc+Lam+259+Tran+Phu+Hai+Chau+Da+Nang" 
                                 target="_blank" 
                                 rel="noreferrer"
-                                className="text-[8px] text-amber-400 hover:underline font-bold flex items-center gap-0.5"
+                                className="text-[8px] text-amber-400 hover:underline font-bold flex items-center gap-0.5 shrink-0 whitespace-nowrap"
                               >
                                 <span>Directions</span>
                                 <ExternalLink className="w-2 h-2" />
@@ -2510,11 +2513,11 @@ export default function App() {
                       <div className="absolute top-1/2 -right-3 w-6 h-6 rounded-full bg-[#0b1513] -translate-y-1/2 border-l border-amber-500/20 z-10"></div>
 
                       <div className="space-y-2">
-                        <div className="flex justify-between items-center">
+                        <div className="flex flex-wrap justify-between items-center gap-x-2 gap-y-1">
                           <span className="text-[8px] bg-amber-500 text-black font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
                             {t.luclam.voucherBadge}
                           </span>
-                          <span className="text-[10px] font-serif font-black text-amber-400 tracking-wide">LỤC LAM VOUCHER</span>
+                          <span className="text-[10px] font-serif font-black text-amber-400 tracking-wide shrink-0 whitespace-nowrap ml-auto">LỤC LAM VOUCHER</span>
                         </div>
 
                         <h4 className="text-xs font-bold text-amber-100">{t.luclam.voucherHeading}</h4>
@@ -2532,7 +2535,9 @@ export default function App() {
                             <span className="text-xs font-mono font-bold tracking-wider text-amber-400">{t.luclam.voucherCode}</span>
                           </div>
                           
-                          <div className="flex gap-0.5">
+                          {/* shrink-0: the bars are the decorative barcode, and
+                              a squeezed row would thin them to nothing. */}
+                          <div className="flex gap-0.5 shrink-0">
                             <div className="w-0.5 h-6 bg-amber-500/80"></div>
                             <div className="w-1 h-6 bg-amber-500/80"></div>
                             <div className="w-0.5 h-6 bg-amber-500/80"></div>

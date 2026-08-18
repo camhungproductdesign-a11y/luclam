@@ -746,11 +746,14 @@ export function PlaceDetailModal({
                     {lang === 'vi' ? 'Mở Google Maps và dẫn đường trực tiếp' : lang === 'ja' ? 'Googleマップでルート案内を開く' : 'Launch navigation with Google Maps'}
                   </p>
                 </div>
+                {/* shrink-0 or the round button squashes to an oval when the
+                    label beside it runs long — the Japanese string is the
+                    widest of the three. */}
                 <a
                   href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name + ' ' + place.addr)}`}
                   target="_blank"
                   rel="noreferrer referrer"
-                  className="bg-white text-[#0b433f] rounded-full p-2.5 shadow hover:scale-105 active:scale-95 transition-transform"
+                  className="bg-white text-[#0b433f] rounded-full p-2.5 shadow hover:scale-105 active:scale-95 transition-transform shrink-0"
                 >
                   <Navigation className="w-4 h-4" />
                 </a>
