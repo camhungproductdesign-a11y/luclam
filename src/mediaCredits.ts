@@ -66,6 +66,13 @@ const CREDITS: Record<string, string> = {
   "/uploads/external/445a26698d7c.jpg": "Ảnh: Hiep Nguyen hiepng — CC0, qua Wikimedia Commons",
   "/uploads/external/c22f445fad1d.jpg": "Ảnh: trungydang — CC BY 3.0, qua Wikimedia Commons",
   "/uploads/external/5fe6aafe9f6e.jpg": "Ảnh: Daderot — CC0, qua Wikimedia Commons",
+  "/uploads/external/d8e432383a80.jpg": "Ảnh: Anne and David from Kent, England UK — Public domain, qua Wikimedia Commons",
+  "/uploads/external/4315c3094d30.jpg": "Ảnh: Balon Greyjoy — CC0, qua Wikimedia Commons",
+  "/uploads/external/07e5d5530756.jpg": "Ảnh: Diego Delso — CC BY-SA 3.0, qua Wikimedia Commons",
+  "/uploads/external/efb5de76d2ab.jpg": "Ảnh: Alpha from Melbourne, Australia — CC BY-SA 2.0, qua Wikimedia Commons",
+  "/uploads/external/dea9d1957905.jpg": "Ảnh: Phương Huy — CC0, qua Wikimedia Commons",
+  "/uploads/external/253070044ab3.jpg": "Ảnh: Phương Huy — CC0, qua Wikimedia Commons",
+  "/uploads/external/fbaa80ad4819.jpg": "Ảnh: Andy Li — CC0, qua Wikimedia Commons",
 };
 
 /**

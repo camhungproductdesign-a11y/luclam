@@ -47,7 +47,7 @@ export const defaultMedia: Record<string, PlaceMedia> = {
   },
   // Banh Mi
   "food-1-0": {
-    img: "/uploads/external/83fd016f33a8.jpg",
+    img: "/uploads/external/fbaa80ad4819.jpg",
     video: ""
   },
   "food-1-1": {
@@ -64,15 +64,15 @@ export const defaultMedia: Record<string, PlaceMedia> = {
   },
   // Cafe — nhom 2 la Saigon Coffee, khong phai com tam
   "food-2-0": {
-    img: "/uploads/external/fa2e55bb77b9.jpg",
+    img: "/uploads/external/9644f86a7b5e.jpg",
     video: ""
   },
   "food-2-1": {
-    img: "/uploads/external/86e8394d0989.jpg",
+    img: "/uploads/external/aec1207e6554.jpg",
     video: ""
   },
   "food-2-2": {
-    img: "/uploads/external/b79df3e27783.jpg",
+    img: "/uploads/external/e6e6279b9ff6.jpg",
     video: ""
   },
   "food-2-3": {
@@ -81,15 +81,15 @@ export const defaultMedia: Record<string, PlaceMedia> = {
   },
   // Com Tam — nhom 3, khong phai cafe
   "food-3-0": {
-    img: "/uploads/external/9644f86a7b5e.jpg",
+    img: "/uploads/external/efb5de76d2ab.jpg",
     video: "https://assets.mixkit.co/videos/preview/mixkit-coffee-dripping-from-a-filter-43093-large.mp4"
   },
   "food-3-1": {
-    img: "/uploads/external/aec1207e6554.jpg",
+    img: "/uploads/external/dea9d1957905.jpg",
     video: ""
   },
   "food-3-2": {
-    img: "/uploads/external/e6e6279b9ff6.jpg",
+    img: "/uploads/external/253070044ab3.jpg",
     video: ""
   },
   "food-3-3": {
@@ -138,11 +138,11 @@ export const defaultMedia: Record<string, PlaceMedia> = {
 
   // --- CULTURE ---
   "culture-0": {
-    img: "/uploads/external/5eae9e5b58fa.jpg",
+    img: "/uploads/external/d8e432383a80.jpg",
     video: ""
   },
   "culture-1": {
-    img: "/uploads/external/ef3b0ad325be.jpg",
+    img: "/uploads/external/4315c3094d30.jpg",
     video: ""
   },
   "culture-2": {
@@ -157,7 +157,7 @@ export const defaultMedia: Record<string, PlaceMedia> = {
     video: ""
   },
   "culture-4": {
-    img: "/uploads/external/e9ecdbb6aaef.jpg",
+    img: "/uploads/external/07e5d5530756.jpg",
     video: ""
   },
   // Street performers on Nguyễn Huệ at night — the living statues the entry is
