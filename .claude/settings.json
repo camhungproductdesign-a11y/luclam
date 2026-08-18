@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(echo \"--- exit $? ---\")",
+      "Bash(rm -f scripts/_final2.ts)"
+    ]
+  }
+}
