@@ -131,6 +131,28 @@
 }
 
 /* --------------------------------------------------------------------------
+   Skip the nine pages that are not on screen
+
+   All ten pages live in one horizontal snap carousel, so pages two to ten sit
+   off to the side rather than far down a long document — and Chrome's lazy
+   threshold, which is several thousand pixels on a slow connection, reads that
+   as imminent. Ten images belonging to other pages were fetched before the
+   cover had finished drawing, about 137KB of them, and every one of those pages
+   was laid out and styled in full.
+
+   content-visibility is the mechanism for exactly this: the browser skips
+   rendering a subtree it cannot see, and skips fetching the lazy images inside
+   it, until the reader scrolls near. Sizing is unaffected — these sections take
+   their width and height from the flex container, not from their contents — so
+   the carousel still measures the same and the snap points do not move. */
+.page-section {
+  content-visibility: auto;
+  /* Only consulted while a section is skipped, and only for its contents. Any
+     plausible figure keeps the scroll extent stable; the frame is 430px wide. */
+  contain-intrinsic-size: auto 430px auto 900px;
+}
+
+/* --------------------------------------------------------------------------
    Mobile type floor
 
    The interface was drawn to be read inside the 430px device mockup on a

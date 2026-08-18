@@ -1,4 +1,5 @@
 import { type Language } from '../../src/translations';
+import { IMAGE_DERIVATIVES } from '../../src/imageDerivatives';
 import { type ResolvedContent } from '../../src/resolveContent';
 import { pathFor, HTML_LANG, LANGUAGES, type Topic } from '../../src/routes';
 import { escapeHtml } from './render-content';
@@ -32,7 +33,11 @@ function absolute(path: string): string {
  */
 function coverPreload(): string {
   const src = '/uploads/cover-benthanh';
-  const widths = [640, 1200];
+  // From the manifest the optimiser writes, never a hand-kept list. A preload
+  // that offers different rungs from the <picture> it is meant to warm up is
+  // worse than no preload: the browser takes one from each and pays twice.
+  const widths = IMAGE_DERIVATIVES[`${src}.jpg`] ?? [];
+  if (widths.length === 0) return '';
   const srcset = widths.map((w) => `${src}-${w}.avif ${w}w`).join(', ');
   return (
     `    <link rel="preload" as="image" type="image/avif" fetchpriority="high"\n` +

@@ -28,10 +28,25 @@ const CSS_URL = `https://fonts.googleapis.com/css2?family=${FAMILY}&display=swap
 const OUTPUT_DIR = path.join(process.cwd(), 'public', 'fonts');
 const CSS_OUTPUT = path.join(process.cwd(), 'src', 'fonts.css');
 
-// Google serves woff2 only to user agents it believes support it.
+/**
+ * An Android user agent, deliberately.
+ *
+ * Google Fonts does not serve one file per face — it picks by user agent, and
+ * the difference is not small: the same Be Vietnam Pro face is 12KB for desktop
+ * Chrome and 5KB for Android Chrome, because the desktop build carries
+ * TrueType hinting instructions that only Windows' rasteriser uses. Asking with
+ * a Windows UA, which is what this script did first, pulled the heavy set and
+ * made the page 124KB heavier than it had been on Google Fonts — self-hosting
+ * had quietly given up the adaptive serving without replacing it.
+ *
+ * Self-hosting means one set for everybody, so the choice is which readers to
+ * favour. This is a pocket guide carried around a city on a phone, so it is the
+ * mobile set. macOS and Linux ignore hinting anyway, and on a modern Windows
+ * display the difference is not something a reader would notice.
+ */
 const MODERN_UA =
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ' +
-  'Chrome/131.0.0.0 Safari/537.36';
+  'Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) ' +
+  'Chrome/136.0.0.0 Mobile Safari/537.36';
 
 /**
  * Which subsets to keep.

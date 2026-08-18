@@ -7,7 +7,7 @@
 export const IMAGE_DERIVATIVES: Record<string, number[]> = {
   "/uploads/brand/grab.png": [96],
   "/uploads/brand/xanh-sm.png": [96],
-  "/uploads/cover-benthanh.jpg": [640, 1200],
+  "/uploads/cover-benthanh.jpg": [640, 960, 1200],
   "/uploads/external/08f6bea23e45.png": [480],
   "/uploads/external/0aad9df07334.jpg": [640, 960],
   "/uploads/external/143a201f9dac.jpg": [400],
@@ -58,7 +58,7 @@ export const IMAGE_DERIVATIVES: Record<string, number[]> = {
   "/uploads/external/hcmc-museum-of-fine-arts.jpg": [640, 960],
   "/uploads/external/hcmc-museum-of-history.jpg": [640, 960],
   "/uploads/external/hidden-cafes-tea.jpg": [640, 800],
-  "/uploads/external/ho-chi-minh-city-hall.jpg": [640, 1280, 1920],
+  "/uploads/external/ho-chi-minh-city-hall.jpg": [640, 960, 1280, 1920],
   "/uploads/external/ho-thi-ky-flower-market.jpg": [640, 960],
   "/uploads/external/independence-palace.jpg": [640, 960],
   "/uploads/external/jade-emperor-pagoda.jpg": [640, 960],
@@ -85,5 +85,5 @@ export const IMAGE_DERIVATIVES: Record<string, number[]> = {
   "/uploads/external/vinh-khanh-food-street.jpg": [640, 960],
   "/uploads/external/vinh-nghiem-pagoda.jpg": [640, 960],
   "/uploads/external/war-remnants-museum.jpg": [640, 960],
-  "/uploads/og-cover.jpg": [640, 1200],
+  "/uploads/og-cover.jpg": [640, 960, 1200],
 };
