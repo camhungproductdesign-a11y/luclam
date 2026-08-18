@@ -16,6 +16,30 @@ function absolute(path: string): string {
   return `${ORIGIN}${path}`;
 }
 
+/**
+ * Start the cover photograph downloading with the HTML, not after it.
+ *
+ * It is the largest element on every page — the full-bleed background of the
+ * first screen — and it is drawn by React, so the browser had no idea it
+ * existed until the bundle had arrived, parsed and rendered. Measured on a
+ * throttled mobile profile that was a second of dead air before the request
+ * even started, against 26ms to actually transfer the file.
+ *
+ * AVIF specifically, and only AVIF: `imagesrcset` with a `type` makes the
+ * preload match the <source> the browser will pick, and a preload that does
+ * not match what the page requests downloads the bytes twice. Every browser
+ * that reads this tag supports AVIF; the rest ignore it and fetch normally.
+ */
+function coverPreload(): string {
+  const src = '/uploads/cover-benthanh';
+  const widths = [640, 1200];
+  const srcset = widths.map((w) => `${src}-${w}.avif ${w}w`).join(', ');
+  return (
+    `    <link rel="preload" as="image" type="image/avif" fetchpriority="high"\n` +
+    `          imagesrcset="${srcset}" imagesizes="(min-width: 1024px) 430px, 100vw" />`
+  );
+}
+
 function hreflangTags(topic: Topic): string {
   const tags = LANGUAGES.map(
     (lang) =>
@@ -339,6 +363,7 @@ export function renderHead(
     <meta name="description" content="${escapeHtml(description)}" />
     <meta name="author" content="Lục Lam Art Of Tea" />
     <link rel="canonical" href="${canonical}" />
+${coverPreload()}
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     ${hreflangTags(topic)}

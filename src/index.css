@@ -24,7 +24,15 @@
    families; --font-sans falls through Be Vietnam Pro, which carries no CJK, to
    system-ui and then to the OS fallback. Those system faces are sans, which is
    what the rest of the interface is now. */
-@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;0,900;1,400;1,600&display=swap');
+/* Served from this origin. The Google Fonts URL that used to sit here made the
+   browser walk three round trips before it could draw a word — fetch this
+   stylesheet, parse it, discover fonts.googleapis.com and shake hands with it,
+   then discover fonts.gstatic.com and shake hands again — all of it blocking
+   the render. And fonts.googleapis.com is blocked in mainland China, where the
+   Simplified Chinese edition of this guide is aimed, so for those readers the
+   request did not arrive late so much as never, holding the stylesheet open
+   until it timed out. See scripts/fetch-fonts.ts. */
+@import "./fonts.css";
 @import "tailwindcss";
 
 @theme {

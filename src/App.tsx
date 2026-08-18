@@ -36,6 +36,7 @@ import {
 import { COMPANY, STORES } from './company';
 import { faqFor } from './faq';
 import { PageHeading } from './components/PageHeading';
+import { DeferredFrame } from './components/DeferredFrame';
 
 // ==========================================================================
 // Translation Data for Saigon Pocket Guide
@@ -1316,17 +1317,25 @@ export default function App() {
                     <div className="grid grid-cols-1 gap-4">
                       {benThanhMapTab === 'google' ? (
                         <div className="w-full aspect-square bg-zinc-100 rounded-xl overflow-hidden border border-zinc-200 shadow-inner relative group min-h-[160px]">
-                          <iframe
+                          {/* Withheld rather than lazy: see DeferredFrame. The
+                              embed was pulling the entire Google Maps JS API —
+                              eight requests, ~300KB, third-party origin — on
+                              the home page, before a pixel of this guide had
+                              been drawn. */}
+                          <DeferredFrame
                             title="Ben Thanh Market Live Google Map"
                             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.4851493033503!2d106.69634921102951!3d10.772590289329712!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f3f5080e7c5%3A0x7d6f59df04a80693!2zQ2jhu6MgQuG6v24gVGjDoG5o!5e0!3m2!1svi!2s!4v1715000000000!5m2!1svi!2s"
-                            width="100%"
-                            height="100%"
-                            style={{ border: 0 }}
-                            allowFullScreen={false}
-                            loading="lazy"
                             referrerPolicy="no-referrer-when-downgrade"
                             className="w-full h-full"
-                          ></iframe>
+                            placeholder={
+                              // The market's name and nothing else. It is a
+                              // proper noun, so it reads the same in all six
+                              // languages, and a translated "loading the map of…"
+                              // would need six strings for a box that is on
+                              // screen for a moment.
+                              <span className="text-[9px] text-zinc-400 font-light">Chợ Bến Thành</span>
+                            }
+                          />
                           <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                             <a 
                               href="https://maps.app.goo.gl/8tExfsHC1m2E4bxH7" 
