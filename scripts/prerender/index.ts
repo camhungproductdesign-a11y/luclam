@@ -1,4 +1,5 @@
 import fs from 'fs/promises';
+import { renderLlmsTxt, llmsStats } from './llms';
 import path from 'path';
 import { ALL_ROUTES, pathFor, HTML_LANG, LANGUAGES, TOPICS, type Topic } from '../../src/routes';
 import type { Language } from '../../src/translations';
@@ -244,12 +245,20 @@ async function main() {
 
   const sitemap = await writeSitemap(imagesByTopic);
 
+  // sitemap.xml is for crawlers; llms.txt is the same map written for an
+  // assistant, which will not fetch sixty pages to find the one that answers a
+  // question. See ./llms.ts.
+  const llms = renderLlmsTxt(resolved);
+  await fs.writeFile(path.join(DIST, 'llms.txt'), llms, 'utf-8');
+  const llmsInfo = llmsStats(llms);
+
   // GitHub Pages serves 404.html for paths that match no file. Ship the
   // Vietnamese homepage there so the SPA can still boot and route.
   await fs.copyFile(path.join(DIST, 'index.html'), path.join(DIST, '404.html'));
 
   console.log(
-    `Đã sinh ${written} trang, ${withImages} thẻ ảnh, sitemap.xml (${sitemap.urls} URL + alternates, ${sitemap.images} ảnh) và 404.html`
+    `Đã sinh ${written} trang, ${withImages} thẻ ảnh, sitemap.xml (${sitemap.urls} URL + alternates, ${sitemap.images} ảnh), ` +
+      `llms.txt (${llmsInfo.links} liên kết, ${(llmsInfo.bytes / 1024).toFixed(1)}KB) và 404.html`
   );
 }
 

@@ -917,9 +917,24 @@ export default function App() {
         </span>
         <div className="flex items-center gap-2">
           {/* Quick select language */}
-          <select 
+          {/* A select whose options are language names still needs to say what
+              it is for: a screen reader announces "combo box, Tiếng Việt" and
+              the reader has no idea whether that picks a language, a city or a
+              currency. The same gap is why an assistant driving this page
+              cannot tell what the control does. */}
+          <select
             id="mobile-lang-select"
-            value={lang} 
+            aria-label={
+              {
+                vi: 'Chọn ngôn ngữ',
+                en: 'Select language',
+                ja: '言語を選択',
+                ko: '언어 선택',
+                zh: '选择语言',
+                zht: '選擇語言',
+              }[lang] ?? 'Select language'
+            }
+            value={lang}
             onChange={(e) => handleLangChange(e.target.value as Language)}
             className="bg-zinc-800/90 text-white text-xs py-1.5 px-2.5 rounded-lg border border-zinc-700 font-medium focus:outline-none focus:ring-1 focus:ring-[#d16b4c]"
           >
@@ -2629,7 +2644,7 @@ export default function App() {
                                 <h5 className="text-[9px] font-bold text-[#0b433f] flex justify-between items-center">
                                   <span>{item.label}</span>
                                   {idx === 0 && (
-                                    <span className="text-[8px] bg-rose-50 text-rose-600 px-1.5 py-0.5 rounded border border-rose-100 font-normal">Emergency</span>
+                                    <span className="text-[8px] bg-rose-50 text-rose-700 px-1.5 py-0.5 rounded border border-rose-100 font-normal">Emergency</span>
                                   )}
                                 </h5>
                                 <p className="text-[9px] text-zinc-500 leading-normal font-light">

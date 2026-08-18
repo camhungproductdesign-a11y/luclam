@@ -41,8 +41,15 @@ type Props = {
   padTop?: 'pt-2' | 'pt-4';
 };
 
+/**
+ * zinc-600, not the zinc-500 these headers carried for a long time: on the cream
+ * page that measured 4.36:1 against the 4.5:1 WCAG asks for body text, and the
+ * mobile floor lifts this to 13.5px, which is still normal text. zinc-600 is
+ * 6.97:1 — and this guide is read outdoors, where reflected light flattens
+ * every ratio further.
+ */
 const PALETTE = {
-  light: { rule: 'border-[#b85233]', label: 'text-[#0b433f]', kicker: 'text-zinc-500' },
+  light: { rule: 'border-[#b85233]', label: 'text-[#0b433f]', kicker: 'text-zinc-600' },
   dark: { rule: 'border-amber-500/30', label: 'text-amber-400', kicker: 'text-amber-500/90' },
 } as const;
 

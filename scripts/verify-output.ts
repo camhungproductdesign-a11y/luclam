@@ -168,6 +168,18 @@ async function main() {
     failures.push('thiếu dist/404.html');
   }
 
+  // llms.txt is only useful if it is well formed — an assistant that cannot
+  // parse it simply falls back to guessing, silently. The two things tools
+  // actually check for are an H1 naming the site and links to follow.
+  try {
+    const llms = await fs.readFile(path.join(DIST, 'llms.txt'), 'utf-8');
+    const links = countOccurrences(llms, /\[[^\]]+\]\(https?:\/\/[^)]+\)/g);
+    check(/^# .+/m.test(llms), 'llms.txt: thiếu tiêu đề H1 ("# Tên site")');
+    check(links >= ALL_ROUTES.length, `llms.txt: chỉ ${links} liên kết, cần ít nhất ${ALL_ROUTES.length}`);
+  } catch {
+    failures.push('llms.txt: không đọc được dist/llms.txt');
+  }
+
   if (failures.length > 0) {
     console.error(`Kiểm chứng thất bại (${failures.length} lỗi):`);
     for (const failure of failures) console.error(`  - ${failure}`);
