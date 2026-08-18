@@ -131,6 +131,35 @@
 }
 
 /* --------------------------------------------------------------------------
+   Do not let a swipe leave the guide
+
+   This whole app is navigated by swiping sideways, which is the one gesture
+   the browser has already claimed. On iOS Safari, and on Chrome for Android,
+   a horizontal swipe that runs past the end of a scrollable element chains up
+   to the browser itself and triggers back-navigation. So a reader on page one
+   who swipes right to check whether there is anything before it does not get
+   a rubber band — they get thrown out of the site, and come back to a fresh
+   load with the language, the page and every open panel reset.
+
+   The vertical axis has the mirror problem: each page scrolls its own content,
+   and pulling down at the top of one fires Chrome for Android's
+   pull-to-refresh, which reloads and discards the same state.
+
+   `contain` keeps the scroll inside the element that owns it. It is the whole
+   fix, it is two declarations, and it is invisible until the moment it saves
+   someone — which is why nothing in a Lighthouse run would ever have flagged
+   it. Firefox, Chrome and Edge have supported it for years; Safari from 16,
+   which is below this build's floor of 16.4 anyway.
+   -------------------------------------------------------------------------- */
+#phone-screen-viewport {
+  overscroll-behavior: contain;
+}
+
+.page-section {
+  overscroll-behavior-y: contain;
+}
+
+/* --------------------------------------------------------------------------
    Skip the nine pages that are not on screen
 
    All ten pages live in one horizontal snap carousel, so pages two to ten sit
