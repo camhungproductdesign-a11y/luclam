@@ -107,6 +107,20 @@ async function main() {
       `${label}: thiếu khối #static-content`
     );
 
+    // A blob that lives in one browser must never reach a page.
+    //
+    // indexedDBStore falls back to "indexeddb-media://<id>" when the upload to
+    // the server did not return a URL, and Creator Studio will happily save
+    // that into config.json. It resolves perfectly for the editor who uploaded
+    // it — the blob is in their own IndexedDB — and resolves to nothing for
+    // everybody else, including the crawler, which would read it as the value
+    // of Product.image. The editor has no way to see that it is broken.
+    check(
+      !html.includes('indexeddb-media://'),
+      `${label}: có ảnh trỏ tới indexeddb-media:// — blob chỉ tồn tại trong máy người sửa, ` +
+        `phải upload lại để có URL trên server`
+    );
+
     const readable = visibleText(html);
 
     for (const match of html.matchAll(
