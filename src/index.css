@@ -135,22 +135,29 @@
 
    All ten pages live in one horizontal snap carousel, so pages two to ten sit
    off to the side rather than far down a long document — and Chrome's lazy
-   threshold, which is several thousand pixels on a slow connection, reads that
-   as imminent. Ten images belonging to other pages were fetched before the
-   cover had finished drawing, about 137KB of them, and every one of those pages
-   was laid out and styled in full.
+   threshold, several thousand pixels on a slow connection, reads that as
+   imminent. Ten images belonging to other pages were fetched before the cover
+   had finished drawing, about 137KB of them, and every one of those pages was
+   laid out and styled in full. Measured: 628KB transferred down to 517KB, and
+   Style & Layout from 1172ms to 601ms.
 
-   content-visibility is the mechanism for exactly this: the browser skips
-   rendering a subtree it cannot see, and skips fetching the lazy images inside
-   it, until the reader scrolls near. Sizing is unaffected — these sections take
-   their width and height from the flex container, not from their contents — so
-   the carousel still measures the same and the snap points do not move. */
+   Sizing is unaffected — these sections take their width and height from the
+   flex container, not from their contents — so the carousel measures the same
+   and the snap points do not move.
+
+   This was removed once, on the theory that it was why Chrome recorded no LCP
+   on routes that deep-link into the carousel. It was not: with the property
+   gone the metric was still absent, three runs out of three. That fault is
+   older than this rule and belongs to how the carousel reaches page N — worth
+   its own investigation, not worth paying 111KB for a guess.
+   -------------------------------------------------------------------------- */
 .page-section {
   content-visibility: auto;
   /* Only consulted while a section is skipped, and only for its contents. Any
      plausible figure keeps the scroll extent stable; the frame is 430px wide. */
   contain-intrinsic-size: auto 430px auto 900px;
 }
+
 
 /* --------------------------------------------------------------------------
    Mobile type floor

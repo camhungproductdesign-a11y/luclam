@@ -878,16 +878,21 @@ export default function App() {
                     onClick={() => navigateToPage(idx)}
                     className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 text-left ${
                       currentPage === idx
-                        ? 'bg-[#b85233]/15 text-[#d16b4c] font-semibold border-l-4 border-[#b85233]'
+                        ? 'bg-[#b85233]/15 text-[#d98a6e] font-semibold border-l-4 border-[#b85233]'
                         : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <span className="font-serif text-xs opacity-75">0{idx + 1}</span>
+                      {/* opacity-90, not 75: at 75 the numeral resolved to
+                          #7b7f86 against the sidebar and measured 4.23:1, just
+                          under the 4.5:1 this size needs. 90 keeps it quieter
+                          than the label beside it and measures 5.75:1. */}
+                      <span className="font-serif text-xs opacity-90">0{idx + 1}</span>
                       <span className="text-sm">{t.pages[pageName]}</span>
                     </div>
+                    {/* zinc-400 on zinc-800 is 5.81:1; zinc-500 was 3.08:1. */}
                     <span className={`text-[10px] px-1.5 py-0.5 rounded uppercase ${
-                      currentPage === idx ? 'bg-[#b85233] text-white' : 'bg-zinc-800 text-zinc-500'
+                      currentPage === idx ? 'bg-[#b85233] text-white' : 'bg-zinc-800 text-zinc-400'
                     }`}>
                       Pg {idx + 1}
                     </span>
@@ -901,7 +906,7 @@ export default function App() {
         {/* Sidebar Footer */}
         <div className="mt-auto pt-6 border-t border-zinc-800/50 space-y-1 text-center shrink-0">
           <p className="text-[11px] text-zinc-400">&copy; 2026 Lục Lam. All rights reserved.</p>
-          <p className="text-[9px] text-zinc-600">Designed for Saigon Travelers with Premium UI</p>
+          <p className="text-[9px] text-zinc-400">Designed for Saigon Travelers with Premium UI</p>
         </div>
       </aside>
 
@@ -1904,7 +1909,7 @@ export default function App() {
                               {cat.subtitle}
                             </span>
 
-                            <ul className="space-y-1.5 text-[9px] text-zinc-600 leading-relaxed font-light">
+                            <ul className="space-y-1.5 text-[9px] text-zinc-400 leading-relaxed font-light">
                               {cat.bullets.map((bul, bidx) => (
                                 <li key={bidx} className="flex gap-1.5 items-start">
                                   <span className="text-[#b85233] shrink-0">•</span>
@@ -2775,7 +2780,7 @@ export default function App() {
               className="z-[45] flex flex-row gap-1.5 p-1.5 rounded-full md:bg-black/75 md:backdrop-blur-md md:border md:border-zinc-800/80 md:shadow-2xl md:absolute md:top-[35%] md:right-2 md:-translate-y-1/2 md:flex-col md:gap-2 md:rounded-2xl md:animate-in md:slide-in-from-right md:duration-500"
               title="Chọn ngôn ngữ / Select Language"
             >
-              <div className="hidden md:block text-[8px] font-bold text-center text-zinc-400 uppercase py-0.5 tracking-wider select-none border-b border-zinc-800/60">
+              <div className="hidden md:block text-[8px] font-bold text-center text-zinc-300 uppercase py-0.5 tracking-wider select-none border-b border-zinc-800/60">
                 Lang
               </div>
               {[
