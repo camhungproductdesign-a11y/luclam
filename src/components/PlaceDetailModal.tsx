@@ -312,35 +312,40 @@ export function PlaceDetailModal({
         onClick={(event) => event.stopPropagation()}
       >
 
-        {/* The clip, in a pane of its own the height of the dialog.
+        {/* The clip, in a pane of its own beside everything else.
 
             Stacked under the hero and the tabs it had only what those left:
             42% of it was visible at 1366x768 and 66% at 1600x900. Beside them
-            its height is the dialog's, so it is whole at every size, and it
-            stays on screen while the reader moves between tabs.
+            it is whole at every size, and it stays on screen while the reader
+            moves between tabs.
 
-            300px wide is 533px tall at 9/16 — the same clip as before, and
-            short enough to fit the dialog on the smallest laptop this branch
-            supports. The iframe is still 1000px and still cropped, for the
-            reason set out where the stacked one used to be. */}
+            No crop here, unlike the stacked version below lg. The crop hides
+            TikTok's handle, caption and Watch-now bar by showing only the top
+            of an over-tall iframe, and it holds only while the box is no
+            taller than the video inside. Their embed draws that video at a
+            fixed height whatever width the iframe is given — measured,
+            276x491 cropped cleanly, 338x600 showed the bar, 420x747 showed
+            the caption — so keeping the crop honest meant pinning the box at
+            315x560 and living with black bands either side of it.
+
+            So the pane is the embed's own width and its own height instead.
+            No letterbox, and the chrome is part of what is shown. When the
+            embed runs past the dialog the pane scrolls, and what scrolls is
+            the caption: the clip is at the top and always whole.
+
+            w-[340px] is TikTok's own embed width plus the padding. */}
         {embedDetails.type === 'tiktok' && (
-          <aside className="hidden lg:flex shrink-0 bg-black items-center justify-center p-3">
-            {/* Height leads, width follows: h-full with a 9/16 ratio makes the
-                width the height times 9/16, so the clip grows with the screen
-                instead of sitting at one size on all of them. Capped at 747px
-                tall — past that it stops being a clip and becomes a pillar. */}
-            <div className="relative h-full max-h-[560px] aspect-[9/16] rounded-2xl overflow-hidden bg-black">
-              <iframe
-                src={embedDetails.embedUrl}
-                className="absolute inset-x-0 top-0 w-full border-0"
-                style={{ height: tiktokHeight ?? 1000 }}
-                allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-                allowFullScreen
-                loading="lazy"
-                scrolling="no"
-                title="TikTok Video Embed"
-              />
-            </div>
+          <aside className="hidden lg:block w-[340px] shrink-0 bg-black overflow-y-auto p-2.5">
+            <iframe
+              src={embedDetails.embedUrl}
+              className="w-full border-0 rounded-2xl block"
+              style={{ height: tiktokHeight ?? 760 }}
+              allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+              allowFullScreen
+              loading="lazy"
+              scrolling="no"
+              title="TikTok Video Embed"
+            />
           </aside>
         )}
 
