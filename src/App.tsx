@@ -1499,7 +1499,7 @@ export default function App() {
                         <div
                           key={dist.id}
                           id={`card-${dist.id}`}
-                          className={`border rounded-xl p-3.5 transition-all duration-300 ${cardColors} ${
+                          className={`border rounded-xl lg:rounded-2xl lg:break-inside-avoid p-3.5 lg:p-5 transition-all duration-300 ${cardColors} ${
                             isHighlighted ? 'ring-2 ring-[#b85233] scale-[1.02] shadow-md' : 'shadow-sm'
                           }`}
                         >
@@ -2421,7 +2421,7 @@ export default function App() {
 
                     <div className="space-y-2 text-zinc-800">
                       {/* Saigon branch */}
-                      <div className="bg-[#0c2b27]/40 rounded-xl p-3 border border-amber-500/10 space-y-1 shadow-inner">
+                      <div className="bg-[#0c2b27]/40 rounded-xl lg:rounded-2xl lg:break-inside-avoid p-3 lg:p-4 border border-amber-500/10 space-y-1 shadow-inner">
                         <div className="flex flex-wrap justify-between items-start gap-x-2 gap-y-1">
                           <span className="text-[8px] bg-[#0b433f] border border-emerald-400/20 text-white font-bold px-1.5 py-0.5 rounded shrink-0">SAIGON</span>
                           <a 
@@ -2685,7 +2685,7 @@ export default function App() {
 
                           <div className="space-y-2">
                             {cat.items.map((item, iidx) => (
-                              <div key={iidx} className="bg-white rounded-xl p-3 border border-zinc-200/60 shadow-sm space-y-1">
+                              <div key={iidx} className="bg-white rounded-xl lg:rounded-2xl lg:break-inside-avoid p-3 lg:p-4 border border-zinc-200/60 shadow-sm space-y-1">
                                 <h5 className="text-[9px] font-bold text-[#0b433f] flex justify-between items-center">
                                   <span>{item.label}</span>
                                   {idx === 0 && (
@@ -2759,7 +2759,7 @@ export default function App() {
                       <span>{t.contact.heading}</span>
                     </h4>
 
-                    <div className="bg-white rounded-xl p-3 border border-zinc-200/60 shadow-sm space-y-1.5">
+                    <div className="bg-white rounded-xl lg:rounded-2xl lg:break-inside-avoid p-3 lg:p-4 border border-zinc-200/60 shadow-sm space-y-1.5">
                       <p className="text-[9px] font-bold text-[#0b433f]">{COMPANY.legalName}</p>
                       <div className="grid grid-cols-[auto_1fr] gap-x-2 gap-y-1 text-[9px] leading-normal">
                         <span className="text-zinc-400 uppercase tracking-wide">{t.contact.phone}</span>
