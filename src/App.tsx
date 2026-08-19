@@ -786,7 +786,7 @@ export default function App() {
           the viewport has nowhere else to go. justify-start plus mt-auto on the
           footer rather than justify-between, which can push content above the
           scroll origin once it overflows. */}
-      <aside className="hidden lg:flex flex-col w-[340px] border-r border-zinc-800/50 p-8 shrink-0 bg-[#0f1f1b] relative z-10 justify-start overflow-y-auto">
+      <aside className="hidden lg:flex flex-col w-[264px] xl:w-[340px] border-r border-zinc-800/50 p-8 shrink-0 bg-[#0f1f1b] relative z-10 justify-start overflow-y-auto">
         <div className="space-y-8 shrink-0">
           {/* Brand header */}
           <div className="space-y-1">
@@ -1151,7 +1151,7 @@ export default function App() {
                   height. vh would read the browser window, which on desktop is
                   taller than the 860px device frame this page lives in. */}
               <section className="[container-type:size] w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-5 overflow-y-auto">
-                <div className="space-y-[clamp(0.65rem,2.4cqh,1.25rem)] lg:columns-2 lg:gap-6">
+                <div className="space-y-[clamp(0.65rem,2.4cqh,1.25rem)] min-[1100px]:columns-2 min-[1100px]:gap-6">
 
                   {/* Minimal page header decoration */}
                   <PageHeading
@@ -1316,7 +1316,7 @@ export default function App() {
                   PAGE 03: CITY GUIDE / DISTRICTS WITH MAP
                   ========================================================================== */}
               <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
-                <div className="space-y-4 lg:columns-2 lg:gap-6">
+                <div className="space-y-4 min-[1100px]:columns-2 min-[1100px]:gap-6">
                   
                   {/* Minimal page header decoration */}
                   <PageHeading number="03" title={t.pages.atmosphere} kicker="Explore Saigon Map" />
@@ -1593,7 +1593,7 @@ export default function App() {
                   PAGE 04: TRANSPORTATION
                   ========================================================================== */}
               <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
-                <div className="space-y-4 lg:columns-2 lg:gap-6">
+                <div className="space-y-4 min-[1100px]:columns-2 min-[1100px]:gap-6">
                   
                   {/* Minimal page header decoration */}
                   <PageHeading number="04" title={t.pages.transport} kicker="Transit in Ho Chi Minh" />
@@ -1849,7 +1849,7 @@ export default function App() {
                   PAGE 05: STAY & REJUVENATE (CARE)
                   ========================================================================== */}
               <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
-                <div className="space-y-4 lg:columns-2 lg:gap-6">
+                <div className="space-y-4 min-[1100px]:columns-2 min-[1100px]:gap-6">
                   
                   {/* Minimal page header decoration */}
                   <PageHeading number="05" title={t.pages.stay} kicker="Wellness & Hotels" />
@@ -2017,7 +2017,7 @@ export default function App() {
                   PAGE 06: FOOD (Legends Must-Eat)
                   ========================================================================== */}
               <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto" id="food-page-section">
-                <div className="space-y-4 lg:columns-2 lg:gap-6 lm-spread">
+                <div className="space-y-4 min-[1100px]:columns-2 min-[1100px]:gap-6 lm-spread">
                   <PageHeading number="06" title={t.pages.food} kicker="Must-Eat Legends" />
 
                   <p className="text-xs leading-relaxed text-zinc-600 font-light">
@@ -2117,7 +2117,7 @@ export default function App() {
                   PAGE 07: CULTURE & LANDMARKS
                   ========================================================================== */}
               <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
-                <div className="space-y-4 lg:columns-2 lg:gap-6 lm-spread">
+                <div className="space-y-4 min-[1100px]:columns-2 min-[1100px]:gap-6 lm-spread">
                   <PageHeading number="07" title={t.pages.culture} kicker="Heritage & Check-in" />
 
                   <p className="text-xs leading-relaxed text-zinc-600 font-light">
@@ -2224,7 +2224,7 @@ export default function App() {
                   PAGE 08: SHOPPING & SOUVENIRS
                   ========================================================================== */}
               <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
-                <div className="space-y-4 lg:columns-2 lg:gap-6">
+                <div className="space-y-4 min-[1100px]:columns-2 min-[1100px]:gap-6">
                   <PageHeading number="08" title={t.pages.shopping} kicker="Shop Local Vibes" />
 
                   <p className="text-xs leading-relaxed text-zinc-600 font-light">
@@ -2284,7 +2284,7 @@ export default function App() {
                   PAGE 09: LỤC LAM TRẠM DỪNG CHÂN (Signature Experience)
                   ========================================================================== */}
               <section className="w-full h-full shrink-0 snap-start bg-[#0b1513] text-[#f6f3eb] flex flex-col justify-between page-section p-6 overflow-y-auto">
-                <div className="space-y-5 lg:columns-2 lg:gap-6 lm-spread">
+                <div className="space-y-5 min-[1100px]:columns-2 min-[1100px]:gap-6 lm-spread">
                   {/* Eyebrow in English by design, like the other eight pages.
                       This one was the only Vietnamese hold-out. */}
                   <PageHeading
@@ -2718,7 +2718,7 @@ export default function App() {
                   PAGE 10: USEFUL INFO (Safety, Cash & SIM)
                   ========================================================================== */}
               <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
-                <div className="space-y-4 lg:columns-2 lg:gap-6 lm-spread">
+                <div className="space-y-4 min-[1100px]:columns-2 min-[1100px]:gap-6 lm-spread">
                   <PageHeading number="10" title={t.pages.info} kicker="Security & Backup" />
 
                   <p className="text-xs leading-relaxed text-zinc-600 font-light">
