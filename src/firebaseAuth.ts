@@ -18,11 +18,29 @@ import firebaseConfig from '../firebase-applet-config.json';
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 export const auth = getAuth(app);
 
-// Configure Google Auth Provider with Google Drive Scopes
+/**
+ * Read-only, and only Drive.
+ *
+ * This asked for three scopes, one of which was `.../auth/drive` — full read,
+ * write and delete over the whole of the signer's Drive. Everything the app
+ * actually does with Drive is two GETs: `files?q=` to search, and
+ * `files/{id}?alt=media` to download the one being imported. There is no POST,
+ * PATCH or DELETE against Drive anywhere in the code, so it never needed
+ * permission to change anything, and an editor importing a photograph was
+ * handing over their whole account to get it.
+ *
+ * `drive.file` is narrower still and would have been the obvious choice, but it
+ * grants access only to files the app itself created or the user picked through
+ * the Google Picker. This code searches with `files.list` instead, which under
+ * that scope returns nothing at all — so it would have quietly emptied the file
+ * browser rather than tightened it. `drive.readonly` is the smallest scope that
+ * covers both calls.
+ *
+ * Anyone already signed in holds a token minted under the old scopes. Sign out
+ * and back in to move to this one; Google will show the narrower consent screen.
+ */
 export const provider = new GoogleAuthProvider();
 provider.addScope('https://www.googleapis.com/auth/drive.readonly');
-provider.addScope('https://www.googleapis.com/auth/drive.file');
-provider.addScope('https://www.googleapis.com/auth/drive');
 
 // In-memory access token cache
 let cachedAccessToken: string | null = null;
