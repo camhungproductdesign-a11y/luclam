@@ -8,7 +8,7 @@ import { describe } from './describe';
 import { faqFor } from '../../src/faq';
 import { COMPANY, STORES, storeName, type Store } from '../../src/company';
 
-const ORIGIN = 'https://gift.luclam.vn';
+import { ORIGIN } from '../../src/origin';
 const OG_IMAGE = `${ORIGIN}/uploads/og-cover.jpg`;
 
 export type Assets = { scripts: string[]; stylesheets: string[] };

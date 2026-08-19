@@ -9,7 +9,7 @@ import { resolveAllLanguages, type Overrides } from '../../src/resolveContent';
 import { imagesFor, type PlaceImage } from './place-images';
 
 const DIST = path.join(process.cwd(), 'dist');
-const ORIGIN = 'https://gift.luclam.vn';
+import { ORIGIN } from '../../src/origin';
 
 /** Read the hashed asset paths out of the index.html Vite just produced. */
 async function readAssets(): Promise<Assets> {

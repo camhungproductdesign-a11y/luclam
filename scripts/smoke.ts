@@ -20,8 +20,8 @@ import { ALL_ROUTES } from '../src/routes';
 
 const BASE = (process.argv[2] ?? 'http://localhost:4177').replace(/\/$/, '');
 
-/** Where the build wrote its canonicals. A different host is a real problem. */
-const BUILT_ORIGIN = 'https://gift.luclam.vn';
+
+
 
 const failures: string[] = [];
 const warnings: string[] = [];
