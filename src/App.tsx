@@ -1135,7 +1135,7 @@ export default function App() {
                   height. vh would read the browser window, which on desktop is
                   taller than the 860px device frame this page lives in. */}
               <section className="[container-type:size] w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-5 overflow-y-auto">
-                <div className="space-y-[clamp(0.65rem,2.4cqh,1.25rem)] lg:columns-2 lg:gap-6 lg:[&>*:not(:last-child)]:break-inside-avoid lg:[&>*:last-child>*]:break-inside-avoid">
+                <div className="space-y-[clamp(0.65rem,2.4cqh,1.25rem)] lg:columns-2 lg:gap-6">
 
                   {/* Minimal page header decoration */}
                   <PageHeading
@@ -1300,7 +1300,7 @@ export default function App() {
                   PAGE 03: CITY GUIDE / DISTRICTS WITH MAP
                   ========================================================================== */}
               <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
-                <div className="space-y-4 lg:columns-2 lg:gap-6 lg:[&>*:not(:last-child)]:break-inside-avoid lg:[&>*:last-child>*]:break-inside-avoid">
+                <div className="space-y-4 lg:columns-2 lg:gap-6">
                   
                   {/* Minimal page header decoration */}
                   <PageHeading number="03" title={t.pages.atmosphere} kicker="Explore Saigon Map" />
@@ -1557,7 +1557,7 @@ export default function App() {
                   PAGE 04: TRANSPORTATION
                   ========================================================================== */}
               <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
-                <div className="space-y-4 lg:columns-2 lg:gap-6 lg:[&>*:not(:last-child)]:break-inside-avoid lg:[&>*:last-child>*]:break-inside-avoid">
+                <div className="space-y-4 lg:columns-2 lg:gap-6">
                   
                   {/* Minimal page header decoration */}
                   <PageHeading number="04" title={t.pages.transport} kicker="Transit in Ho Chi Minh" />
@@ -1813,7 +1813,7 @@ export default function App() {
                   PAGE 05: STAY & REJUVENATE (CARE)
                   ========================================================================== */}
               <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
-                <div className="space-y-4 lg:columns-2 lg:gap-6 lg:[&>*:not(:last-child)]:break-inside-avoid lg:[&>*:last-child>*]:break-inside-avoid">
+                <div className="space-y-4 lg:columns-2 lg:gap-6">
                   
                   {/* Minimal page header decoration */}
                   <PageHeading number="05" title={t.pages.stay} kicker="Wellness & Hotels" />
@@ -1981,7 +1981,7 @@ export default function App() {
                   PAGE 06: FOOD (Legends Must-Eat)
                   ========================================================================== */}
               <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto" id="food-page-section">
-                <div className="space-y-4 lg:columns-2 lg:gap-6 lg:[&>*:not(:last-child)]:break-inside-avoid lg:[&>*:last-child>*]:break-inside-avoid">
+                <div className="space-y-4 lg:columns-2 lg:gap-6">
                   <PageHeading number="06" title={t.pages.food} kicker="Must-Eat Legends" />
 
                   <p className="text-xs leading-relaxed text-zinc-600 font-light">
@@ -2031,7 +2031,7 @@ export default function App() {
                           key={idx}
                           id={`food-restaurant-${idx}`}
                           onClick={() => handleOpenDetail('food', activeFoodTab, idx, item)}
-                          className="w-full text-left bg-white rounded-2xl lg:rounded-3xl p-3 lg:p-4 border border-zinc-200/80 shadow-sm hover:border-[#b85233]/40 hover:shadow-md active:scale-[0.99] active:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b85233]/50 transition-all duration-200 relative group overflow-hidden flex gap-3 lg:gap-5 items-center cursor-pointer"
+                          className="w-full text-left bg-white rounded-2xl lg:rounded-3xl lg:break-inside-avoid p-3 lg:p-4 border border-zinc-200/80 shadow-sm hover:border-[#b85233]/40 hover:shadow-md active:scale-[0.99] active:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b85233]/50 transition-all duration-200 relative group overflow-hidden flex gap-3 lg:gap-5 items-center cursor-pointer"
                         >
                           {/* Card Media Thumbnail Left */}
                           <div className="w-16 h-16 lg:w-28 lg:h-28 rounded-xl lg:rounded-2xl bg-zinc-100 overflow-hidden shrink-0 border border-zinc-200/50 relative">
@@ -2072,7 +2072,7 @@ export default function App() {
                   PAGE 07: CULTURE & LANDMARKS
                   ========================================================================== */}
               <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
-                <div className="space-y-4 lg:columns-2 lg:gap-6 lg:[&>*:not(:last-child)]:break-inside-avoid lg:[&>*:last-child>*]:break-inside-avoid">
+                <div className="space-y-4 lg:columns-2 lg:gap-6">
                   <PageHeading number="07" title={t.pages.culture} kicker="Heritage & Check-in" />
 
                   <p className="text-xs leading-relaxed text-zinc-600 font-light">
@@ -2124,7 +2124,7 @@ export default function App() {
                             type="button"
                             key={idx}
                             onClick={() => handleOpenDetail('culture', originalIdx >= 0 ? originalIdx : idx, undefined, item)}
-                            className="w-full text-left bg-white rounded-2xl lg:rounded-3xl p-3 lg:p-4 border border-zinc-200/80 shadow-sm hover:border-[#0b433f]/40 hover:shadow-md active:scale-[0.99] active:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b433f]/50 transition-all duration-200 relative group overflow-hidden flex gap-3 lg:gap-5 items-center cursor-pointer"
+                            className="w-full text-left bg-white rounded-2xl lg:rounded-3xl lg:break-inside-avoid p-3 lg:p-4 border border-zinc-200/80 shadow-sm hover:border-[#0b433f]/40 hover:shadow-md active:scale-[0.99] active:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b433f]/50 transition-all duration-200 relative group overflow-hidden flex gap-3 lg:gap-5 items-center cursor-pointer"
                           >
                             <div className="absolute top-0 left-0 w-1 lg:w-1.5 h-full bg-[#0b433f]"></div>
 
@@ -2172,7 +2172,7 @@ export default function App() {
                   PAGE 08: SHOPPING & SOUVENIRS
                   ========================================================================== */}
               <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
-                <div className="space-y-4 lg:columns-2 lg:gap-6 lg:[&>*:not(:last-child)]:break-inside-avoid lg:[&>*:last-child>*]:break-inside-avoid">
+                <div className="space-y-4 lg:columns-2 lg:gap-6">
                   <PageHeading number="08" title={t.pages.shopping} kicker="Shop Local Vibes" />
 
                   <p className="text-xs leading-relaxed text-zinc-600 font-light">
@@ -2189,7 +2189,7 @@ export default function App() {
                           type="button"
                           key={idx}
                           onClick={() => handleOpenDetail('shopping', idx, undefined, item)}
-                          className="w-full text-left bg-white rounded-2xl lg:rounded-3xl p-3 lg:p-4 border border-zinc-200/80 shadow-sm hover:border-amber-600/40 hover:shadow-md active:scale-[0.99] active:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-600/50 transition-all duration-200 relative group overflow-hidden flex gap-3 lg:gap-5 items-center cursor-pointer"
+                          className="w-full text-left bg-white rounded-2xl lg:rounded-3xl lg:break-inside-avoid p-3 lg:p-4 border border-zinc-200/80 shadow-sm hover:border-amber-600/40 hover:shadow-md active:scale-[0.99] active:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-600/50 transition-all duration-200 relative group overflow-hidden flex gap-3 lg:gap-5 items-center cursor-pointer"
                         >
                           <div className="w-16 h-16 lg:w-28 lg:h-28 rounded-xl lg:rounded-2xl bg-zinc-100 overflow-hidden shrink-0 border border-zinc-200/50 relative">
                             <ThumbnailPreview url={media.img || media.video} />
@@ -2232,7 +2232,7 @@ export default function App() {
                   PAGE 09: LỤC LAM TRẠM DỪNG CHÂN (Signature Experience)
                   ========================================================================== */}
               <section className="w-full h-full shrink-0 snap-start bg-[#0b1513] text-[#f6f3eb] flex flex-col justify-between page-section p-6 overflow-y-auto">
-                <div className="space-y-5 lg:columns-2 lg:gap-6 lg:[&>*:not(:last-child)]:break-inside-avoid lg:[&>*:last-child>*]:break-inside-avoid">
+                <div className="space-y-5 lg:columns-2 lg:gap-6">
                   {/* Eyebrow in English by design, like the other eight pages.
                       This one was the only Vietnamese hold-out. */}
                   <PageHeading
@@ -2662,7 +2662,7 @@ export default function App() {
                   PAGE 10: USEFUL INFO (Safety, Cash & SIM)
                   ========================================================================== */}
               <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
-                <div className="space-y-4 lg:columns-2 lg:gap-6 lg:[&>*:not(:last-child)]:break-inside-avoid lg:[&>*:last-child>*]:break-inside-avoid">
+                <div className="space-y-4 lg:columns-2 lg:gap-6">
                   <PageHeading number="10" title={t.pages.info} kicker="Security & Backup" />
 
                   <p className="text-xs leading-relaxed text-zinc-600 font-light">

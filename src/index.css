@@ -313,6 +313,25 @@
    Absolutely positioned children are exempt: the cover photograph is one, and
    it is meant to bleed to the edges.
    -------------------------------------------------------------------------- */
+/* --------------------------------------------------------------------------
+   A heading never ends a column
+
+   Blocks are allowed to break across the column boundary now, which is what
+   lets the columns balance — before this a tall block could not split, so it
+   moved to the second column whole and left the first one half empty. The cost
+   of allowing it is that a break can land between a heading and the thing it
+   introduces, which reads as two unrelated fragments.
+   -------------------------------------------------------------------------- */
+@media (min-width: 1024px) {
+  .page-section h1,
+  .page-section h2,
+  .page-section h3,
+  .page-section h4,
+  .page-section h5,
+  .page-section h6 {
+    break-after: avoid;
+  }
+}
 @media (min-width: 1024px) {
   .page-section > *:not(.absolute) {
     width: 100%;
