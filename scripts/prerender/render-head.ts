@@ -6,7 +6,7 @@ import { escapeHtml } from './render-content';
 import { parsePrice } from '../../src/parsePrice';
 import { describe } from './describe';
 import { faqFor } from '../../src/faq';
-import { COMPANY, STORES, FLAGSHIP_HOURS } from '../../src/company';
+import { COMPANY, STORES, storeName, type Store } from '../../src/company';
 
 const ORIGIN = 'https://gift.luclam.vn';
 const OG_IMAGE = `${ORIGIN}/uploads/og-cover.jpg`;
@@ -223,6 +223,30 @@ function products(lang: Language, topic: Topic, resolved: ResolvedContent): stri
   });
 }
 
+/**
+ * A shop's hours, or nothing at all where they were never confirmed.
+ *
+ * Hội An is the one shop without them, and it stays without them: an assistant
+ * repeats opening times as fact, so a guess here sends somebody to a shut door.
+ */
+function openingHours(store: Store) {
+  if (!store.hours) return undefined;
+  return {
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ],
+    opens: store.hours.opens,
+    closes: store.hours.closes,
+  };
+}
+
 function localBusiness(lang: Language, resolved: ResolvedContent): string {
   // telephone was empty here until Lục Lam confirmed the number, because a
   // wrong one in structured data is worse than none — an assistant reads it out
@@ -252,34 +276,19 @@ function localBusiness(lang: Language, resolved: ResolvedContent): string {
     geo: flagship.geo
       ? { '@type': 'GeoCoordinates', latitude: flagship.geo.latitude, longitude: flagship.geo.longitude }
       : undefined,
-    // Only the flagship's hours are known. The other three shops carry an
-    // address and no times rather than times that were guessed.
-    openingHoursSpecification: {
-      '@type': 'OpeningHoursSpecification',
-      dayOfWeek: [
-        'Monday',
-        'Tuesday',
-        'Wednesday',
-        'Thursday',
-        'Friday',
-        'Saturday',
-        'Sunday',
-      ],
-      opens: FLAGSHIP_HOURS.opens,
-      closes: FLAGSHIP_HOURS.closes,
-    },
+    openingHoursSpecification: openingHours(flagship),
     parentOrganization: { '@id': `${ORIGIN}#organization` },
     sameAs: ['https://www.facebook.com/luclamartoftea', COMPANY.website],
   });
 }
 
 /**
- * The company behind the shops, and all four of them.
+ * The company behind the shops, and every one of them.
  *
  * The site knew one address — the Takashimaya counter — while Lục Lam trades
- * from four: that one, Hội An, and two on Trần Phú in Đà Nẵng. Somebody asking
- * an assistant where to buy this tea was being told about a quarter of the
- * answer.
+ * from five: that one, Hội An, and three on Trần Phú in Đà Nẵng. Somebody
+ * asking an assistant where to buy this tea was being told about a fifth of
+ * the answer.
  */
 function organization(lang: Language, resolved: ResolvedContent): string {
   return JSON.stringify({
@@ -312,7 +321,7 @@ function organization(lang: Language, resolved: ResolvedContent): string {
     location: STORES.map((store) => ({
       '@type': 'Store',
       '@id': `${ORIGIN}#store-${store.id}`,
-      name: `${COMPANY.brand} — ${store.city}`,
+      name: `${storeName(store)} — ${store.city}`,
       address: {
         '@type': 'PostalAddress',
         streetAddress: store.street,
@@ -323,6 +332,7 @@ function organization(lang: Language, resolved: ResolvedContent): string {
       ...(store.geo
         ? { geo: { '@type': 'GeoCoordinates', latitude: store.geo.latitude, longitude: store.geo.longitude } }
         : {}),
+      ...(store.hours ? { openingHoursSpecification: openingHours(store) } : {}),
     })),
     sameAs: ['https://www.facebook.com/luclamartoftea', COMPANY.website],
   });

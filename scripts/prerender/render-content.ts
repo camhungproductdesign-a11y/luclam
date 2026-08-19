@@ -2,7 +2,7 @@ import { type Language } from '../../src/translations';
 import { pathFor, TOPICS, type Topic } from '../../src/routes';
 import { type ResolvedContent } from '../../src/resolveContent';
 import { type PlaceImage } from './place-images';
-import { COMPANY, STORES } from '../../src/company';
+import { COMPANY, STORES, storeName } from '../../src/company';
 import { faqFor } from '../../src/faq';
 
 export function escapeHtml(value: string): string {
@@ -157,7 +157,7 @@ function renderFaq(lang: Language, topic: Topic, t: any): string {
  * questions.
  *
  * Structured data is supposed to describe what the page shows, and the
- * Organization block now names four shops, a phone number, an email and a
+ * Organization block now names every shop, a phone number, an email and a
  * registration number that appeared nowhere in the markup. This puts them where
  * a reader can see them too — and where an assistant quoting the schema can
  * point at the sentence it came from.
@@ -169,12 +169,12 @@ function renderContact(topic: Topic, t: any): string {
   if (topic !== 'info' || !t.contact) return '';
   const c = t.contact;
 
-  const shops = STORES.map(
-    (store) =>
-      `<li><strong>${escapeHtml(store.city)}</strong> — ${escapeHtml(
-        `${store.street}, ${store.locality}`
-      )}</li>`
-  ).join('');
+  const shops = STORES.map((store) => {
+    const hours = store.hours ? ` (${store.hours.opens}–${store.hours.closes})` : '';
+    return `<li><strong>${escapeHtml(storeName(store))}</strong>, ${escapeHtml(
+      store.city
+    )} — ${escapeHtml(`${store.street}, ${store.locality}`)}${escapeHtml(hours)}</li>`;
+  }).join('');
 
   return (
     `<section><h2>${escapeHtml(c.heading)}</h2>` +

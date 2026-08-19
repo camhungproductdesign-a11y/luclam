@@ -3,7 +3,7 @@ import { type Language } from '../../src/translations';
 import { type ResolvedContent } from '../../src/resolveContent';
 import { describe } from './describe';
 import { faqFor } from '../../src/faq';
-import { COMPANY, STORES, FLAGSHIP_HOURS } from '../../src/company';
+import { COMPANY, STORES, storeName } from '../../src/company';
 
 /**
  * /llms.txt — the site, described for a language model rather than a crawler.
@@ -52,9 +52,10 @@ const TOPIC_EN: Record<Topic, string> = {
 
 function shopLines(): string {
   return STORES.map((store) => {
-    const hours =
-      store.id === 'takashimaya' ? ` Open ${FLAGSHIP_HOURS.opens}–${FLAGSHIP_HOURS.closes}.` : '';
-    return `- **${store.city}** — ${store.street}, ${store.locality}, ${store.region}.${hours}`;
+    // The shop carries its own hours, or none. Hội An's are unconfirmed, and an
+    // assistant reading this file repeats what it says as fact.
+    const hours = store.hours ? ` Open ${store.hours.opens}–${store.hours.closes}.` : '';
+    return `- **${storeName(store)}**, ${store.city} — ${store.street}, ${store.locality}, ${store.region}.${hours}`;
   }).join('\n');
 }
 

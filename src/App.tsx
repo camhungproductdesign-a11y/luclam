@@ -33,7 +33,7 @@ import {
   ShieldAlert,
   Settings
 } from 'lucide-react';
-import { COMPANY, STORES } from './company';
+import { COMPANY, STORES, STORES_BY_CITY, storeMapUrl, storeName } from './company';
 import { faqFor } from './faq';
 import { PageHeading } from './components/PageHeading';
 import { DeferredFrame } from './components/DeferredFrame';
@@ -2420,99 +2420,83 @@ export default function App() {
                       <h4 className="text-[11px] font-bold text-amber-400 tracking-wider uppercase">
                         {lang === 'vi' ? 'Hệ Thống Cửa Hàng Lục Lam' : lang === 'ko' ? '룩람 오프라인 매장' : lang === 'ja' ? 'Lục Lam 店舗ネットワーク' : 'Lục Lam Branch Locator'}
                       </h4>
-                      <span className="text-[7px] font-mono bg-amber-950 text-amber-300 border border-amber-500/20 px-1.5 py-0.5 rounded font-bold shrink-0 whitespace-nowrap">4 BRANCHES</span>
+                      <span className="text-[7px] font-mono bg-amber-950 text-amber-300 border border-amber-500/20 px-1.5 py-0.5 rounded font-bold shrink-0 whitespace-nowrap">{STORES.length} BRANCHES</span>
                     </div>
-
+                  
+                    {/* One panel per city, every one of them read from STORES.
+                  
+                        This list was hardcoded, and it drifted from the same list in the
+                        structured data and on page 10: the locator carried 259 Trần Phú
+                        and no Hội An, the schema carried Hội An and no 259. Both were
+                        published, so a reader and an assistant got different answers to
+                        the same question. There is one list now, and adding a shop to it
+                        adds the shop here, in the schema, in the FAQ and in llms.txt at
+                        once.
+                  
+                        Addresses stay in Vietnamese in every language — a visitor shows
+                        one to a driver or types it into a map. */}
                     <div className="space-y-2 text-zinc-800">
-                      {/* Saigon branch */}
-                      <div className="bg-[#0c2b27]/40 rounded-xl lg:rounded-2xl lg:break-inside-avoid p-3 lg:p-4 border border-amber-500/10 space-y-1 shadow-inner">
-                        <div className="flex flex-wrap justify-between items-start gap-x-2 gap-y-1">
-                          <span className="text-[8px] bg-[#0b433f] border border-emerald-400/20 text-white font-bold px-1.5 py-0.5 rounded shrink-0">SAIGON</span>
-                          <a 
-                            href="https://maps.app.goo.gl/8tExfsHC1m2E4bxH7" 
-                            target="_blank" 
-                            rel="noreferrer"
-                            className="inline-flex items-center gap-1 text-[8px] text-amber-400 hover:underline font-bold shrink-0 whitespace-nowrap"
-                          >
-                            <span>Google Maps</span>
-                            <ExternalLink className="w-2.5 h-2.5" />
-                          </a>
-                        </div>
-                        <h5 className="text-[10.5px] font-bold text-white tracking-wide">Lục Lam Takashimaya B2 Branch</h5>
-                        <p className="text-[8.5px] text-zinc-400 font-light">B2 Floor, Takashimaya, 65 Lê Lợi, Bến Nghé, District 1, HCMC</p>
-                      </div>
-
-                      {/* Da Nang branches */}
-                      <div className="bg-amber-950/20 rounded-xl p-3 border border-amber-500/15 space-y-2.5">
-                        <div className="flex flex-wrap justify-between items-start gap-x-2 gap-y-1">
-                          <span className="text-[8px] bg-amber-600 text-white font-bold px-1.5 py-0.5 rounded shrink-0">ĐÀ NẴNG (3 Locations)</span>
-                          <span className="text-[8px] text-amber-400 font-bold italic animate-pulse shrink-0 whitespace-nowrap">New Concept Open!</span>
-                        </div>
-                        
-                        <div className="divide-y divide-zinc-800/60 space-y-2.5 pt-0.5">
-                          {/* 1. Lục Lam Flagship */}
-                          <div className="space-y-1.5 pt-1">
-                            <div className="flex flex-wrap justify-between items-center gap-x-2 gap-y-1">
-                              <span className="text-[10px] font-bold text-amber-200">1. Lục Lam Flagship</span>
-                              <a 
-                                href="https://www.google.com/maps/search/?api=1&query=Luc+Lam+202+Tran+Phu+Hai+Chau+Da+Nang" 
-                                target="_blank" 
-                                rel="noreferrer"
-                                className="text-[8px] text-amber-400 hover:underline font-bold flex items-center gap-0.5 shrink-0 whitespace-nowrap"
-                              >
-                                <span>Directions</span>
-                                <ExternalLink className="w-2 h-2" />
-                              </a>
+                      {STORES_BY_CITY.map((group) => {
+                        const flagged = group.stores.find((store) => store.flag);
+                        const many = group.stores.length > 1;
+                        return (
+                          <div key={group.city} className="bg-[#0c2b27]/40 rounded-xl lg:rounded-2xl lg:break-inside-avoid p-3 lg:p-4 border border-amber-500/10 space-y-2 shadow-inner">
+                            <div className="flex flex-wrap justify-between items-start gap-x-2 gap-y-1">
+                              <span className="text-[8px] bg-[#0b433f] border border-emerald-400/20 text-white font-bold uppercase tracking-wide px-1.5 py-0.5 rounded shrink-0">
+                                {group.cityShort}{many ? ` (${group.stores.length})` : ''}
+                              </span>
+                              {flagged && (
+                                <span className="text-[8px] text-amber-400 font-bold italic animate-pulse shrink-0 whitespace-nowrap">{flagged.flag}</span>
+                              )}
                             </div>
-                            <Picture
-                              src="/uploads/external/c561cd48f545.jpg"
-                              alt="Lục Lam Flagship" 
-                              onError={useFallbackImage}
-                              width={800}
-                              height={533}
-                              loading="lazy"
-                              decoding="async"
-                              className="w-full h-24 lg:h-44 object-cover rounded-lg lg:rounded-xl border border-zinc-800/80 my-1"
-                              referrerPolicy="no-referrer"
-                            />
-                            <p className="text-[8.5px] text-zinc-400 font-light">202 Trần Phú, Hải Châu, Đà Nẵng</p>
-                          </div>
-
-                          {/* 2. Lục Lam Premium */}
-                          <div className="space-y-1.5 pt-2">
-                            <div className="flex flex-wrap justify-between items-center gap-x-2 gap-y-1">
-                              <span className="text-[10px] font-bold text-amber-200">2. Lục Lam Premium</span>
-                              <a 
-                                href="https://www.google.com/maps/search/?api=1&query=Luc+Lam+104+Tran+Phu+Hai+Chau+Da+Nang" 
-                                target="_blank" 
-                                rel="noreferrer"
-                                className="text-[8px] text-amber-400 hover:underline font-bold flex items-center gap-0.5 shrink-0 whitespace-nowrap"
-                              >
-                                <span>Directions</span>
-                                <ExternalLink className="w-2 h-2" />
-                              </a>
+                  
+                            <div className={many ? 'divide-y divide-zinc-800/60 space-y-2.5' : ''}>
+                              {group.stores.map((store, index) => (
+                                <div key={store.id} className={`space-y-1.5 ${index > 0 ? 'pt-2.5' : ''}`}>
+                                  <div className="flex flex-wrap justify-between items-center gap-x-2 gap-y-1">
+                                    <h5 className="text-[10.5px] font-bold text-amber-200 tracking-wide">
+                                      {many ? `${index + 1}. ` : ''}{storeName(store)}
+                                    </h5>
+                                    <a
+                                      href={storeMapUrl(store)}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="inline-flex items-center gap-1 text-[8px] text-amber-400 hover:underline font-bold shrink-0 whitespace-nowrap"
+                                    >
+                                      <span>Directions</span>
+                                      <ExternalLink className="w-2.5 h-2.5" />
+                                    </a>
+                                  </div>
+                                  {store.photo && (
+                                    <Picture
+                                      src={store.photo.src}
+                                      alt={storeName(store)}
+                                      onError={useFallbackImage}
+                                      width={store.photo.width}
+                                      height={store.photo.height}
+                                      loading="lazy"
+                                      decoding="async"
+                                      className="w-full h-24 lg:h-44 object-cover rounded-lg lg:rounded-xl border border-zinc-800/80 my-1"
+                                      referrerPolicy="no-referrer"
+                                    />
+                                  )}
+                                  {/* Hours ride on the address line rather than
+                                      taking one of their own. Five shops instead
+                                      of four already cost this section 118px of
+                                      height, measured, and it overflows its
+                                      screen before the extra line is counted. */}
+                                  <p className="text-[8.5px] text-zinc-400 font-light">
+                                    {`${store.street}, ${store.locality}`}
+                                    {store.hours && (
+                                      <span className="text-emerald-300/90 tabular-nums"> · {store.hours.opens}–{store.hours.closes}</span>
+                                    )}
+                                  </p>
+                                </div>
+                              ))}
                             </div>
-                            <p className="text-[8.5px] text-zinc-400 font-light">104 Trần Phú, Hải Châu, Đà Nẵng</p>
                           </div>
-
-                          {/* 3. Lục Lam New Concept */}
-                          <div className="space-y-1.5 pt-2">
-                            <div className="flex flex-wrap justify-between items-center gap-x-2 gap-y-1">
-                              <span className="text-[10px] font-bold text-amber-200">3. Lục Lam New Concept</span>
-                              <a 
-                                href="https://www.google.com/maps/search/?api=1&query=Luc+Lam+259+Tran+Phu+Hai+Chau+Da+Nang" 
-                                target="_blank" 
-                                rel="noreferrer"
-                                className="text-[8px] text-amber-400 hover:underline font-bold flex items-center gap-0.5 shrink-0 whitespace-nowrap"
-                              >
-                                <span>Directions</span>
-                                <ExternalLink className="w-2 h-2" />
-                              </a>
-                            </div>
-                            <p className="text-[8.5px] text-zinc-400 font-light">259 Trần Phú, Hải Châu, Đà Nẵng</p>
-                          </div>
-                        </div>
-                      </div>
+                        );
+                      })}
                     </div>
                   </div>
 
@@ -2748,7 +2732,7 @@ export default function App() {
                   </div>
 
                   {/* Lục Lam's own details. The Organization structured data on
-                      this page names four shops, a phone number and a
+                      this page names every shop, a phone number and a
                       registration number; Google expects structured data to
                       describe what the page actually shows, so this is where a
                       reader sees the same facts.
@@ -2787,11 +2771,18 @@ export default function App() {
                       {t.contact.stores}
                     </h5>
                     <div className="space-y-1.5">
+                      {/* The branch name leads, because three of the five shops
+                          are in Đà Nẵng and the city alone no longer tells them
+                          apart. Hours appear only where the company confirmed
+                          them — Hội An's are unknown and stay unstated. */}
                       {STORES.map((store) => (
-                        <div key={store.id} className="bg-white rounded-xl p-2.5 border border-zinc-200/60 shadow-sm">
-                          <p className="text-[9px] font-bold text-[#0b433f]">{store.city}</p>
+                        <div key={store.id} className="bg-white rounded-xl lg:break-inside-avoid p-2.5 border border-zinc-200/60 shadow-sm">
+                          <p className="text-[9px] font-bold text-[#0b433f]">{storeName(store)}</p>
                           <p className="text-[9px] text-zinc-500 leading-normal font-light">
-                            {`${store.street}, ${store.locality}`}
+                            {`${store.street}, ${store.locality}, ${store.region}`}
+                            {store.hours && (
+                              <span className="text-zinc-400 tabular-nums"> · {store.hours.opens}–{store.hours.closes}</span>
+                            )}
                           </p>
                         </div>
                       ))}

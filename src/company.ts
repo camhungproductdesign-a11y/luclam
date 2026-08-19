@@ -33,29 +33,59 @@ export type Store = {
   id: string;
   /** What to call this branch in a list — the city, since that is how a visitor picks. */
   city: string;
+  /** The same city cut down to fit a chip on the branch locator. */
+  cityShort: string;
+  /** The name over the door, where the shop has one of its own. */
+  name?: string;
   street: string;
   locality: string;
   region: string;
   geo?: { latitude: number; longitude: number };
+  /** Opening times, only where the company has confirmed them. */
+  hours?: { opens: string; closes: string };
+  /** A map link the company published; otherwise one is built from the address. */
+  mapUrl?: string;
+  /** A photograph of the shopfront, where there is one. */
+  photo?: { src: string; width: number; height: number };
+  /** A short flag beside the branch — a newly opened shop, say. */
+  flag?: string;
 };
 
+/** Opening hours, confirmed for the Saigon counter and the three Đà Nẵng shops. */
+export const FLAGSHIP_HOURS = { opens: '09:30', closes: '22:00' };
+
 /**
- * The four shops. Only the Takashimaya one has confirmed opening hours, so only
- * it carries them; guessing the rest would put invented times in front of an
- * assistant that repeats them as fact.
+ * Every shop, and the only list of them.
+ *
+ * Page 09's branch locator used to carry its own hardcoded copy of this, and
+ * the two drifted apart exactly as you would expect: the locator knew about
+ * 259 Trần Phú and had never heard of Hội An, while the structured data knew
+ * the opposite. Both were published, so an assistant reading the page and an
+ * assistant reading the schema gave different answers about where to buy this
+ * tea. Everything renders from here now.
+ *
+ * Hội An has no confirmed hours, so it carries none — times that were guessed
+ * are worse than times that are absent, because an assistant repeats them as
+ * fact.
  */
 export const STORES: Store[] = [
   {
     id: 'takashimaya',
     city: 'Thành phố Hồ Chí Minh',
+    cityShort: 'Saigon',
+    name: 'Lục Lam Takashimaya B2',
     street: 'Tầng B2, Takashimaya, 92-94 Nam Kỳ Khởi Nghĩa',
     locality: 'Bến Nghé, Quận 1',
     region: 'Thành phố Hồ Chí Minh',
     geo: { latitude: 10.7733, longitude: 106.7011 },
+    hours: FLAGSHIP_HOURS,
+    mapUrl: 'https://maps.app.goo.gl/8tExfsHC1m2E4bxH7',
   },
   {
     id: 'hoian',
     city: 'Hội An',
+    cityShort: 'Hội An',
+    name: 'Lục Lam Hội An',
     street: '62 Nguyễn Thị Minh Khai',
     locality: 'Phường Minh An',
     region: 'Quảng Nam',
@@ -63,21 +93,62 @@ export const STORES: Store[] = [
   {
     id: 'danang-tran-phu-202',
     city: 'Đà Nẵng',
+    cityShort: 'Đà Nẵng',
+    name: 'Lục Lam Flagship',
     street: '202 Trần Phú',
     locality: 'Phường Phước Ninh, Quận Hải Châu',
     region: 'Đà Nẵng',
+    hours: FLAGSHIP_HOURS,
+    photo: { src: '/uploads/external/c561cd48f545.jpg', width: 800, height: 533 },
   },
   {
     id: 'danang-tran-phu-104',
     city: 'Đà Nẵng',
+    cityShort: 'Đà Nẵng',
+    name: 'Lục Lam Premium',
     street: '104 Trần Phú',
     locality: 'Quận Hải Châu',
     region: 'Đà Nẵng',
+    hours: FLAGSHIP_HOURS,
+  },
+  {
+    id: 'danang-tran-phu-259',
+    city: 'Đà Nẵng',
+    cityShort: 'Đà Nẵng',
+    name: 'Lục Lam New Concept',
+    street: '259 Trần Phú',
+    locality: 'Quận Hải Châu',
+    region: 'Đà Nẵng',
+    hours: FLAGSHIP_HOURS,
+    flag: 'New Concept Open!',
   },
 ];
 
-/** Opening hours are only known for the flagship. */
-export const FLAGSHIP_HOURS = { opens: '09:30', closes: '22:00' };
-
 export const fullAddress = (store: Store): string =>
   `${store.street}, ${store.locality}, ${store.region}`;
+
+/** The shop's own name, or one built from the brand and the city. */
+export const storeName = (store: Store): string =>
+  store.name ?? `${COMPANY.brand} ${store.cityShort}`;
+
+/**
+ * Where to send someone for directions.
+ *
+ * A published short link when the company gave one, otherwise a Maps search
+ * for the address — so every branch has a way to be found, including the ones
+ * added later.
+ */
+export const storeMapUrl = (store: Store): string =>
+  store.mapUrl ??
+  `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    `Lục Lam ${store.street}, ${store.locality}, ${store.region}`
+  )}`;
+
+/** The shops grouped by city, in the order the cities first appear above. */
+export const STORES_BY_CITY: { city: string; cityShort: string; stores: Store[] }[] =
+  STORES.reduce<{ city: string; cityShort: string; stores: Store[] }[]>((groups, store) => {
+    const group = groups.find((g) => g.city === store.city);
+    if (group) group.stores.push(store);
+    else groups.push({ city: store.city, cityShort: store.cityShort, stores: [store] });
+    return groups;
+  }, []);

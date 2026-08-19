@@ -1,7 +1,7 @@
 import { type Language } from './translations';
 import { LANGUAGES, HTML_LANG } from './routes';
 import { parsePrice } from './parsePrice';
-import { COMPANY, STORES } from './company';
+import { COMPANY, STORES, storeName } from './company';
 
 /**
  * The FAQ for one language, with its facts filled in from live data.
@@ -78,7 +78,11 @@ export function faqFor(lang: Language, t: any): Array<{ q: string; a: string }> 
     // Addresses stay in Vietnamese in every language: a visitor shows them to a
     // driver or types them into a map, and a translated street name serves
     // neither.
-    stores: STORES.map((store) => `${store.city} — ${store.street}, ${store.locality}`).join('; '),
+    // Three of the shops are in Đà Nẵng, so the city alone no longer tells them
+    // apart — the branch name goes in front of it.
+    stores: STORES.map(
+      (store) => `${storeName(store)}, ${store.city} — ${store.street}, ${store.locality}`
+    ).join('; '),
     storeCount: String(STORES.length),
     phone: COMPANY.telephoneDisplay,
     email: COMPANY.email,
