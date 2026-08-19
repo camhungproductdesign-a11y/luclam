@@ -305,12 +305,43 @@ export function PlaceDetailModal({
       
       {/* Scrollable Container styled as a premium mobile slide-up sheet */}
       <div
-        className="w-full h-[90%] lg:w-[920px] lg:max-w-full lg:h-auto lg:max-h-full bg-[#f6f3eb] rounded-t-[32px] lg:rounded-3xl overflow-hidden shadow-2xl flex flex-col relative animate-in slide-in-from-bottom lg:zoom-in-95 duration-300"
+        className={`w-full h-[90%] ${embedDetails.type === 'tiktok' ? 'lg:w-[1080px]' : 'lg:w-[920px]'} lg:max-w-full lg:h-auto lg:max-h-full bg-[#f6f3eb] rounded-t-[32px] lg:rounded-3xl overflow-hidden shadow-2xl flex flex-col lg:flex-row relative animate-in slide-in-from-bottom lg:zoom-in-95 duration-300`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="place-detail-title"
         onClick={(event) => event.stopPropagation()}
       >
+
+        {/* The clip, in a pane of its own the height of the dialog.
+
+            Stacked under the hero and the tabs it had only what those left:
+            42% of it was visible at 1366x768 and 66% at 1600x900. Beside them
+            its height is the dialog's, so it is whole at every size, and it
+            stays on screen while the reader moves between tabs.
+
+            300px wide is 533px tall at 9/16 — the same clip as before, and
+            short enough to fit the dialog on the smallest laptop this branch
+            supports. The iframe is still 1000px and still cropped, for the
+            reason set out where the stacked one used to be. */}
+        {embedDetails.type === 'tiktok' && (
+          <aside className="hidden lg:flex w-[300px] shrink-0 bg-black items-center justify-center p-3">
+            <div className="relative w-full aspect-[9/16] rounded-2xl overflow-hidden bg-black">
+              <iframe
+                src={embedDetails.embedUrl}
+                className="absolute inset-x-0 top-0 w-full border-0"
+                style={{ height: tiktokHeight ?? 1000 }}
+                allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                allowFullScreen
+                loading="lazy"
+                scrolling="no"
+                title="TikTok Video Embed"
+              />
+            </div>
+          </aside>
+        )}
+
+        {/* Everything else, in a column beside it. */}
+        <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         
         {/* Top visual bar for dragging effect */}
         <div className="lg:hidden absolute top-2 left-1/2 -translate-x-1/2 w-12 h-1 bg-white/40 rounded-full z-40"></div>
@@ -541,7 +572,7 @@ export function PlaceDetailModal({
 
               {/* Dynamic Video Showcase Block */}
               {resolvedVideo && (
-                <div className="mt-4 lg:mt-0 space-y-2 lg:w-[300px] lg:shrink-0">
+                <div className="mt-4 space-y-2 lg:hidden">
                   <div className="flex items-center gap-2 text-zinc-800 border-b border-zinc-100 pb-2">
                     <div className="w-6 h-6 bg-amber-500/10 rounded-md flex items-center justify-center">
                       <Play className="w-3.5 h-3.5 text-amber-600 fill-current" />
@@ -816,6 +847,7 @@ export function PlaceDetailModal({
           </a>
         </div>
 
+        </div>
       </div>
     </div>
   );
