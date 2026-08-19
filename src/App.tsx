@@ -255,7 +255,11 @@ export default function App() {
   const [showTransportPopup, setShowTransportPopup] = useState<number | null>(null);
   const [voucherClaimed, setVoucherClaimed] = useState<boolean>(false);
   const [activeFoodTab, setActiveFoodTab] = useState<number>(0);
-  const [activeCultureCategory, setActiveCultureCategory] = useState<'all' | 'heritage' | 'spiritual' | 'modern' | 'nature'>('all');
+  // No 'all' here, the same way page 06 has no "all" tab: it listed 26 places
+  // at once, which came to 2315px in a 820px screen — the single worst overflow
+  // on the site, and it was the default, so that wall of cards was what the
+  // page opened on. One category at a time is what the tabs are for.
+  const [activeCultureCategory, setActiveCultureCategory] = useState<'heritage' | 'spiritual' | 'modern' | 'nature'>('heritage');
   const [benThanhMapTab, setBenThanhMapTab] = useState<'gate' | 'google'>('google');
   const [expandedTea, setExpandedTea] = useState<number | null>(null);
   
@@ -2113,13 +2117,10 @@ export default function App() {
 
                   {/* Category Selection Tabs */}
                   <div className="flex gap-1.5 lg:gap-2 overflow-x-auto lg:overflow-visible lg:flex-wrap pb-1 pt-0.5 no-scrollbar">
-                    {(['all', 'heritage', 'spiritual', 'modern', 'nature'] as const).map((cat) => {
+                    {(['heritage', 'spiritual', 'modern', 'nature'] as const).map((cat) => {
                       const isSelected = activeCultureCategory === cat;
-                      const label = cat === 'all'
-                        ? { vi: 'Tất cả', en: 'All', ja: 'すべて', zh: '全部', zht: '全部' }[lang]
-                        : t.culture.categories[cat];
+                      const label = t.culture.categories[cat];
                       const emoji = {
-                        all: '✨',
                         heritage: '🏛️',
                         spiritual: '🛕',
                         modern: '🏙️',
@@ -2144,19 +2145,29 @@ export default function App() {
                   </div>
 
                   <div className="space-y-3 pt-1">
-                    {t.culture.items
-                      .filter(item => activeCultureCategory === 'all' || item.category === activeCultureCategory)
-                      .map((item, idx) => {
-                        const originalIdx = t.culture.items.findIndex((x: any) => x.name === item.name);
-                        const placeId = `culture-${originalIdx >= 0 ? originalIdx : idx}`;
+                    {/* Every place stays in the DOM; the tab only hides the ones
+                        it is not showing.
+
+                        Filtering them out of the array would have been shorter,
+                        and it is what page 06 does — but this page removes
+                        #static-content on mount, and it publishes no ItemList,
+                        so the rendered DOM is the only place a crawler that runs
+                        JS can find these 26 landmarks. Dropping to one category
+                        would have hidden 19 of them from Google to win a layout
+                        argument. `hidden` costs no height, so the screen fits
+                        either way, and the lazy images inside a display:none
+                        card are never fetched. */}
+                    {t.culture.items.map((item, idx) => {
+                        const shown = item.category === activeCultureCategory;
+                        const placeId = `culture-${idx}`;
                         const media = getPlaceMedia(placeId);
-                        
+
                         return (
                           <button
                             type="button"
                             key={idx}
-                            onClick={() => handleOpenDetail('culture', originalIdx >= 0 ? originalIdx : idx, undefined, item)}
-                            className="w-full text-left bg-white rounded-2xl lg:rounded-3xl lg:break-inside-avoid p-3 lg:p-4 border border-zinc-200/80 shadow-sm hover:border-[#0b433f]/40 hover:shadow-md active:scale-[0.99] active:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b433f]/50 transition-all duration-200 relative group overflow-hidden flex gap-3 lg:gap-5 items-center cursor-pointer"
+                            onClick={() => handleOpenDetail('culture', idx, undefined, item)}
+                            className={`${shown ? 'flex' : 'hidden'} w-full text-left bg-white rounded-2xl lg:rounded-3xl lg:break-inside-avoid p-3 lg:p-4 border border-zinc-200/80 shadow-sm hover:border-[#0b433f]/40 hover:shadow-md active:scale-[0.99] active:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b433f]/50 transition-all duration-200 relative group overflow-hidden gap-3 lg:gap-5 items-center cursor-pointer`}
                           >
                             <div className="absolute top-0 left-0 w-1 lg:w-1.5 h-full bg-[#0b433f]"></div>
 
