@@ -36,6 +36,7 @@ import {
 import { COMPANY, STORES, STORES_BY_CITY, storeMapUrl, storeName } from './company';
 import { faqFor } from './faq';
 import { PageHeading } from './components/PageHeading';
+import { SectionTabs } from './components/SectionTabs';
 import { DeferredFrame } from './components/DeferredFrame';
 
 // ==========================================================================
@@ -261,6 +262,12 @@ export default function App() {
   // page opened on. One category at a time is what the tabs are for.
   const [activeCultureCategory, setActiveCultureCategory] = useState<'heritage' | 'spiritual' | 'modern' | 'nature'>('heritage');
   const [benThanhMapTab, setBenThanhMapTab] = useState<'gate' | 'google'>('google');
+  // Pages 03, 09 and 10 held more than their screen could take — 461px, 702px
+  // and 573px of scroll at 1440x900. Each now shows one group at a time, the
+  // way pages 06 and 07 already did. The panels stay mounted; see SectionTabs.
+  const [activeAtmosphereTab, setActiveAtmosphereTab] = useState<'districts' | 'map'>('districts');
+  const [activeLuclamTab, setActiveLuclamTab] = useState<'teas' | 'stores' | 'offers'>('teas');
+  const [activeInfoTab, setActiveInfoTab] = useState<'info' | 'contact' | 'faq'>('info');
   const [expandedTea, setExpandedTea] = useState<number | null>(null);
   
   // Creator check
@@ -1345,10 +1352,30 @@ export default function App() {
                     {t.atmosphere.description}
                   </p>
 
+                  {/* Two blocks, one screen. The district cards came to 969px and the
+                      Bến Thành map to 727px against 1544px of column, so with both in
+                      the flow at once the page scrolled 461px. */}
+                  <SectionTabs
+                    label={t.pages.atmosphere}
+                    active={activeAtmosphereTab}
+                    onChange={setActiveAtmosphereTab}
+                    tabs={[
+                      { id: 'districts', emoji: '🏙️', label: t.pages.atmosphere },
+                      {
+                        id: 'map',
+                        emoji: '🗺️',
+                        // The same string the map's own <h3> uses, so the tab
+                        // and the heading it reveals cannot say different
+                        // things.
+                        label: lang === 'vi' ? 'Bản Đồ Chợ Bến Thành' : lang === 'ko' ? '벤탄 시장 지도' : lang === 'ja' ? 'ベンタイン市場 地図' : 'Bến Thành Market Map',
+                      },
+                    ] as const}
+                  />
+
 
 
                   {/* Bến Thành Market Stylized Map Guide */}
-                  <div className="bg-[#fcfbf9] border border-zinc-300/80 rounded-2xl p-4 shadow-sm space-y-3 text-zinc-800">
+                  <div className={`bg-[#fcfbf9] border border-zinc-300/80 rounded-2xl p-4 shadow-sm space-y-3 text-zinc-800 ${activeAtmosphereTab === 'map' ? '' : 'hidden'}`}>
                     {/* Stacked, not two columns on one row.
                         A heading, a subtitle and two labelled tabs will not fit
                         across 430px, and the frame is 430px on a desktop screen
@@ -1522,7 +1549,7 @@ export default function App() {
                   </div>
 
                   {/* 3 District Detail Cards horizontally or vertically scrollable */}
-                  <div className="space-y-3">
+                  <div className={`space-y-3 ${activeAtmosphereTab === 'districts' ? '' : 'hidden'}`}>
                     {t.atmosphere.districts.map((dist) => {
                       const isHighlighted = highlightedCard === dist.id;
                       const cardColors = dist.id === 'd1' 
@@ -1565,7 +1592,7 @@ export default function App() {
                 </div>
 
                 {/* Bottom Tip Banner */}
-                <div className="mt-4 p-3 bg-[#f0ede4] rounded-xl border border-[#dcd7ca] flex gap-3 text-[10px] text-zinc-700 leading-relaxed items-start relative overflow-hidden">
+                <div className="p-3 bg-[#f0ede4] rounded-xl border border-[#dcd7ca] flex gap-3 text-[10px] text-zinc-700 leading-relaxed items-start relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-1 h-full bg-[#b85233]"></div>
                   {/* Stacked. tipsDesc alone came to seven lines in its 175px
                       column, in English and in Vietnamese both, next to a
@@ -1998,7 +2025,7 @@ export default function App() {
                 </div>
 
                                 {/* Bottom row advice tips */}
-                <div className="mt-4 p-3 bg-[#e6e2d8] rounded-xl border-l-4 border-[#0b433f] flex gap-3 text-[10px] text-zinc-700 leading-relaxed items-start">
+                <div className="p-3 bg-[#e6e2d8] rounded-xl border-l-4 border-[#0b433f] flex gap-3 text-[10px] text-zinc-700 leading-relaxed items-start">
                   <Info className="w-4 h-4 text-[#0b433f] shrink-0 mt-0.5" />
                   {/* Stacked. Side by side each tip had about 187px, and both
                       run to four lines of prose at that width in English and in
@@ -2099,7 +2126,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-zinc-200/40 text-center">
+                <div className="pt-3 border-t border-zinc-200/40 text-center">
                   <span className="text-[8px] tracking-widest text-zinc-400 uppercase">Lục Lam Pocket Companion</span>
                 </div>
               </section>
@@ -2206,7 +2233,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-zinc-200/40 text-center">
+                <div className="pt-3 border-t border-zinc-200/40 text-center">
                   <span className="text-[8px] tracking-widest text-zinc-400 uppercase">Lục Lam Heritage Route</span>
                 </div>
               </section>
@@ -2266,7 +2293,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-zinc-200/40 text-center">
+                <div className="pt-3 border-t border-zinc-200/40 text-center">
                   <span className="text-[8px] tracking-widest text-zinc-400 uppercase">Lục Lam Shopping Companion</span>
                 </div>
               </section>
@@ -2309,8 +2336,23 @@ export default function App() {
                     </div>
                   </div>
 
+                  {/* Four blocks, one screen. Together they came to 2549px against
+                      1544px of column — 702px of scroll, the worst left on the site.
+                      The card above stays on every tab. */}
+                  <SectionTabs
+                    tone="dark"
+                    label={t.pages.luclam}
+                    active={activeLuclamTab}
+                    onChange={setActiveLuclamTab}
+                    tabs={[
+                      { id: 'teas', emoji: '🍵', label: t.luclam.menuHeading },
+                      { id: 'stores', emoji: '📍', label: lang === 'vi' ? 'Hệ thống cửa hàng' : lang === 'ko' ? '매장 안내' : lang === 'ja' ? '店舗ネットワーク' : 'Branch locator' },
+                      { id: 'offers', emoji: '🎁', label: lang === 'vi' ? 'Ưu đãi & Đánh giá' : lang === 'ko' ? '혜택 & 리뷰' : lang === 'ja' ? '特典＆口コミ' : 'Offers & reviews' },
+                    ] as const}
+                  />
+
                   {/* Premium Tea Menu List */}
-                  <div className="space-y-3">
+                  <div className={`space-y-3 ${activeLuclamTab === 'teas' ? '' : 'hidden'}`}>
                     <h4 className="text-[11px] font-bold text-amber-400 tracking-wider uppercase border-l-2 border-amber-500 pl-2">
                       {t.luclam.menuHeading}
                     </h4>
@@ -2451,7 +2493,7 @@ export default function App() {
                   </div>
 
                   {/* Shimming Branch Locator */}
-                  <div className="space-y-3 pt-2">
+                  <div className={`space-y-3 pt-2 ${activeLuclamTab === 'stores' ? '' : 'hidden'}`}>
                     {/* Same shape as the page headers: a localised title beside a
                         short fixed badge. The badge is pinned so the title wraps
                         instead of both being squeezed into broken words. */}
@@ -2540,7 +2582,7 @@ export default function App() {
                   </div>
 
                   {/* International Instagram Portals */}
-                  <div className="space-y-3 pt-2">
+                  <div className={`space-y-3 pt-2 ${activeLuclamTab === 'offers' ? '' : 'hidden'}`}>
                     <h4 className="text-[11px] font-bold text-amber-400 tracking-wider uppercase border-l-2 border-amber-500 pl-2">
                       {lang === 'vi' ? 'Đánh Giá Từ Du Khách Quốc Tế' : lang === 'ko' ? '글로벌 여행자 리뷰 포털' : lang === 'ja' ? 'グローバル旅行者の口コミ' : 'Global Traveler Review Portals'}
                     </h4>
@@ -2603,7 +2645,7 @@ export default function App() {
                   </div>
 
                   {/* Elegant Golden Coupon / Voucher */}
-                  <div className="space-y-3 pt-2">
+                  <div className={`space-y-3 pt-2 ${activeLuclamTab === 'offers' ? '' : 'hidden'}`}>
                     <div className="relative bg-[#0d2b27] rounded-2xl border-2 border-dashed border-amber-500/30 p-4 shadow-xl overflow-hidden flex flex-col justify-between">
                       {/* Left-right notched holes */}
                       <div className="absolute top-1/2 -left-3 w-6 h-6 rounded-full bg-[#0b1513] -translate-y-1/2 border-r border-amber-500/20 z-10"></div>
@@ -2680,7 +2722,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-zinc-800 text-center">
+                <div className="pt-3 border-t border-zinc-800 text-center">
                   <span className="text-[8px] tracking-widest text-zinc-500 uppercase">Lục Lam Hospitality Oasis</span>
                 </div>
               </section>
@@ -2696,7 +2738,20 @@ export default function App() {
                     {t.info.intro}
                   </p>
 
-                  <div className="space-y-4 pt-1">
+                  {/* Three blocks, one screen. Together they came to 2396px against 1544px
+                      of column, so the page scrolled 573px; apart, the largest is 1029. */}
+                  <SectionTabs
+                    label={t.info.title}
+                    active={activeInfoTab}
+                    onChange={setActiveInfoTab}
+                    tabs={[
+                      { id: 'info', emoji: '🚨', label: t.pages.info },
+                      { id: 'contact', emoji: '🍵', label: t.contact.heading },
+                      { id: 'faq', emoji: '❓', label: t.faqHeading },
+                    ] as const}
+                  />
+
+                  <div className={`space-y-4 pt-1 ${activeInfoTab === 'info' ? '' : 'hidden'}`}>
                     {t.info.categories.map((cat, idx) => {
                       const icons = [
                         <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />,
@@ -2743,7 +2798,7 @@ export default function App() {
                       bury the safety and SIM information above, and the content
                       stays in the DOM either way, which is what a crawler
                       reads. */}
-                  <div className="space-y-2 pt-1">
+                  <div className={`space-y-2 pt-1 ${activeInfoTab === 'faq' ? '' : 'hidden'}`}>
                     <h4 className="text-[10px] font-bold text-zinc-800 uppercase tracking-wider flex items-center gap-1.5">
                       <Info className="w-4 h-4 text-[#0b433f] shrink-0" />
                       <span>{t.faqHeading}</span>
@@ -2780,7 +2835,7 @@ export default function App() {
                       phone taps to call. The addresses stay in Vietnamese in
                       every language: they get shown to a driver or typed into a
                       map, and a translated street name serves neither. */}
-                  <div className="space-y-2 pt-1">
+                  <div className={`space-y-2 pt-1 ${activeInfoTab === 'contact' ? '' : 'hidden'}`}>
                     <h4 className="text-[10px] font-bold text-zinc-800 uppercase tracking-wider flex items-center gap-1.5">
                       <PhoneCall className="w-4 h-4 text-[#b85233] shrink-0" />
                       <span>{t.contact.heading}</span>
@@ -2830,7 +2885,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-zinc-200/40 text-center">
+                <div className="pt-3 border-t border-zinc-200/40 text-center">
                   <span className="text-[8px] tracking-widest text-zinc-400 uppercase">Lục Lam Peace of Mind Guarantee</span>
                 </div>
               </section>

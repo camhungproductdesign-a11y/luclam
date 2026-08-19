@@ -343,8 +343,12 @@
 @media (min-width: 1024px) {
   .page-section {
     justify-content: safe center;
-    gap: 2.5rem;
-    padding: 3rem 3.5rem;
+    /* 2.5rem of gap and 3rem top and bottom spent 136px of a 820px screen on
+       frame, and six pages were scrolling by less than that. The trim is worth
+       more here than the air. The horizontal 3.5rem is untouched — that is the
+       part actually holding the columns off the edge of the spread. */
+    gap: 1.75rem;
+    padding: 2rem 3.5rem;
   }
 }
 
