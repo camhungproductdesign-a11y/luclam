@@ -4,7 +4,7 @@ import path from 'path';
 import { ALL_ROUTES, LANGUAGES, TOPICS } from '../src/routes';
 
 const DIST = path.join(process.cwd(), 'dist');
-const ORIGIN = 'https://gift.luclam.vn';
+import { ORIGIN } from '../src/origin';
 
 /**
  * Characters, not words: ja, ko, zh and zht do not put spaces between words,

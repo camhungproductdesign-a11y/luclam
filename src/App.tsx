@@ -772,33 +772,6 @@ export default function App() {
   // resolve content the same way. See src/resolveContent.ts.
   const t = resolveContent(lang, overrides);
 
-  /**
-   * The language selector sits in its own row below md, so the strip behind it
-   * would otherwise show the frame's cream through every page. Two pages are
-   * dark, so it has to follow whichever is open rather than pick one colour.
-   * Values match the section backgrounds exactly.
-   */
-  const selectorStripBackground =
-    pagesList[currentPage] === 'cover'
-      ? 'bg-zinc-950'
-      : pagesList[currentPage] === 'luclam'
-        ? 'bg-[#0b1513]'
-        : 'bg-[#f6f3eb]';
-
-  /**
-   * The buttons have no fill of their own, so the ring and the label are all
-   * that separate them from the page — and on two of the ten pages that page is
-   * near-black. Both readings come from the same page name the strip uses, so
-   * the button can never end up styled for a background the strip is not
-   * painting.
-   *
-   * Only below md. From md up these sit inside the dark pill at the right edge,
-   * where the treatment is dark whatever page is open, and the md: classes on
-   * the button say so.
-   */
-  const selectorOnDark =
-    pagesList[currentPage] === 'cover' || pagesList[currentPage] === 'luclam';
-
 
   return (
     <div
@@ -813,7 +786,7 @@ export default function App() {
           the viewport has nowhere else to go. justify-start plus mt-auto on the
           footer rather than justify-between, which can push content above the
           scroll origin once it overflows. */}
-      <aside className="hidden lg:flex flex-col w-[340px] border-r border-zinc-800/50 p-8 shrink-0 bg-[#0f1f1b] relative z-10 justify-start overflow-y-auto">
+      <aside className="hidden lg:flex flex-col w-[264px] xl:w-[340px] border-r border-zinc-800/50 p-8 shrink-0 bg-[#0f1f1b] relative z-10 justify-start overflow-y-auto">
         <div className="space-y-8 shrink-0">
           {/* Brand header */}
           <div className="space-y-1">
@@ -1178,7 +1151,7 @@ export default function App() {
                   height. vh would read the browser window, which on desktop is
                   taller than the 860px device frame this page lives in. */}
               <section className="[container-type:size] w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-5 overflow-y-auto">
-                <div className="space-y-[clamp(0.65rem,2.4cqh,1.25rem)] lg:columns-2 lg:gap-6">
+                <div className="space-y-[clamp(0.65rem,2.4cqh,1.25rem)] min-[1100px]:columns-2 min-[1100px]:gap-6">
 
                   {/* Minimal page header decoration */}
                   <PageHeading
@@ -1343,7 +1316,7 @@ export default function App() {
                   PAGE 03: CITY GUIDE / DISTRICTS WITH MAP
                   ========================================================================== */}
               <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
-                <div className="space-y-4 lg:columns-2 lg:gap-6">
+                <div className="space-y-4 min-[1100px]:columns-2 min-[1100px]:gap-6">
                   
                   {/* Minimal page header decoration */}
                   <PageHeading number="03" title={t.pages.atmosphere} kicker="Explore Saigon Map" />
@@ -1592,7 +1565,7 @@ export default function App() {
                 </div>
 
                 {/* Bottom Tip Banner */}
-                <div className="p-3 bg-[#f0ede4] rounded-xl border border-[#dcd7ca] flex gap-3 text-[10px] text-zinc-700 leading-relaxed items-start relative overflow-hidden">
+                <div className="mt-4 lg:mt-0 p-3 bg-[#f0ede4] rounded-xl border border-[#dcd7ca] flex gap-3 text-[10px] text-zinc-700 leading-relaxed items-start relative overflow-hidden">
                   <div className="absolute top-0 left-0 w-1 h-full bg-[#b85233]"></div>
                   {/* Stacked. tipsDesc alone came to seven lines in its 175px
                       column, in English and in Vietnamese both, next to a
@@ -1620,7 +1593,7 @@ export default function App() {
                   PAGE 04: TRANSPORTATION
                   ========================================================================== */}
               <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
-                <div className="space-y-4 lg:columns-2 lg:gap-6">
+                <div className="space-y-4 min-[1100px]:columns-2 min-[1100px]:gap-6">
                   
                   {/* Minimal page header decoration */}
                   <PageHeading number="04" title={t.pages.transport} kicker="Transit in Ho Chi Minh" />
@@ -1876,7 +1849,7 @@ export default function App() {
                   PAGE 05: STAY & REJUVENATE (CARE)
                   ========================================================================== */}
               <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
-                <div className="space-y-4 lg:columns-2 lg:gap-6">
+                <div className="space-y-4 min-[1100px]:columns-2 min-[1100px]:gap-6">
                   
                   {/* Minimal page header decoration */}
                   <PageHeading number="05" title={t.pages.stay} kicker="Wellness & Hotels" />
@@ -2025,7 +1998,7 @@ export default function App() {
                 </div>
 
                                 {/* Bottom row advice tips */}
-                <div className="p-3 bg-[#e6e2d8] rounded-xl border-l-4 border-[#0b433f] flex gap-3 text-[10px] text-zinc-700 leading-relaxed items-start">
+                <div className="mt-4 lg:mt-0 p-3 bg-[#e6e2d8] rounded-xl border-l-4 border-[#0b433f] flex gap-3 text-[10px] text-zinc-700 leading-relaxed items-start">
                   <Info className="w-4 h-4 text-[#0b433f] shrink-0 mt-0.5" />
                   {/* Stacked. Side by side each tip had about 187px, and both
                       run to four lines of prose at that width in English and in
@@ -2044,7 +2017,7 @@ export default function App() {
                   PAGE 06: FOOD (Legends Must-Eat)
                   ========================================================================== */}
               <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto" id="food-page-section">
-                <div className="space-y-4 lg:columns-2 lg:gap-6 lm-spread">
+                <div className="space-y-4 min-[1100px]:columns-2 min-[1100px]:gap-6 lm-spread">
                   <PageHeading number="06" title={t.pages.food} kicker="Must-Eat Legends" />
 
                   <p className="text-xs leading-relaxed text-zinc-600 font-light">
@@ -2135,7 +2108,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-zinc-200/40 text-center">
+                <div className="mt-4 lg:mt-0 pt-3 border-t border-zinc-200/40 text-center">
                   <span className="text-[8px] tracking-widest text-zinc-400 uppercase">Lục Lam Pocket Companion</span>
                 </div>
               </section>
@@ -2144,7 +2117,7 @@ export default function App() {
                   PAGE 07: CULTURE & LANDMARKS
                   ========================================================================== */}
               <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
-                <div className="space-y-4 lg:columns-2 lg:gap-6 lm-spread">
+                <div className="space-y-4 min-[1100px]:columns-2 min-[1100px]:gap-6 lm-spread">
                   <PageHeading number="07" title={t.pages.culture} kicker="Heritage & Check-in" />
 
                   <p className="text-xs leading-relaxed text-zinc-600 font-light">
@@ -2242,7 +2215,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-zinc-200/40 text-center">
+                <div className="mt-4 lg:mt-0 pt-3 border-t border-zinc-200/40 text-center">
                   <span className="text-[8px] tracking-widest text-zinc-400 uppercase">Lục Lam Heritage Route</span>
                 </div>
               </section>
@@ -2251,7 +2224,7 @@ export default function App() {
                   PAGE 08: SHOPPING & SOUVENIRS
                   ========================================================================== */}
               <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
-                <div className="space-y-4 lg:columns-2 lg:gap-6">
+                <div className="space-y-4 min-[1100px]:columns-2 min-[1100px]:gap-6">
                   <PageHeading number="08" title={t.pages.shopping} kicker="Shop Local Vibes" />
 
                   <p className="text-xs leading-relaxed text-zinc-600 font-light">
@@ -2302,7 +2275,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-zinc-200/40 text-center">
+                <div className="mt-4 lg:mt-0 pt-3 border-t border-zinc-200/40 text-center">
                   <span className="text-[8px] tracking-widest text-zinc-400 uppercase">Lục Lam Shopping Companion</span>
                 </div>
               </section>
@@ -2311,7 +2284,7 @@ export default function App() {
                   PAGE 09: LỤC LAM TRẠM DỪNG CHÂN (Signature Experience)
                   ========================================================================== */}
               <section className="w-full h-full shrink-0 snap-start bg-[#0b1513] text-[#f6f3eb] flex flex-col justify-between page-section p-6 overflow-y-auto">
-                <div className="space-y-5 lg:columns-2 lg:gap-6 lm-spread">
+                <div className="space-y-5 min-[1100px]:columns-2 min-[1100px]:gap-6 lm-spread">
                   {/* Eyebrow in English by design, like the other eight pages.
                       This one was the only Vietnamese hold-out. */}
                   <PageHeading
@@ -2736,7 +2709,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-zinc-800 text-center">
+                <div className="mt-4 lg:mt-0 pt-3 border-t border-zinc-800 text-center">
                   <span className="text-[8px] tracking-widest text-zinc-500 uppercase">Lục Lam Hospitality Oasis</span>
                 </div>
               </section>
@@ -2745,7 +2718,7 @@ export default function App() {
                   PAGE 10: USEFUL INFO (Safety, Cash & SIM)
                   ========================================================================== */}
               <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
-                <div className="space-y-4 lg:columns-2 lg:gap-6 lm-spread">
+                <div className="space-y-4 min-[1100px]:columns-2 min-[1100px]:gap-6 lm-spread">
                   <PageHeading number="10" title={t.pages.info} kicker="Security & Backup" />
 
                   <p className="text-xs leading-relaxed text-zinc-600 font-light">
@@ -2899,85 +2872,13 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-zinc-200/40 text-center">
+                <div className="mt-4 lg:mt-0 pt-3 border-t border-zinc-200/40 text-center">
                   <span className="text-[8px] tracking-widest text-zinc-400 uppercase">Lục Lam Peace of Mind Guarantee</span>
                 </div>
               </section>
 
             </div>
 
-            {/* Language selector. In the flow below md, sitting between the pages
-                and the nav so it takes its own space; floating at the right edge
-                from md up, where it never overlapped anything. It used to be
-                absolutely positioned over the pages at every width, which hid
-                whatever ended at the bottom of one. */}
-            {/* md:contents dissolves this wrapper from md up, where the selector
-                goes back to floating at the right edge and needs no strip. */}
-            <div
-              className={`shrink-0 flex justify-center pt-1 pb-2 transition-colors duration-300 md:contents ${selectorStripBackground}`}
-            >
-            {/* No pill below md: the buttons sit straight on the strip, which
-                already matches the page behind it, so they read as floating.
-                From md up this same element becomes the vertical selector at the
-                right edge, floating over whatever the page happens to show —
-                photos, text — and there the dark backing and blur are what keep
-                it legible, so they stay. */}
-            <div
-              id="sticky-flag-selector"
-              className="z-[45] lg:hidden flex flex-row gap-1.5 p-1.5 rounded-full md:bg-black/75 md:backdrop-blur-md md:border md:border-zinc-800/80 md:shadow-2xl md:absolute md:top-[35%] md:right-2 md:-translate-y-1/2 md:flex-col md:gap-2 md:rounded-2xl md:animate-in md:slide-in-from-right md:duration-500"
-              title="Chọn ngôn ngữ / Select Language"
-            >
-              <div className="hidden md:block text-[8px] font-bold text-center text-zinc-300 uppercase py-0.5 tracking-wider select-none border-b border-zinc-800/60">
-                Lang
-              </div>
-              {[
-                { code: 'en' as Language, label: 'English', flag: '🇺🇸' },
-                { code: 'zht' as Language, label: '繁體中文', flag: '🇹🇼' },
-                { code: 'zh' as Language, label: '简体中文', flag: '🇨🇳' },
-                { code: 'ja' as Language, label: '日本語', flag: '🇯🇵' },
-                { code: 'ko' as Language, label: '한국어', flag: '🇰🇷' }
-              ].map(({ code, label, flag }) => {
-                const isActive = lang === code;
-                return (
-                  <div key={code} className="relative group flex items-center justify-center">
-                    {/* No fill: the page shows through the button. What is left
-                        to carry it is the ring and the label, and those have to
-                        flip with the page — dark ink on the cream pages, light
-                        on the cover and Lục Lam. A fill would have made one set
-                        of colours work everywhere, which is exactly what taking
-                        it away costs.
-
-                        Windows has no glyph for the regional-indicator pairs, so
-                        these render as the letters US, TW, CN, JP, KR rather
-                        than flags. Letters take the text colour; the colour
-                        emoji other platforms draw ignore it and stay legible on
-                        either ground. Both readings are covered. */}
-                    <button
-                      onClick={() => handleLangChange(code)}
-                      className={`w-8 h-8 md:w-9 md:h-9 rounded-full flex items-center justify-center text-lg md:text-xl transition-all duration-300 cursor-pointer ${
-                        selectorOnDark ? 'text-zinc-100' : 'text-zinc-700 md:text-zinc-100'
-                      } ${
-                        isActive
-                          ? 'border-2 border-[#d16b4c] bg-[#d16b4c]/10 scale-110 ring-2 ring-[#d16b4c]/15 md:bg-amber-500/20'
-                          : selectorOnDark
-                            ? 'border border-white/30 hover:bg-white/10 hover:scale-105 hover:border-white/50'
-                            : 'border border-zinc-900/25 hover:bg-zinc-900/5 hover:scale-105 hover:border-zinc-900/45 md:border-white/30 md:hover:bg-white/10 md:hover:border-white/50'
-                      }`}
-                      title={label}
-                    >
-                      <span className="leading-none">{flag}</span>
-                    </button>
-                    
-                    {/* Tooltip on Hover */}
-                    <div className="absolute right-12 top-1/2 -translate-y-1/2 pointer-events-none opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 bg-zinc-950/95 text-white text-[10px] font-bold px-2.5 py-1.5 rounded-lg border border-zinc-800 shadow-xl whitespace-nowrap transition-all duration-200 z-50 hidden md:block">
-                      <span className="mr-1.5">{flag}</span>
-                      <span>{label}</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-            </div>
 
             {/* ==========================================================================
                 MOBILE VIEWPORT BOTTOM TABS NAVIGATOR (Syncs scroll snaps)

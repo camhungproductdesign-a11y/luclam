@@ -27,6 +27,21 @@ const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
  * either would be passed to listen() as a silent request for a random free
  * port. Refusing to start is easier to diagnose than a server nobody can reach.
  */
+/**
+ * Loopback by default, because this sits behind a reverse proxy.
+ *
+ * It bound 0.0.0.0, which listens on every interface — so on a VPS the write
+ * API answered directly on http://<ip>:3000, going around nginx and therefore
+ * around TLS. The admin token travels in an Authorization header, so that path
+ * put it on the wire in clear text, and a firewall rule was the only thing
+ * standing between the internet and POST /api/config.
+ *
+ * A proxy on the same host reaches 127.0.0.1 fine. Set HOST=0.0.0.0 where the
+ * server genuinely has to be reachable from elsewhere — a container, or another
+ * machine on the LAN — and mean it when you do.
+ */
+const HOST = process.env.HOST?.trim() || "127.0.0.1";
+
 const PORT = (() => {
   const raw = process.env.PORT;
   if (raw === undefined || raw.trim() === "") return 3000;
@@ -272,8 +287,8 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+  app.listen(PORT, HOST, () => {
+    console.log(`Server running on http://${HOST}:${PORT}`);
   });
 }
 

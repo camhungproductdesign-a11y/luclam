@@ -623,6 +623,24 @@ export function CreatorStudio({
         </span>
       </div>
 
+      {/* A save reaches the app immediately and the sixty static pages not at all.
+          Worth saying out loud, because nothing on screen would otherwise show
+          the difference: /api/config serves this editor's changes live, but the
+          prerendered HTML — the copy Google and the assistant crawlers actually
+          read — is written at build time. An operator who edits and stops here
+          has changed what visitors see and left what search engines see alone,
+          which is the exact failure the SEO work on this site was about. */}
+      <div className="px-4 py-2 bg-amber-950/30 border-b border-amber-500/25 shrink-0 flex items-start gap-2">
+        <span aria-hidden="true" className="text-amber-400 text-xs leading-5 shrink-0">
+          ⚠
+        </span>
+        <p className="text-[10.5px] leading-5 text-amber-200/90 m-0">
+          Lưu xong là khách vào web thấy ngay, nhưng <strong>60 trang tĩnh</strong> mà Google và
+          trợ lý AI đọc thì chưa đổi — chúng được sinh lúc build. Sửa nội dung xong nhớ{' '}
+          <strong>chạy lại deploy</strong> trên máy chủ, nếu không công cụ tìm kiếm vẫn thấy bản cũ.
+        </p>
+      </div>
+
       {/* Primary Tab Navigation */}
       <div className="flex bg-zinc-900/60 border-b border-zinc-800 shrink-0">
         <button

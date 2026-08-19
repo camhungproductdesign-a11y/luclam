@@ -159,6 +159,23 @@
   overscroll-behavior-y: contain;
 }
 
+/**
+ * Breathing room above the bottom nav on a phone.
+ *
+ * The language selector used to sit in a strip between the pages and the tab
+ * bar, and it was quietly doing this job — about 44px of it. Taking the strip
+ * away left the last card 24px from the bar, close enough to read as a mistake
+ * rather than a margin.
+ *
+ * Below lg only: from lg up there is no bottom nav, and the desktop padding is
+ * already tuned against how much each page has to fit into one screen.
+ */
+@media (max-width: 1023px) {
+  .page-section {
+    padding-bottom: 3rem;
+  }
+}
+
 /* --------------------------------------------------------------------------
    Skip the nine pages that are not on screen
 
@@ -340,7 +357,10 @@
     margin-right: auto;
   }
 }
-@media (min-width: 1024px) {
+/* 1280, matching xl:columns-2 — below that there is one column and nothing to
+   span across. A tablet at 1024 had two columns of 234px, which left 32px for
+   the text in a card and wrapped names one letter per line. */
+@media (min-width: 1100px) {
   /**
    * The page furniture crosses both columns; the content still flows in them.
    *
@@ -368,14 +388,24 @@
   .lm-spread > .lm-span {
     column-span: all;
   }
+}
 
+/* Frame padding starts at lg, where the sidebar and the reading frame appear —
+   a tablet gets it too, it is the column count that waits for 1280. */
+@media (min-width: 1024px) {
   .page-section {
     justify-content: safe center;
     /* 2.5rem of gap and 3rem top and bottom spent 136px of a 820px screen on
        frame, and six pages were scrolling by less than that. The trim is worth
-       more here than the air. The horizontal 3.5rem is untouched — that is the
-       part actually holding the columns off the edge of the spread. */
+       more here than the air. Horizontal drops to 2rem below xl, where the
+       spread is only 760px wide and 3.5rem either side is a tenth of it. */
     gap: 1.75rem;
+    padding: 2rem;
+  }
+}
+
+@media (min-width: 1100px) {
+  .page-section {
     padding: 2rem 3.5rem;
   }
 }

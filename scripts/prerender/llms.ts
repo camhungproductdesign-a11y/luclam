@@ -24,7 +24,7 @@ import { COMPANY, STORES, storeName } from '../../src/company';
  * answers a question without fetching all of them first.
  */
 
-const ORIGIN = 'https://gift.luclam.vn';
+import { ORIGIN } from '../../src/origin';
 
 /** What each language calls itself, so a model can route a reader correctly. */
 const ENDONYM: Record<Language, string> = {

@@ -15,7 +15,8 @@
     "media:credits": "tsx scripts/fetch-wikimedia-credits.ts",
     "media:rewrite": "tsx scripts/rewrite-media-urls.ts",
     "credits": "tsx scripts/generate-credits-module.ts",
-    "verify": "tsx scripts/verify-output.ts"
+    "verify": "tsx scripts/verify-output.ts",
+    "smoke": "tsx scripts/smoke.ts"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.14",
