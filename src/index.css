@@ -297,6 +297,30 @@
    exactly then. Chrome 93, Safari 16, Firefox 63 — all below this build's
    floor of Safari 16.4.
    -------------------------------------------------------------------------- */
+/* --------------------------------------------------------------------------
+   One measure per page, for everything in it
+
+   The columns were capped at 920px on the content wrapper, and nothing else
+   was. So the closing note under every page ran the full 1800px of a wide
+   monitor while the text above it stopped at 920, and the cover — which has no
+   column wrapper at all, being a single hero — stretched its masthead and its
+   call to action from edge to edge. A rule that spans a screen and a half is
+   not a rule, it is a line.
+
+   Capping the section's children instead of one wrapper inside it gives every
+   block on every page the same measure, including the ones added later.
+
+   Absolutely positioned children are exempt: the cover photograph is one, and
+   it is meant to bleed to the edges.
+   -------------------------------------------------------------------------- */
+@media (min-width: 1024px) {
+  .page-section > *:not(.absolute) {
+    width: 100%;
+    max-width: 920px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
 @media (min-width: 1024px) {
   .page-section {
     justify-content: safe center;
