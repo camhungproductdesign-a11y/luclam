@@ -299,13 +299,13 @@ export function PlaceDetailModal({
        lg:hidden header that sits outside the frame. Nothing on the way up sets
        transform, filter or contain, so `fixed` escapes as intended. */
     <div
-      className="fixed lg:absolute inset-0 z-50 bg-black/60 backdrop-blur-sm flex flex-col justify-end"
+      className="fixed lg:absolute inset-0 z-50 bg-black/60 backdrop-blur-sm flex flex-col justify-end lg:justify-center lg:items-center lg:p-8"
       onClick={onClose}
     >
       
       {/* Scrollable Container styled as a premium mobile slide-up sheet */}
       <div
-        className="w-full h-[90%] bg-[#f6f3eb] rounded-t-[32px] overflow-hidden shadow-2xl flex flex-col relative animate-in slide-in-from-bottom duration-300"
+        className="w-full h-[90%] lg:w-[920px] lg:max-w-full lg:h-auto lg:max-h-full bg-[#f6f3eb] rounded-t-[32px] lg:rounded-3xl overflow-hidden shadow-2xl flex flex-col relative animate-in slide-in-from-bottom lg:zoom-in-95 duration-300"
         role="dialog"
         aria-modal="true"
         aria-labelledby="place-detail-title"
@@ -313,12 +313,12 @@ export function PlaceDetailModal({
       >
         
         {/* Top visual bar for dragging effect */}
-        <div className="absolute top-2 left-1/2 -translate-x-1/2 w-12 h-1 bg-white/40 rounded-full z-40"></div>
+        <div className="lg:hidden absolute top-2 left-1/2 -translate-x-1/2 w-12 h-1 bg-white/40 rounded-full z-40"></div>
 
         {/* --- HERO MEDIA HEADER --- */}
         <div 
           onClick={isCreator ? handleHeroClick : undefined}
-          className={`w-full h-[230px] bg-zinc-950 relative overflow-hidden shrink-0 ${isCreator ? 'group/hero cursor-pointer' : ''}`}
+          className={`w-full h-[230px] lg:h-[300px] bg-zinc-950 relative overflow-hidden shrink-0 ${isCreator ? 'group/hero cursor-pointer' : ''}`}
           title={isCreator ? (lang === 'vi' ? 'Nhấp vào đây để tải lên ảnh hoặc video cho địa điểm này' : 'Click to upload custom photo or video') : undefined}
         >
           {/* Hidden File Input */}
@@ -485,7 +485,12 @@ export function PlaceDetailModal({
         </div>
 
         {/* --- MAIN SCROLLABLE CONTENT --- */}
-        <div className="flex-1 overflow-y-auto p-5 space-y-5">
+        {/* lg:max-w-[680px]: the dialog is 920px because that is the measure
+            every page uses, but prose wants a narrower one. At the full width a
+            description ran about 110 characters to the line, against the 45-75
+            that is worth aiming for. The frame keeps its width; the reading
+            inside it does not have to. */}
+        <div className="flex-1 overflow-y-auto p-5 lg:p-7 space-y-5 lg:max-w-[680px] lg:mx-auto lg:w-full">
           
           {/* TAB 1: ABOUT DESCRIPTION */}
           {activeTab === 'about' && (
