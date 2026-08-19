@@ -262,6 +262,11 @@
   .page-section .text-\[11px\],
   .page-section .text-\[11\.5px\] { font-size: 15.5px; }
   .page-section .text-\[12px\]   { font-size: 16px; }
+  /* The one size in App.tsx above the ladder, and it is the place-card title.
+     Leaving it at 15px while the subtitle beneath it lifted to 15.5px made the
+     subtitle the larger of the two and the hierarchy read backwards. Whatever
+     the ladder lifts has to bring along what sits above it. */
+  .page-section .text-\[15px\]   { font-size: 19px; }
 
   /* Tailwind's own steps have to move with them or the hierarchy flattens: a
      caption lifted to 15px sitting beside a text-sm label still at 14px reads

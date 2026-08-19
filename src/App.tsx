@@ -2027,10 +2027,10 @@ export default function App() {
                           key={idx}
                           id={`food-restaurant-${idx}`}
                           onClick={() => handleOpenDetail('food', activeFoodTab, idx, item)}
-                          className="w-full text-left bg-white rounded-2xl p-3 border border-zinc-200/80 shadow-sm hover:border-[#b85233]/40 hover:shadow-md active:scale-[0.99] active:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b85233]/50 transition-all duration-200 relative group overflow-hidden flex gap-3 items-center cursor-pointer"
+                          className="w-full text-left bg-white rounded-2xl lg:rounded-3xl p-3 lg:p-4 border border-zinc-200/80 shadow-sm hover:border-[#b85233]/40 hover:shadow-md active:scale-[0.99] active:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b85233]/50 transition-all duration-200 relative group overflow-hidden flex gap-3 lg:gap-5 items-center cursor-pointer"
                         >
                           {/* Card Media Thumbnail Left */}
-                          <div className="w-16 h-16 rounded-xl bg-zinc-100 overflow-hidden shrink-0 border border-zinc-200/50 relative">
+                          <div className="w-16 h-16 lg:w-28 lg:h-28 rounded-xl lg:rounded-2xl bg-zinc-100 overflow-hidden shrink-0 border border-zinc-200/50 relative">
                             <ThumbnailPreview url={media.img || media.video} />
                           </div>
 
@@ -2076,7 +2076,7 @@ export default function App() {
                   </p>
 
                   {/* Category Selection Tabs */}
-                  <div className="flex gap-1.5 overflow-x-auto pb-1 pt-0.5 no-scrollbar">
+                  <div className="flex gap-1.5 lg:gap-2 overflow-x-auto lg:overflow-visible lg:flex-wrap pb-1 pt-0.5 no-scrollbar">
                     {(['all', 'heritage', 'spiritual', 'modern', 'nature'] as const).map((cat) => {
                       const isSelected = activeCultureCategory === cat;
                       const label = cat === 'all'
@@ -2120,11 +2120,11 @@ export default function App() {
                             type="button"
                             key={idx}
                             onClick={() => handleOpenDetail('culture', originalIdx >= 0 ? originalIdx : idx, undefined, item)}
-                            className="w-full text-left bg-white rounded-2xl p-3 border border-zinc-200/80 shadow-sm hover:border-[#0b433f]/40 hover:shadow-md active:scale-[0.99] active:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b433f]/50 transition-all duration-200 relative group overflow-hidden flex gap-3 items-center cursor-pointer"
+                            className="w-full text-left bg-white rounded-2xl lg:rounded-3xl p-3 lg:p-4 border border-zinc-200/80 shadow-sm hover:border-[#0b433f]/40 hover:shadow-md active:scale-[0.99] active:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b433f]/50 transition-all duration-200 relative group overflow-hidden flex gap-3 lg:gap-5 items-center cursor-pointer"
                           >
-                            <div className="absolute top-0 left-0 w-1 h-full bg-[#0b433f]"></div>
+                            <div className="absolute top-0 left-0 w-1 lg:w-1.5 h-full bg-[#0b433f]"></div>
 
-                            <div className="w-16 h-16 rounded-xl bg-zinc-100 overflow-hidden shrink-0 border border-zinc-200/50 relative">
+                            <div className="w-16 h-16 lg:w-28 lg:h-28 rounded-xl lg:rounded-2xl bg-zinc-100 overflow-hidden shrink-0 border border-zinc-200/50 relative">
                               <ThumbnailPreview url={media.img || media.video} />
                             </div>
 
@@ -2152,7 +2152,7 @@ export default function App() {
                               </span>
                             </div>
 
-                            <ChevronRight className="w-4 h-4 text-zinc-300 shrink-0 self-center group-hover:text-[#0b433f] transition-colors" />
+                            <ChevronRight className="w-4 h-4 lg:w-5 lg:h-5 text-zinc-300 shrink-0 self-center group-hover:text-[#0b433f] transition-colors" />
                           </button>
                         );
                       })}
@@ -2185,9 +2185,9 @@ export default function App() {
                           type="button"
                           key={idx}
                           onClick={() => handleOpenDetail('shopping', idx, undefined, item)}
-                          className="w-full text-left bg-white rounded-2xl p-3 border border-zinc-200/80 shadow-sm hover:border-amber-600/40 hover:shadow-md active:scale-[0.99] active:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-600/50 transition-all duration-200 relative group overflow-hidden flex gap-3 items-center cursor-pointer"
+                          className="w-full text-left bg-white rounded-2xl lg:rounded-3xl p-3 lg:p-4 border border-zinc-200/80 shadow-sm hover:border-amber-600/40 hover:shadow-md active:scale-[0.99] active:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-600/50 transition-all duration-200 relative group overflow-hidden flex gap-3 lg:gap-5 items-center cursor-pointer"
                         >
-                          <div className="w-16 h-16 rounded-xl bg-zinc-100 overflow-hidden shrink-0 border border-zinc-200/50 relative">
+                          <div className="w-16 h-16 lg:w-28 lg:h-28 rounded-xl lg:rounded-2xl bg-zinc-100 overflow-hidden shrink-0 border border-zinc-200/50 relative">
                             <ThumbnailPreview url={media.img || media.video} />
                           </div>
 
