@@ -1241,7 +1241,7 @@ export default function App() {
                             onClick={() => setShowFeaturePopup(showFeaturePopup === idx ? null : idx)}
                             className="relative flex flex-col items-center text-center cursor-pointer group rounded-lg active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b433f]/50 transition-transform"
                           >
-                            <div className="w-10 h-10 rounded-full bg-white border border-zinc-200/80 flex items-center justify-center text-[#0b433f] shadow-sm group-hover:bg-[#0b433f] group-hover:text-white group-hover:-translate-y-1 transition-all duration-300">
+                            <div className="w-10 h-10 lg:w-14 lg:h-14 rounded-full bg-white border border-zinc-200/80 flex items-center justify-center text-[#0b433f] shadow-sm group-hover:bg-[#0b433f] group-hover:text-white group-hover:-translate-y-1 transition-all duration-300">
                               {iconsList[idx]}
                             </div>
                             {/* The whole title, wrapped over at most two lines.
@@ -1444,7 +1444,7 @@ export default function App() {
                             </div>
 
                             {/* Center Dome (Gian trung tâm) */}
-                            <div className="text-center shrink-0 w-20 h-20 flex flex-col items-center justify-center p-1 bg-[#b85233]/10 border border-[#b85233]/30 rounded-full">
+                            <div className="text-center shrink-0 w-20 h-20 lg:w-28 lg:h-28 flex flex-col items-center justify-center p-1 lg:p-2 bg-[#b85233]/10 border border-[#b85233]/30 rounded-full">
                               <span className="text-[8px] font-bold text-[#b85233] block">
                                 {lang === 'vi' ? 'ẨM THỰC' : lang === 'ko' ? '푸드코트' : 'FOOD'}
                               </span>
@@ -1587,7 +1587,7 @@ export default function App() {
                           className="flex flex-col items-center text-center cursor-pointer group rounded-lg active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0b433f]/50 transition-transform"
                         >
                           <div
-                            className={`w-14 h-14 rounded-full border shadow-sm flex items-center justify-center hover:scale-105 transition-all ${
+                            className={`w-14 h-14 lg:w-20 lg:h-20 rounded-full border shadow-sm flex items-center justify-center hover:scale-105 transition-all ${
                               showTransportPopup === idx
                                 ? 'bg-[#0b433f]/10 border-[#0b433f] ring-2 ring-[#0b433f]/25'
                                 : 'bg-white border-zinc-200 hover:bg-zinc-100'
@@ -1915,7 +1915,7 @@ export default function App() {
                           className="bg-white border border-zinc-200 rounded-xl overflow-hidden flex flex-col justify-between shadow-sm hover:ring-1 hover:ring-[#b85233] transition-all group"
                         >
                           {/* Top Image Banner */}
-                          <div className="h-28 relative overflow-hidden bg-zinc-100">
+                          <div className="h-28 lg:h-44 relative overflow-hidden bg-zinc-100">
                             <Picture
                               src={catBanners[cidx]}
                               alt={cat.title}
@@ -2321,7 +2321,7 @@ export default function App() {
                                   height={48}
                                   loading="lazy"
                                   decoding="async"
-                                  className={`w-12 h-12 rounded-lg object-cover shrink-0 border border-zinc-800 transition-transform duration-300 ${isExpanded ? 'scale-105 border-amber-500/30' : ''}`}
+                                  className={`w-12 h-12 lg:w-24 lg:h-24 rounded-lg lg:rounded-xl object-cover shrink-0 border border-zinc-800 transition-transform duration-300 ${isExpanded ? 'scale-105 border-amber-500/30' : ''}`}
                                   referrerPolicy="no-referrer"
                                   onError={useFallbackImage}
                                 />
@@ -2330,10 +2330,10 @@ export default function App() {
                               )}
                               <div className="flex-1 min-w-0 space-y-1">
                                 <div className="flex justify-between items-baseline gap-2">
-                                  <h5 className="text-[10.5px] font-bold text-white tracking-wide truncate pr-1">{item.name}</h5>
+                                  <h5 className="text-[10.5px] font-bold text-white tracking-wide truncate lg:overflow-visible lg:text-clip lg:whitespace-normal pr-1">{item.name}</h5>
                                   <span className="text-[10px] font-bold text-amber-400 shrink-0">{item.price}</span>
                                 </div>
-                                <p className={`text-[9px] text-zinc-400 leading-normal font-light ${isExpanded ? '' : 'line-clamp-1'}`}>
+                                <p className={`text-[9px] text-zinc-400 leading-normal font-light ${isExpanded ? '' : 'line-clamp-1 lg:line-clamp-2'}`}>
                                   {item.desc}
                                 </p>
                               </div>
@@ -2468,7 +2468,7 @@ export default function App() {
                               height={533}
                               loading="lazy"
                               decoding="async"
-                              className="w-full h-24 object-cover rounded-lg border border-zinc-800/80 my-1"
+                              className="w-full h-24 lg:h-44 object-cover rounded-lg lg:rounded-xl border border-zinc-800/80 my-1"
                               referrerPolicy="no-referrer"
                             />
                             <p className="text-[8.5px] text-zinc-400 font-light">202 Trần Phú, Hải Châu, Đà Nẵng</p>
