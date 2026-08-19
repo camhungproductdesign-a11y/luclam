@@ -2075,26 +2075,34 @@ export default function App() {
                   </div>
 
                   {/* Category Quote Card */}
-                  {t.food.categories[activeFoodTab]?.quote && (
-                    <div className="bg-amber-50/50 rounded-xl p-3 border-l-4 border-[#b85233]/70 shadow-sm" id="food-quote-card">
-                      <p className="text-[10px] italic text-zinc-700 leading-relaxed font-serif">
-                        {t.food.categories[activeFoodTab].quote}
-                      </p>
-                    </div>
+                  {t.food.categories.map((cat: any, catIdx: number) =>
+                    cat.quote ? (
+                      <div
+                        key={catIdx}
+                        id={`food-quote-${catIdx}`}
+                        className={`${catIdx === activeFoodTab ? 'block' : 'hidden'} bg-amber-50/50 rounded-xl p-3 border-l-4 border-[#b85233]/70 shadow-sm`}
+                      >
+                        <p className="text-[10px] italic text-zinc-700 leading-relaxed font-serif">
+                          {cat.quote}
+                        </p>
+                      </div>
+                    ) : null
                   )}
 
                   {/* Curated 3 Restaurants List for active Category */}
                   <div className="space-y-3 pt-1" id="food-restaurants-list">
-                    {t.food.categories[activeFoodTab]?.restaurants.map((item: any, idx: number) => {
-                      const placeId = `food-${activeFoodTab}-${idx}`;
+                    {t.food.categories.flatMap((cat: any, catIdx: number) =>
+                      (cat.restaurants ?? []).map((item: any, idx: number) => {
+                      const shown = catIdx === activeFoodTab;
+                      const placeId = `food-${catIdx}-${idx}`;
                       const media = getPlaceMedia(placeId);
                       return (
                         <button
                           type="button"
-                          key={idx}
-                          id={`food-restaurant-${idx}`}
-                          onClick={() => handleOpenDetail('food', activeFoodTab, idx, item)}
-                          className="w-full text-left bg-white rounded-2xl lg:rounded-3xl lg:break-inside-avoid p-3 lg:p-4 border border-zinc-200/80 shadow-sm hover:border-[#b85233]/40 hover:shadow-md active:scale-[0.99] active:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b85233]/50 transition-all duration-200 relative group overflow-hidden flex gap-3 lg:gap-5 items-center cursor-pointer"
+                          key={`${catIdx}-${idx}`}
+                          id={`food-restaurant-${catIdx}-${idx}`}
+                          onClick={() => handleOpenDetail('food', catIdx, idx, item)}
+                          className={`${shown ? 'flex' : 'hidden'} w-full text-left bg-white rounded-2xl lg:rounded-3xl lg:break-inside-avoid p-3 lg:p-4 border border-zinc-200/80 shadow-sm hover:border-[#b85233]/40 hover:shadow-md active:scale-[0.99] active:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b85233]/50 transition-all duration-200 relative group overflow-hidden gap-3 lg:gap-5 items-center cursor-pointer`}
                         >
                           {/* Card Media Thumbnail Left */}
                           <div className="w-16 h-16 lg:w-28 lg:h-28 rounded-xl lg:rounded-2xl bg-zinc-100 overflow-hidden shrink-0 border border-zinc-200/50 relative">
@@ -2122,7 +2130,8 @@ export default function App() {
                           <ChevronRight className="w-4 h-4 text-zinc-300 shrink-0 self-center group-hover:text-[#b85233] transition-colors" />
                         </button>
                       );
-                    })}
+                      })
+                    )}
                   </div>
                 </div>
 
