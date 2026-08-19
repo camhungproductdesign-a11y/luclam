@@ -64,6 +64,31 @@ if (!ADMIN_TOKEN) {
   process.exit(1);
 }
 
+/**
+ * A token short enough to guess is the same as no token.
+ *
+ * Emptiness was the only thing checked, so ADMIN_TOKEN=1234 started the server
+ * and looked exactly as secure as a real one. Nothing throttles a wrong guess
+ * either, so a short token is not a smaller door — it is an open one that takes
+ * a few seconds to walk through.
+ *
+ * 32 is a floor, not a recommendation: .env.example generates 64 hex characters
+ * from 32 random bytes, which is what to use. Refusing to start is the point —
+ * a warning in a log nobody reads would leave the weak token in service.
+ */
+const MIN_TOKEN_LENGTH = 32;
+
+if (ADMIN_TOKEN.length < MIN_TOKEN_LENGTH) {
+  console.error(
+    `ADMIN_TOKEN chỉ dài ${ADMIN_TOKEN.length} ký tự, cần ít nhất ${MIN_TOKEN_LENGTH}.\n` +
+      "Server từ chối khởi động: một token ngắn thì đoán ra được, mà không có gì\n" +
+      "chặn việc đoán nhiều lần.\n\n" +
+      "Sinh token mới bằng:\n" +
+      `  node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
+  );
+  process.exit(1);
+}
+
 async function startServer() {
   const app = express();
 
@@ -84,33 +109,84 @@ async function startServer() {
   // Setup JSON parser with large limit to allow rich custom configurations and media arrays
   app.use(express.json({ limit: "20mb" }));
 
+  /**
+   * A wrong token answers slower every time. A right one never waits.
+   *
+   * timingSafeEqual keeps the comparison from leaking the token, but nothing
+   * stopped a caller simply trying again as fast as the network allowed. The
+   * comparison was safe; the door was not.
+   *
+   * The order matters, and the first version of this got it backwards. Refusing
+   * a request outright while a penalty was running turned the defence into the
+   * attack: anyone could spam wrong tokens and lock the real operator out, and
+   * behind one office NAT they share an address, so it took no privilege at all.
+   * It also never escalated, because a blocked request returned before reaching
+   * the counter.
+   *
+   * So the token is checked first, always. A correct one clears the record and
+   * passes immediately. Only a wrong one pays — the response is held for a
+   * delay that doubles from 250ms to a 10s ceiling, which costs a guesser
+   * everything and an operator who mistyped once about a quarter of a second.
+   *
+   * `trust proxy` makes req.ip the visitor rather than nginx. It is safe only
+   * because the server binds 127.0.0.1: X-Forwarded-For is trivially forged, so
+   * trusting it would let a guesser rotate keys and dodge this — but nothing
+   * outside the host can open a connection to forge it with.
+   */
+  app.set("trust proxy", 1);
+
+  const failures = new Map<string, { count: number; last: number }>();
+  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+  // Bounded, so a spray of addresses cannot grow this without limit.
+  function forget(now: number) {
+    if (failures.size < 1000) return;
+    for (const [key, entry] of failures) {
+      if (now - entry.last > 60 * 60_000) failures.delete(key);
+    }
+  }
+
   // Guards the endpoints that write to disk. Read endpoints stay public.
-  function requireAdmin(
+  async function requireAdmin(
     req: express.Request,
     res: express.Response,
     next: express.NextFunction
   ) {
+    const who = req.ip ?? "unknown";
     const header = req.get("authorization") ?? "";
     const prefix = "Bearer ";
 
-    if (!header.startsWith(prefix)) {
-      return res.status(401).json({ error: "Thiếu token xác thực" });
+    let ok = false;
+    if (header.startsWith(prefix)) {
+      const supplied = Buffer.from(header.slice(prefix.length));
+      const expected = Buffer.from(ADMIN_TOKEN as string);
+      // Length is compared first because timingSafeEqual throws on a length
+      // mismatch. Leaking the token's length is acceptable; leaking its bytes
+      // through response timing is not.
+      ok =
+        supplied.length === expected.length &&
+        crypto.timingSafeEqual(supplied, expected);
     }
 
-    const supplied = Buffer.from(header.slice(prefix.length));
-    const expected = Buffer.from(ADMIN_TOKEN as string);
-
-    // Length is compared first because timingSafeEqual throws on a length
-    // mismatch. Leaking the token's length is acceptable; leaking its bytes
-    // through response timing is not.
-    if (
-      supplied.length !== expected.length ||
-      !crypto.timingSafeEqual(supplied, expected)
-    ) {
-      return res.status(401).json({ error: "Token không hợp lệ" });
+    if (ok) {
+      failures.delete(who);
+      return next();
     }
 
-    next();
+    const now = Date.now();
+    const count = (failures.get(who)?.count ?? 0) + 1;
+    forget(now);
+    failures.set(who, { count, last: now });
+
+    const wait = Math.min(250 * 2 ** (count - 1), 10_000);
+    res.setHeader("Retry-After", String(Math.ceil(wait / 1000)));
+    await sleep(wait);
+
+    return res.status(401).json({
+      error: header.startsWith(prefix)
+        ? "Token không hợp lệ"
+        : "Thiếu token xác thực",
+    });
   }
 
   const CONFIG_PATH = path.join(process.cwd(), "public", "config.json");
@@ -121,8 +197,19 @@ async function startServer() {
     fs.mkdirSync(uploadsDir, { recursive: true });
   }
 
-  // Serve static uploads
-  app.use("/uploads", express.static(uploadsDir));
+  /**
+   * Serve uploads, and never let the browser second-guess their type.
+   *
+   * nosniff stops content sniffing from promoting a file to something
+   * executable on the strength of its bytes. The extension allowlist on upload
+   * is the real control — this is the belt to its braces.
+   */
+  app.use(
+    "/uploads",
+    express.static(uploadsDir, {
+      setHeaders: (res) => res.setHeader("X-Content-Type-Options", "nosniff"),
+    })
+  );
 
   // API to fetch synchronized custom guides
   app.get("/api/config", async (req, res) => {
@@ -146,9 +233,9 @@ async function startServer() {
   const MAX_UPLOAD_WIDTH = 1280;
   const WEBP_QUALITY = 72;
 
-  // GIFs pass through untouched: re-encoding one loses the animation, and they
-  // are rare enough here not to be worth the animated-WebP path.
-  const PASSTHROUGH = /\.gif$/i;
+  // GIFs pass through untouched — re-encoding one loses the animation, and they
+  // are rare enough here not to be worth the animated-WebP path — so they sit in
+  // the VERBATIM list beside the video containers, at the point of use.
 
   /**
    * Uploads are optimised here rather than at build time.
@@ -179,10 +266,37 @@ async function startServer() {
       const fileExt = path.extname(fileName) || (fileType ? `.${fileType.split("/")[1]}` : ".png");
       const baseName = path.basename(fileName, fileExt).replace(/[^a-zA-Z0-9]/g, "_");
 
-      const isImage =
+      const ext = fileExt.toLowerCase();
+      const claimsMedia =
         String(fileType ?? "").startsWith("image/") ||
-        /\.(jpe?g|png|webp|avif|tiff?)$/i.test(fileName);
-      const optimise = isImage && !PASSTHROUGH.test(fileName);
+        String(fileType ?? "").startsWith("video/");
+
+      // sharp re-encodes these to WebP, so whatever arrives, a picture leaves.
+      const RASTERISED = /^\.(jpe?g|png|webp|avif|tiff?|svg)$/;
+      // Written byte for byte, so the list is short and every entry is a
+      // container the browser will never execute.
+      const VERBATIM = /^\.(gif|mp4|webm|mov|m4v|ogv)$/;
+
+      if (!RASTERISED.test(ext) && !VERBATIM.test(ext)) {
+        return res.status(400).json({
+          error:
+            `Không nhận định dạng "${ext || "không rõ"}". Chỉ nhận ảnh ` +
+            "(jpg, png, webp, avif, tiff, svg, gif) và video (mp4, webm, mov, m4v, ogv).",
+        });
+      }
+      if (!claimsMedia && fileType) {
+        return res.status(400).json({
+          error: `Kiểu tệp "${fileType}" không phải ảnh hoặc video.`,
+        });
+      }
+
+      // svg is in the rasterised set on purpose. It is an image by every test
+      // this used to apply, and it is also a document that can carry script —
+      // served from public/uploads that is script on this site's own origin,
+      // with the admin token sitting in localStorage a few lines away. Passing
+      // it through sharp means what lands on disk is a WebP and the markup
+      // never survives the trip.
+      const optimise = RASTERISED.test(ext);
 
       let output = buffer;
       let outExt = fileExt;
