@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(echo \"--- exit $? ---\")",
+      "Bash(rm -f scripts/_final2.ts)",
+      "Bash(grep -cE '/[0-9a-f]{12}\\\\.jpg$')",
+      "Bash(xargs echo \"  ten bam con lai:\")",
+      "Bash(node -e ' *)"
+    ]
+  }
+}

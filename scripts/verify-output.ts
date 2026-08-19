@@ -1,0 +1,212 @@
+import fs from 'fs/promises';
+import { COMPANY } from '../src/company';
+import path from 'path';
+import { ALL_ROUTES, LANGUAGES, TOPICS } from '../src/routes';
+
+const DIST = path.join(process.cwd(), 'dist');
+const ORIGIN = 'https://gift.luclam.vn';
+
+/**
+ * Characters, not words: ja, ko, zh and zht do not put spaces between words,
+ * so a word count reads every CJK page as nearly empty. The thinnest real page
+ * measured 547 characters, so 400 leaves headroom without letting an empty
+ * page through.
+ */
+const MIN_CHARS = 400;
+
+const failures: string[] = [];
+
+function check(condition: boolean, message: string) {
+  if (!condition) failures.push(message);
+}
+
+/** Visible text only — scripts and tags stripped. */
+function contentLength(html: string): number {
+  const body = html.split('<body>')[1] ?? html;
+  return body
+    .replace(/<script[\s\S]*?<\/script>/g, ' ')
+    // Strip style blocks too, or their CSS text would count as page content and
+    // a nearly empty page could clear the minimum on stylesheet rules alone.
+    .replace(/<style[\s\S]*?<\/style>/g, ' ')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim().length;
+}
+
+function countOccurrences(haystack: string, needle: RegExp): number {
+  return (haystack.match(needle) ?? []).length;
+}
+
+/**
+ * The page as a reader sees it: tags gone, scripts and styles gone, entities
+ * turned back into the characters the structured data holds.
+ */
+function visibleText(html: string): string {
+  const body = html.split('<body>')[1] ?? html;
+  return body
+    .replace(/<script[\s\S]*?<\/script>/g, ' ')
+    .replace(/<style[\s\S]*?<\/style>/g, ' ')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    // Last, or an escaped entity would be decoded twice.
+    .replace(/&amp;/g, '&')
+    .replace(/\s+/g, ' ');
+}
+
+/** Every Question name anywhere in a JSON-LD block. */
+function questionsIn(node: unknown, found: string[] = []): string[] {
+  if (Array.isArray(node)) {
+    for (const item of node) questionsIn(item, found);
+  } else if (node && typeof node === 'object') {
+    const record = node as Record<string, unknown>;
+    if (record['@type'] === 'Question' && typeof record.name === 'string') {
+      found.push(record.name);
+    }
+    for (const value of Object.values(record)) questionsIn(value, found);
+  }
+  return found;
+}
+
+async function main() {
+  for (const route of ALL_ROUTES) {
+    const file = path.join(DIST, route.path, 'index.html');
+    const label = `${route.lang}/${route.topic}`;
+
+    let html: string;
+    try {
+      html = await fs.readFile(file, 'utf-8');
+    } catch {
+      failures.push(`${label}: thiếu trang ${route.path}`);
+      continue;
+    }
+
+    // Only <link rel="alternate">, never <a hreflang> in the body nav.
+    const alternates = countOccurrences(html, /<link rel="alternate" hreflang=/g);
+    check(alternates === 7, `${label}: ${alternates} thẻ alternate, cần 7`);
+
+    const canonical = countOccurrences(html, /<link rel="canonical"/g);
+    check(canonical === 1, `${label}: ${canonical} canonical, cần 1`);
+    check(
+      html.includes(`<link rel="canonical" href="${ORIGIN}${route.path}" />`),
+      `${label}: canonical không trỏ chính nó`
+    );
+
+    const chars = contentLength(html);
+    check(chars >= MIN_CHARS, `${label}: chỉ ${chars} ký tự nội dung, tối thiểu ${MIN_CHARS}`);
+
+    check(
+      countOccurrences(html, /<h1[\s>]/g) === 1,
+      `${label}: cần đúng 1 thẻ h1`
+    );
+
+    check(
+      html.includes('id="static-content"'),
+      `${label}: thiếu khối #static-content`
+    );
+
+    // A blob that lives in one browser must never reach a page.
+    //
+    // indexedDBStore falls back to "indexeddb-media://<id>" when the upload to
+    // the server did not return a URL, and Creator Studio will happily save
+    // that into config.json. It resolves perfectly for the editor who uploaded
+    // it — the blob is in their own IndexedDB — and resolves to nothing for
+    // everybody else, including the crawler, which would read it as the value
+    // of Product.image. The editor has no way to see that it is broken.
+    check(
+      !html.includes('indexeddb-media://'),
+      `${label}: có ảnh trỏ tới indexeddb-media:// — blob chỉ tồn tại trong máy người sửa, ` +
+        `phải upload lại để có URL trên server`
+    );
+
+    const readable = visibleText(html);
+
+    for (const match of html.matchAll(
+      /<script type="application\/ld\+json">([\s\S]*?)<\/script>/g
+    )) {
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(match[1]);
+      } catch (error) {
+        failures.push(`${label}: JSON-LD không parse được — ${(error as Error).message}`);
+        continue;
+      }
+
+      // Every question the markup claims must be readable on the same page.
+      //
+      // The FAQPage block shipped for a while describing content that existed
+      // nowhere — not in this HTML, not in the app. Google's rule is that the
+      // markup describe what a reader can see, and an assistant that quotes an
+      // answer is quoting a page that never said it. The failure was silent
+      // because structured data is invisible by definition, so it gets a gate.
+      for (const question of questionsIn(parsed)) {
+        check(
+          readable.includes(question),
+          `${label}: FAQPage hỏi "${question.slice(0, 48)}…" nhưng câu này không hiện trên trang`
+        );
+      }
+
+      // This asserted the absence of a telephone until Lục Lam confirmed the
+      // number, and it did its job — the build refused the moment one appeared.
+      // Now that there is a confirmed number, absence is no longer the thing
+      // worth guarding: the risk is a different number, since an assistant
+      // reads whatever is here out as fact. So the rule inverts to "if a
+      // telephone is present it must be the one in src/company.ts", which fails
+      // just as loudly on a typo or a stale copy.
+      const telephones = [...match[1].matchAll(/"telephone"\s*:\s*"([^"]*)"/g)].map((m) => m[1]);
+      const wrong = telephones.filter((number) => number !== COMPANY.telephone);
+      check(
+        wrong.length === 0,
+        `${label}: JSON-LD có số điện thoại lạ: ${wrong.join(', ')} (đúng phải là ${COMPANY.telephone})`
+      );
+    }
+  }
+
+  try {
+    const sitemap = await fs.readFile(path.join(DIST, 'sitemap.xml'), 'utf-8');
+    const locs = countOccurrences(sitemap, /<loc>/g);
+    const alternates = countOccurrences(sitemap, /xhtml:link/g);
+    const expected = TOPICS.length * (LANGUAGES.length + 1);
+
+    check(locs === TOPICS.length, `sitemap: ${locs} thẻ loc, cần ${TOPICS.length}`);
+    check(alternates === expected, `sitemap: ${alternates} thẻ alternate, cần ${expected}`);
+  } catch {
+    failures.push('sitemap: không đọc được dist/sitemap.xml');
+  }
+
+  try {
+    await fs.access(path.join(DIST, '404.html'));
+  } catch {
+    failures.push('thiếu dist/404.html');
+  }
+
+  // llms.txt is only useful if it is well formed — an assistant that cannot
+  // parse it simply falls back to guessing, silently. The two things tools
+  // actually check for are an H1 naming the site and links to follow.
+  try {
+    const llms = await fs.readFile(path.join(DIST, 'llms.txt'), 'utf-8');
+    const links = countOccurrences(llms, /\[[^\]]+\]\(https?:\/\/[^)]+\)/g);
+    check(/^# .+/m.test(llms), 'llms.txt: thiếu tiêu đề H1 ("# Tên site")');
+    check(links >= ALL_ROUTES.length, `llms.txt: chỉ ${links} liên kết, cần ít nhất ${ALL_ROUTES.length}`);
+  } catch {
+    failures.push('llms.txt: không đọc được dist/llms.txt');
+  }
+
+  if (failures.length > 0) {
+    console.error(`Kiểm chứng thất bại (${failures.length} lỗi):`);
+    for (const failure of failures) console.error(`  - ${failure}`);
+    process.exit(1);
+  }
+
+  console.log(
+    `Kiểm chứng đạt: ${ALL_ROUTES.length} trang, mỗi trang 1 canonical tự trỏ + 7 alternate + 1 h1, ` +
+      `sitemap đủ alternate, 404.html có mặt.`
+  );
+}
+
+main().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});

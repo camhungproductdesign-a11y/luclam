@@ -11,117 +11,182 @@ export const defaultMedia: Record<string, PlaceMedia> = {
   // --- FOOD ---
   // Pho
   "food-0-0": {
-    img: "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=800&q=80",
-    video: "https://www.tiktok.com/@maytinhsgn/video/7626240228788833544"
+    img: "/uploads/external/pho-hoa-pasteur.jpg",
+    // The TikTok that sat here was @maytinhsgn — a computer shop advertising a
+    // Lenovo desktop, attached to a phở restaurant. Presumably pasted while
+    // testing the video field and committed by accident.
+    video: ""
   },
+  // Bowls of phở, vendored CC0 from Wikimedia Commons and checked by eye. They
+  // are representative rather than photographs of these shops, which is the
+  // trade-off for showing something instead of a placeholder. Chosen to match
+  // what each listing claims: the plain bowl for the northern kitchen, the one
+  // served with a herb plate for the southern.
+  //
+  // Two candidates were rejected for the reason this guide already has a
+  // problem with: one was shot through a window onto a European street, which
+  // is a phở shop abroad, not Saigon.
+  //
+  // The Unsplash URLs that used to sit on the next two answer 404 at source, so
+  // both were rendering the placeholder anyway.
   "food-0-1": {
-    img: "https://images.unsplash.com/photo-1625220194771-7ebedd0b7d10?auto=format&fit=crop&w=800&q=80",
+    img: "/uploads/external/pho-viet-nam.jpg",
     video: ""
   },
   "food-0-2": {
-    img: "https://images.unsplash.com/photo-1634149737683-897903eeac35?auto=format&fit=crop&w=800&q=80",
+    img: "/uploads/external/pho-dau.jpg",
+    video: ""
+  },
+  "food-0-3": {
+    img: "/uploads/external/pho-le.jpg",
+    video: ""
+  },
+  "food-0-4": {
+    img: "/uploads/external/pho-phu-vuong.jpg",
     video: ""
   },
   // Banh Mi
   "food-1-0": {
-    img: "https://images.unsplash.com/photo-1608897013039-887f21d8c804?auto=format&fit=crop&w=800&q=80",
+    img: "/uploads/external/banh-mi-huynh-hoa.jpg",
     video: ""
   },
   "food-1-1": {
-    img: "https://images.unsplash.com/photo-1509722747041-616f39b57569?auto=format&fit=crop&w=800&q=80",
+    img: "/uploads/external/banh-mi-bay-ho.jpg",
     video: ""
   },
   "food-1-2": {
-    img: "https://images.unsplash.com/photo-1550507992-eb63ffee0847?auto=format&fit=crop&w=800&q=80",
+    img: "/uploads/external/banh-mi-hong-hoa.jpg",
     video: ""
   },
-  // Com Tam
+  "food-1-3": {
+    img: "/uploads/external/banh-mi-nhu-lan.jpg",
+    video: ""
+  },
+  // Cafe — nhom 2 la Saigon Coffee, khong phai com tam
   "food-2-0": {
-    img: "https://images.unsplash.com/photo-1541518763669-27fef04b14ea?auto=format&fit=crop&w=800&q=80",
+    img: "/uploads/external/cong-ca-phe.jpg",
     video: ""
   },
   "food-2-1": {
-    img: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=800&q=80",
+    img: "/uploads/external/ca-phe-vot-phan-dinh-phung.jpg",
     video: ""
   },
   "food-2-2": {
-    img: "https://images.unsplash.com/photo-1621841957884-1210fe19d66d?auto=format&fit=crop&w=800&q=80",
+    img: "/uploads/external/ca-phe-vy.jpg",
     video: ""
   },
-  // Cafe
+  "food-2-3": {
+    img: "/uploads/external/cheo-leo-cafe.jpg",
+    video: ""
+  },
+  // Com Tam — nhom 3, khong phai cafe
   "food-3-0": {
-    img: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80",
+    img: "/uploads/external/com-tam-ba-ghien.jpg",
     video: "https://assets.mixkit.co/videos/preview/mixkit-coffee-dripping-from-a-filter-43093-large.mp4"
   },
   "food-3-1": {
-    img: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=800&q=80",
+    img: "/uploads/external/com-tam-thuan-kieu.jpg",
     video: ""
   },
   "food-3-2": {
-    img: "https://images.unsplash.com/photo-1445116572660-236099ec97a0?auto=format&fit=crop&w=800&q=80",
+    img: "/uploads/external/com-tam-moc.jpg",
     video: ""
   },
-  // Seafood / Beer
+  "food-3-3": {
+    img: "/uploads/external/com-tam-nguyen-van-cu.jpg",
+    video: ""
+  },
+  "food-3-4": {
+    img: "/uploads/external/com-tam-kieu-giang.jpg",
+    video: ""
+  },
+  // Food Complexes — khu am thuc, khong phai hai san
   "food-4-0": {
-    img: "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=800&q=80",
+    img: "/uploads/external/5d49c81dc807.jpg",
     video: ""
   },
   "food-4-1": {
-    img: "https://images.unsplash.com/photo-1615147342761-9238e15d8b96?auto=format&fit=crop&w=800&q=80",
+    img: "/uploads/external/d06e10e91ce6.jpg",
     video: ""
   },
   "food-4-2": {
-    img: "https://images.unsplash.com/photo-1571613316887-6f8d5cbf7ef7?auto=format&fit=crop&w=800&q=80",
+    img: "/uploads/external/33679cf1e5a9.jpg",
+    video: ""
+  },
+  "food-4-3": {
+    img: "/uploads/external/vinh-khanh-food-street.jpg",
+    video: ""
+  },
+  "food-4-4": {
+    img: "/uploads/external/bui-vien-walking-street.jpg",
     video: ""
   },
 
   // --- STAY ---
   "stay-0": {
-    img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80",
+    img: "/uploads/external/boutique-hotels.jpg",
     video: ""
   },
   "stay-1": {
-    img: "https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?auto=format&fit=crop&w=800&q=80",
+    img: "/uploads/external/spa-herbal-wash.jpg",
     video: "https://assets.mixkit.co/videos/preview/mixkit-dripping-oil-on-massage-stones-in-a-spa-treatment-41666-large.mp4"
   },
   "stay-2": {
-    img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80",
+    img: "/uploads/external/hidden-cafes-tea.jpg",
     video: ""
   },
 
   // --- CULTURE ---
   "culture-0": {
-    img: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=800&q=80",
+    img: "/uploads/external/saigon-central-post-office.jpg",
     video: ""
   },
   "culture-1": {
-    img: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=800&q=80",
+    img: "/uploads/external/independence-palace.jpg",
     video: ""
   },
   "culture-2": {
-    img: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=80",
+    img: "/uploads/external/b08281fd0cd8.jpg",
     video: ""
   },
+  // The Unsplash URL that used to sit here answers 404 at source, so this entry
+  // rendered the placeholder. Replaced with the building itself: CC BY 2.0, via
+  // Wikimedia Commons; see public/uploads/external/CREDITS.json.
   "culture-3": {
-    img: "https://images.unsplash.com/photo-1596422846543-75c6fc1f7f43?auto=format&fit=crop&w=800&q=80",
+    img: "/uploads/external/saigon-opera-house.jpg",
     video: ""
   },
   "culture-4": {
-    img: "https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=800&q=80",
+    img: "/uploads/external/war-remnants-museum.jpg",
+    video: ""
+  },
+  // Street performers on Nguyễn Huệ at night — the living statues the entry is
+  // about, not a daytime view of the boulevard. CC0, choi kwangmo, via
+  // Wikimedia Commons; see public/uploads/external/CREDITS.json.
+  // Flower market. This is the flower section of Bến Thành rather than Hồ Thị
+  // Kỷ itself — Commons files the only images under that name to a food tour
+  // that passed through, and they are a charcoal grill and a selfie in the
+  // alley. A Saigon flower market it is; that market it is not.
+  "culture-17": {
+    img: "/uploads/external/ho-thi-ky-flower-market.jpg",
+    video: ""
+  },
+  "culture-15": {
+    img: "/uploads/external/nguyen-hue-street-performances.jpg",
     video: ""
   },
 
   // --- SHOPPING ---
   "shopping-0": {
-    img: "https://images.unsplash.com/photo-1569154941061-e231b4725ef1?auto=format&fit=crop&w=800&q=80",
+    img: "/uploads/external/ben-thanh-market.jpg",
     video: ""
   },
   "shopping-1": {
-    img: "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=800&q=80",
+    img: "/uploads/external/281474115b74.jpg",
     video: ""
   },
   "shopping-2": {
-    img: "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=800&q=80",
+    img: "/uploads/external/the-new-playground.jpg",
     video: ""
   }
 };
@@ -163,38 +228,38 @@ export const videoPresets = [
 export const imagePresets = [
   {
     name: "Traditional Pho Soup",
-    url: "https://images.unsplash.com/photo-1582878826629-29b7ad1cdc43?auto=format&fit=crop&w=800&q=80"
+    url: "/uploads/external/pho-hoa-pasteur.jpg"
   },
   {
     name: "Gourmet Crispy Banh Mi",
-    url: "https://images.unsplash.com/photo-1608897013039-887f21d8c804?auto=format&fit=crop&w=800&q=80"
+    url: "/uploads/external/83fd016f33a8.jpg"
   },
   {
     name: "Charcoal Grilled Pork Broken Rice",
-    url: "https://images.unsplash.com/photo-1621841957884-1210fe19d66d?auto=format&fit=crop&w=800&q=80"
+    url: "/uploads/external/b79df3e27783.jpg"
   },
   {
     name: "Classic Saigon Milk Iced Coffee",
-    url: "https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80"
+    url: "/uploads/external/cong-ca-phe.jpg"
   },
   {
     name: "Steaming Snails with Lemongrass",
-    url: "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?auto=format&fit=crop&w=800&q=80"
+    url: "/uploads/external/5d49c81dc807.jpg"
   },
   {
     name: "Cozy Wellness Spa Ambience",
-    url: "https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?auto=format&fit=crop&w=800&q=80"
+    url: "/uploads/external/spa-herbal-wash.jpg"
   },
   {
     name: "Lush French Colonial Boutique Room",
-    url: "https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=80"
+    url: "/uploads/external/boutique-hotels.jpg"
   },
   {
     name: "Majestic Saigon Post Office Face",
-    url: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=800&q=80"
+    url: "/uploads/external/5eae9e5b58fa.jpg"
   },
   {
     name: "Vibrant Ben Thanh Market Gateway",
-    url: "https://images.unsplash.com/photo-1569154941061-e231b4725ef1?auto=format&fit=crop&w=800&q=80"
+    url: "/uploads/external/24f78b813a4f.jpg"
   }
 ];

@@ -23,12 +23,16 @@ import {
   ArrowRight,
   Info,
   Sparkles,
+  Lock,
   X
 } from 'lucide-react';
 import { googleSignIn, logout, getAccessToken } from '../firebaseAuth';
 import { saveMedia, listMedia, deleteMedia, UploadedMedia, uploadMediaToServer } from '../indexedDBStore';
 import { defaultMedia, imagePresets, videoPresets } from '../defaultMedia';
 import { Language, translations } from '../translations';
+import { LANGUAGES } from '../routes';
+import { checkPrice } from '../parsePrice';
+import { getAdminToken, setAdminToken } from '../adminToken';
 
 interface CreatorStudioProps {
   lang: Language;
@@ -42,6 +46,37 @@ interface CreatorStudioProps {
   activeEditPlaceId?: string | null;
   onSetActiveEditPlaceId?: (id: string | null) => void;
   onDeactivateCreator?: () => void;
+}
+
+/**
+ * Shows a piece of copy that the editor deliberately cannot change.
+ *
+ * These are the sentences an assistant quotes when someone asks what Lục Lam
+ * is — the welcome text and every section's opening paragraph. They change
+ * every few years, and a mistake in them is invisible on screen while it sits
+ * in machine-readable answers for a long time afterwards. That is worth a
+ * commit and a review rather than a textarea.
+ *
+ * The text is still shown, because "where did that field go" is a worse
+ * experience than "here it is, and here is why you cannot type in it".
+ */
+function LockedCopy({ label, text, path }: { label: string; text: string; path: string }) {
+  return (
+    <div className="space-y-1.5">
+      <label className="text-zinc-400 font-medium flex items-center gap-1.5">
+        <Lock className="w-3 h-3 text-zinc-500 shrink-0" />
+        <span>{label}</span>
+      </label>
+      <p className="bg-zinc-950/60 border border-zinc-800/70 rounded-xl p-2.5 text-zinc-400 leading-relaxed whitespace-pre-line">
+        {text || <span className="italic text-zinc-600">(trống)</span>}
+      </p>
+      <p className="text-[10px] text-zinc-500 leading-relaxed">
+        Giọng thương hiệu — sửa trong <code className="text-zinc-400">src/translations.ts</code> tại{' '}
+        <code className="text-zinc-400">{path}</code>, rồi build lại. Đây là câu trợ lý AI trích khi
+        khách hỏi về Lục Lam, nên nó đi qua review thay vì sửa trực tiếp.
+      </p>
+    </div>
+  );
 }
 
 export function CreatorStudio({
@@ -59,7 +94,16 @@ export function CreatorStudio({
 }: CreatorStudioProps) {
   const [activeStudioTab, setActiveStudioTab] = useState<'media' | 'content'>('media');
   const [activeLang, setActiveLang] = useState<Language>(lang);
-  
+
+  // Admin token for the guarded write endpoints. Entered by the operator and
+  // kept in localStorage — it must never be baked into the bundle.
+  const [adminToken, setAdminTokenState] = useState<string>(getAdminToken);
+
+  const handleAdminTokenChange = (value: string) => {
+    setAdminTokenState(value);
+    setAdminToken(value);
+  };
+
   // Auth state
   const [user, setUser] = useState<any>(null);
   const [authToken, setAuthToken] = useState<string | null>(null);
@@ -313,29 +357,11 @@ export function CreatorStudio({
     setTimeout(() => setCopiedText(null), 2500);
   };
 
-  // Update localized text overrides
-  const updateOverrideValue = (path: string[], value: string) => {
-    const updated = { ...overrides };
-    let current = updated;
-    
-    // Ensure nested path exists
-    if (!current[activeLang]) {
-      current[activeLang] = {};
-    }
-    current = current[activeLang];
-
-    for (let i = 0; i < path.length - 1; i++) {
-      const part = path[i];
-      if (!current[part]) {
-        current[part] = {};
-      }
-      current = current[part];
-    }
-
-    current[path[path.length - 1]] = value;
-    onUpdateOverrides(updated);
-    onForceRefresh();
-  };
+  // updateOverrideValue lived here and is gone with its eleven call sites. It
+  // wrote single text fields — the welcome copy and every section's opening
+  // paragraph — which are now shown through LockedCopy instead. Nothing writes
+  // a lone string any more; what remains edits list items, which is where the
+  // volatile facts live.
 
   // Update localized list overrides (arrays)
   const updateOverrideListValue = (path: string[], index: number, field: string, value: string) => {
@@ -350,20 +376,107 @@ export function CreatorStudio({
     for (let i = 0; i < path.length; i++) {
       const part = path[i];
       if (!current[part]) {
-        current[part] = path[i] === 'items' || path[i] === 'restaurants' || path[i] === 'districts' ? [] : {};
+        current[part] =
+          path[i] === 'items' ||
+          path[i] === 'restaurants' ||
+          path[i] === 'districts' ||
+          path[i] === 'menuItems'
+            ? []
+            : {};
       }
       current = current[part];
     }
 
-    // Ensure array index exists
-    if (!current[index]) {
-      current[index] = {};
+    // Fill every slot up to index, never just the one being written. Assigning
+    // straight into current[index] on a fresh array leaves the slots below it
+    // as holes, and JSON.stringify turns a hole into null on the way to
+    // config.json — which then overwrote the untouched entries on the way back.
+    // Editing the second product this way deleted the first.
+    for (let i = 0; i <= index; i++) {
+      if (!current[i]) current[i] = {};
     }
     current[index][field] = value;
-    
+
     onUpdateOverrides(updated);
     onForceRefresh();
   };
+
+  /**
+   * Writes one fare figure into every language at once.
+   *
+   * Fares are the same number in all six — "40k-70k" does not translate — but
+   * they have to live inside each language's transport block, because that is
+   * what scripts/prerender reads to build the static pages. Editing them per
+   * language would mean six chances to update Vietnamese and forget Japanese,
+   * and a stale fare that only some readers see is worse than one everybody
+   * sees. So the field is language-neutral in the interface and replicated in
+   * the data.
+   */
+  const updateFareForAllLanguages = (modeIdx: number, fareIdx: number, value: string) => {
+    const updated = { ...overrides };
+
+    for (const code of LANGUAGES) {
+      if (!updated[code]) updated[code] = {};
+      const langBlock = updated[code];
+      if (!langBlock.transport) langBlock.transport = {};
+      if (!langBlock.transport.options) langBlock.transport.options = [];
+
+      // Fill up to modeIdx rather than assigning straight into it. Writing
+      // options[2] of an empty array leaves holes at 0 and 1, and a hole reads
+      // as undefined — which deepMerge used to write over the real entry,
+      // erasing the two modes above the one being edited.
+      const list: any[] = langBlock.transport.options;
+      for (let i = 0; i <= modeIdx; i++) {
+        if (!list[i]) list[i] = {};
+      }
+
+      const mode = list[modeIdx];
+      // Start from what that language currently shows, so editing one column
+      // does not blank the other two.
+      const current: string[] =
+        mode.fares ??
+        (translations[code] as any)?.transport?.options?.[modeIdx]?.fares ??
+        ['', '', ''];
+      const next = [...current];
+      next[fareIdx] = value;
+      mode.fares = next;
+    }
+
+    onUpdateOverrides(updated);
+    onForceRefresh();
+  };
+
+  /**
+   * Edits one entry of an array of plain strings — safetyTips, points — which
+   * updateOverrideListValue cannot do: it writes a named field on an object.
+   */
+  const updateStringListValue = (path: string[], index: number, value: string) => {
+    const updated = { ...overrides };
+    if (!updated[activeLang]) updated[activeLang] = {};
+    let current = updated[activeLang];
+
+    for (let i = 0; i < path.length - 1; i++) {
+      if (!current[path[i]]) current[path[i]] = {};
+      current = current[path[i]];
+    }
+
+    const key = path[path.length - 1];
+    const fallback: string[] =
+      (translations[activeLang] as any)?.[path[0]]?.[key] ?? [];
+    const next = [...(current[key] ?? fallback)];
+    next[index] = value;
+    current[key] = next;
+
+    onUpdateOverrides(updated);
+    onForceRefresh();
+  };
+
+  /**
+   * What the generator would make of the price currently in the field, checked
+   * against the one shipped in translations.ts for that product.
+   */
+  const priceVerdict = (itemIdx: number, item: any) =>
+    checkPrice(getProductValue(itemIdx, 'price'), item?.price);
 
   // Assign Media (Image or Video) to a PlaceId
   const assignMediaToPlace = (placeId: string, type: 'img' | 'video', url: string) => {
@@ -457,6 +570,12 @@ export function CreatorStudio({
     return overrides[activeLang]?.shopping?.items?.[itemIdx]?.[field] ?? translations[activeLang]?.shopping?.items?.[itemIdx]?.[field] ?? '';
   };
 
+  const getProductValue = (itemIdx: number, field: string) => {
+    return (overrides as any)[activeLang]?.luclam?.menuItems?.[itemIdx]?.[field]
+      ?? (translations[activeLang] as any)?.luclam?.menuItems?.[itemIdx]?.[field]
+      ?? '';
+  };
+
   return (
     <div className="w-full h-full flex flex-col bg-zinc-950 border-l border-zinc-800 text-zinc-100 font-sans relative">
       
@@ -484,6 +603,25 @@ export function CreatorStudio({
           )}
         </div>
       </header>
+
+      {/* Admin token. Without it the server rejects every save with 401. */}
+      <div className="px-4 py-2.5 bg-zinc-900/40 border-b border-zinc-800 shrink-0 flex items-center gap-3 flex-wrap">
+        <label htmlFor="admin-token" className="text-[10px] uppercase tracking-wider font-bold text-zinc-400 shrink-0">
+          Token quản trị
+        </label>
+        <input
+          id="admin-token"
+          type="password"
+          value={adminToken}
+          onChange={(e) => handleAdminTokenChange(e.target.value)}
+          placeholder="Dán ADMIN_TOKEN của máy chủ"
+          autoComplete="off"
+          className="flex-1 min-w-[180px] bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs text-zinc-200 font-mono focus:outline-none focus:border-[#b85233]"
+        />
+        <span className={`text-[10px] font-mono shrink-0 ${adminToken ? 'text-emerald-400' : 'text-amber-400'}`}>
+          {adminToken ? 'Đã có token' : 'Chưa nhập — mọi thao tác lưu sẽ bị từ chối'}
+        </span>
+      </div>
 
       {/* Primary Tab Navigation */}
       <div className="flex bg-zinc-900/60 border-b border-zinc-800 shrink-0">
@@ -669,7 +807,16 @@ export function CreatorStudio({
                         <div key={file.id} className="bg-zinc-950 border border-zinc-800 rounded-xl p-2 flex flex-col justify-between space-y-2 text-[10px]">
                           <div className="flex gap-2">
                             {file.thumbnailLink ? (
-                              <img src={file.thumbnailLink} alt="" className="w-10 h-10 object-cover rounded-lg shrink-0 bg-zinc-900 border border-zinc-800" referrerPolicy="no-referrer" />
+                              <img
+                                src={file.thumbnailLink}
+                                alt=""
+                                width={40}
+                                height={40}
+                                loading="lazy"
+                                decoding="async"
+                                className="w-10 h-10 object-cover rounded-lg shrink-0 bg-zinc-900 border border-zinc-800"
+                                referrerPolicy="no-referrer"
+                              />
                             ) : (
                               <div className="w-10 h-10 bg-zinc-900 rounded-lg flex items-center justify-center shrink-0 border border-zinc-800">
                                 {file.mimeType?.startsWith('video/') ? <FileVideo className="w-5 h-5 text-purple-400" /> : <FileImage className="w-5 h-5 text-blue-400" />}
@@ -779,13 +926,25 @@ export function CreatorStudio({
                               <span className="absolute bottom-1 right-1 text-[8px] bg-black/80 px-1 py-0.5 rounded uppercase">Video</span>
                             </div>
                           ) : (
-                            <img 
-                              src={item.serverUrl || `indexeddb-media://${item.id}`} 
-                              alt={item.name} 
-                              className="w-full h-full object-cover" 
+                            <img
+                              src={item.serverUrl || `indexeddb-media://${item.id}`}
+                              alt={item.name}
+                              width={64}
+                              height={64}
+                              loading="lazy"
+                              decoding="async"
+                              className="w-full h-full object-cover"
                               onError={(e) => {
-                                // Fallback if raw protocol is not parsed here
-                                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1596422846543-75c6fc1f7f43?auto=format&fit=crop&w=150&q=80';
+                                // Fallback if the raw protocol is not parsed here.
+                                // The flag stops the handler from reassigning a src
+                                // that is itself broken, which loops forever.
+                                const image = e.currentTarget;
+                                if (image.dataset.fallbackApplied === 'true') {
+                                  image.style.display = 'none';
+                                  return;
+                                }
+                                image.dataset.fallbackApplied = 'true';
+                                image.src = '/uploads/cover-benthanh.jpg';
                               }}
                             />
                           )}
@@ -862,7 +1021,15 @@ export function CreatorStudio({
                   <div className="grid grid-cols-2 gap-2">
                     {imagePresets.map((img, idx) => (
                       <div key={idx} className="bg-zinc-950 rounded-xl overflow-hidden border border-zinc-800/60 flex flex-col justify-between">
-                        <img src={img.url} alt={img.name} className="w-full h-12 object-cover" />
+                        <img
+                          src={img.url}
+                          alt={img.name}
+                          width={200}
+                          height={48}
+                          loading="lazy"
+                          decoding="async"
+                          className="w-full h-12 object-cover"
+                        />
                         <div className="p-1.5 flex justify-between items-center gap-1">
                           <span className="truncate text-[8px] text-zinc-400" title={img.name}>{img.name}</span>
                           <button 
@@ -946,6 +1113,7 @@ export function CreatorStudio({
                 <option value="food">Ẩm Thực 5 Danh Mục (Legends Food)</option>
                 <option value="culture">Địa Điểm Check-In (Culture)</option>
                 <option value="shopping">Mua Sắm Đặc Sản (Shopping)</option>
+                <option value="products">Sản Phẩm Trà Lục Lam (Products)</option>
               </select>
             </div>
 
@@ -955,43 +1123,26 @@ export function CreatorStudio({
               {/* SECTION: INTRO (Cover & Welcome) */}
               {selectedSection === 'intro' && (
                 <div className="space-y-4 text-xs">
-                  <div className="space-y-1.5">
-                    <label className="text-zinc-400 font-medium">Tiêu đề Mở Đầu:</label>
-                    <textarea 
-                      value={getIntroText('heading')}
-                      onChange={(e) => updateOverrideValue(['welcome', 'heading'], e.target.value)}
-                      placeholder="Nhập tiêu đề đón chào..."
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 min-h-[70px] focus:outline-none focus:border-[#b85233]"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-zinc-400 font-medium">Đoạn văn 1 (Giới thiệu):</label>
-                    <textarea 
-                      value={getIntroText('p1')}
-                      onChange={(e) => updateOverrideValue(['welcome', 'p1'], e.target.value)}
-                      placeholder="Mô tả tóm tắt..."
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 min-h-[90px] focus:outline-none focus:border-[#b85233]"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-zinc-400 font-medium">Đoạn văn 2:</label>
-                    <textarea 
-                      value={getIntroText('p2')}
-                      onChange={(e) => updateOverrideValue(['welcome', 'p2'], e.target.value)}
-                      placeholder="Mô tả bổ sung..."
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 min-h-[90px] focus:outline-none focus:border-[#b85233]"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-zinc-400 font-medium">Slogan nổi bật (Dưới cùng):</label>
-                    <input 
-                      type="text"
-                      value={getIntroText('highlight')}
-                      onChange={(e) => updateOverrideValue(['welcome', 'highlight'], e.target.value)}
-                      placeholder="Ví dụ: Sài Gòn đang chờ đợi bạn..."
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 focus:outline-none focus:border-[#b85233]"
-                    />
-                  </div>
+                  <LockedCopy
+                    label="Tiêu đề Mở Đầu"
+                    text={getIntroText('heading')}
+                    path="welcome.heading"
+                  />
+                  <LockedCopy
+                    label="Đoạn văn 1 (Giới thiệu)"
+                    text={getIntroText('p1')}
+                    path="welcome.p1"
+                  />
+                  <LockedCopy
+                    label="Đoạn văn 2"
+                    text={getIntroText('p2')}
+                    path="welcome.p2"
+                  />
+                  <LockedCopy
+                    label="Slogan nổi bật"
+                    text={getIntroText('highlight')}
+                    path="welcome.highlight"
+                  />
                 </div>
               )}
 
@@ -999,13 +1150,11 @@ export function CreatorStudio({
               {selectedSection === 'districts' && (
                 <div className="space-y-4 text-xs">
                   <div className="space-y-1.5">
-                    <label className="text-zinc-400 font-medium">Lời dẫn Không khí các Quận:</label>
-                    <textarea 
-                      value={overrides[activeLang]?.atmosphere?.description || ''}
-                      onChange={(e) => updateOverrideValue(['atmosphere', 'description'], e.target.value)}
-                      placeholder="Giới thiệu chung về các quận..."
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 min-h-[70px] focus:outline-none focus:border-[#b85233]"
-                    />
+                  <LockedCopy
+                    label="Lời dẫn Không khí các Quận"
+                    text={(translations[activeLang] as any)?.atmosphere?.description ?? ''}
+                    path="atmosphere.description"
+                  />
                   </div>
 
                   <span className="block border-t border-zinc-800 pt-3 text-[10px] uppercase font-bold text-[#b85233]">Chi Tiết Từng Quận</span>
@@ -1041,14 +1190,106 @@ export function CreatorStudio({
               {/* SECTION: TRANSPORTATION */}
               {selectedSection === 'transport' && (
                 <div className="space-y-4 text-xs">
-                  <div className="space-y-1.5">
-                    <label className="text-zinc-400 font-medium">Giới thiệu Di chuyển & An toàn:</label>
-                    <textarea 
-                      value={getTransportText()}
-                      onChange={(e) => updateOverrideValue(['transport', 'intro'], e.target.value)}
-                      placeholder="Mô tả chung..."
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 min-h-[100px] focus:outline-none focus:border-[#b85233]"
-                    />
+                  <LockedCopy
+                    label="Giới thiệu Di chuyển & An toàn"
+                    text={getTransportText()}
+                    path="transport.intro"
+                  />
+
+                  {/* Fares. Owned by Grab and the taxi firms rather than by Lục
+                      Lam, and the fastest-decaying facts on the site — which is
+                      why they are here at all. They were a constant in App.tsx
+                      until now: invisible to the generated pages and beyond the
+                      editor's reach at the same time. */}
+                  <div className="space-y-2 border-t border-zinc-800 pt-3">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                        Bảng giá ước tính
+                      </span>
+                      <span className="text-[9px] text-amber-500/90">Áp dụng cho cả 6 ngôn ngữ</span>
+                    </div>
+                    <p className="text-[10px] text-zinc-500 leading-relaxed">
+                      Con số giống nhau ở mọi ngôn ngữ, nên sửa một lần là đổi hết — không có
+                      chuyện bản tiếng Việt mới còn bản tiếng Nhật cũ.
+                    </p>
+
+                    {((translations[activeLang] as any)?.transport?.options ?? []).map(
+                      (mode: any, modeIdx: number) => {
+                        const saved =
+                          (overrides as any)[activeLang]?.transport?.options?.[modeIdx]?.fares;
+                        const fares: string[] = saved ?? mode.fares ?? ['', '', ''];
+                        const headers =
+                          (translations[activeLang] as any)?.transport?.tableHeaders ?? [];
+
+                        return (
+                          <div
+                            key={modeIdx}
+                            className="p-2.5 bg-zinc-950 rounded-xl border border-zinc-800 space-y-2"
+                          >
+                            <span className="text-[10px] font-bold text-amber-500">{mode.name}</span>
+                            <div className="grid grid-cols-3 gap-2">
+                              {[0, 1, 2].map((fareIdx) => (
+                                <div key={fareIdx} className="space-y-1">
+                                  <label className="text-zinc-500 text-[9px] block">
+                                    {headers[fareIdx + 1] ?? `Cột ${fareIdx + 1}`}
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={fares[fareIdx] ?? ''}
+                                    onChange={(e) =>
+                                      updateFareForAllLanguages(modeIdx, fareIdx, e.target.value)
+                                    }
+                                    placeholder="15k-25k"
+                                    className="w-full bg-zinc-900 border border-zinc-800 rounded p-1 text-[10px] focus:outline-none focus:border-[#b85233] text-zinc-200"
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      }
+                    )}
+                  </div>
+
+                  {/* Safety tips and transit points are prose, so unlike the
+                      fares they belong to one language at a time. */}
+                  <div className="space-y-2 border-t border-zinc-800 pt-3">
+                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                      Mẹo an toàn ({activeLang})
+                    </span>
+                    {((translations[activeLang] as any)?.transport?.safetyTips ?? []).map(
+                      (tip: string, idx: number) => (
+                        <textarea
+                          key={idx}
+                          value={
+                            (overrides as any)[activeLang]?.transport?.safetyTips?.[idx] ?? tip
+                          }
+                          onChange={(e) =>
+                            updateStringListValue(['transport', 'safetyTips'], idx, e.target.value)
+                          }
+                          className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 min-h-[70px] focus:outline-none focus:border-[#b85233]"
+                        />
+                      )
+                    )}
+                  </div>
+
+                  <div className="space-y-2 border-t border-zinc-800 pt-3">
+                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                      Mẹo di chuyển ({activeLang})
+                    </span>
+                    {((translations[activeLang] as any)?.transport?.points ?? []).map(
+                      (point: string, idx: number) => (
+                        <input
+                          key={idx}
+                          type="text"
+                          value={(overrides as any)[activeLang]?.transport?.points?.[idx] ?? point}
+                          onChange={(e) =>
+                            updateStringListValue(['transport', 'points'], idx, e.target.value)
+                          }
+                          className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 focus:outline-none focus:border-[#b85233]"
+                        />
+                      )
+                    )}
                   </div>
                 </div>
               )}
@@ -1057,13 +1298,11 @@ export function CreatorStudio({
               {selectedSection === 'stay' && (
                 <div className="space-y-4 text-xs">
                   <div className="space-y-1.5">
-                    <label className="text-zinc-400 font-medium">Mở đầu Khách sạn & Trị liệu:</label>
-                    <textarea 
-                      value={getStayText()}
-                      onChange={(e) => updateOverrideValue(['stay', 'intro'], e.target.value)}
-                      placeholder="Lời dẫn nghỉ ngơi..."
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 min-h-[100px] focus:outline-none focus:border-[#b85233]"
-                    />
+                  <LockedCopy
+                    label="Mở đầu Khách sạn & Trị liệu"
+                    text={getStayText()}
+                    path="stay.intro"
+                  />
                   </div>
                 </div>
               )}
@@ -1073,13 +1312,11 @@ export function CreatorStudio({
                 <div className="space-y-4 text-xs animate-in fade-in duration-300">
                   
                   <div className="space-y-1.5">
-                    <label className="text-zinc-400 font-medium">Giới thiệu Ẩm Thực:</label>
-                    <textarea 
-                      value={getFoodIntroText()}
-                      onChange={(e) => updateOverrideValue(['food', 'intro'], e.target.value)}
-                      placeholder="Mô tả chung ẩm thực..."
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 min-h-[60px] focus:outline-none focus:border-[#b85233]"
-                    />
+                  <LockedCopy
+                    label="Giới thiệu Ẩm Thực"
+                    text={getFoodIntroText()}
+                    path="food.intro"
+                  />
                   </div>
 
                   {/* Horizontal Categories selector inside Editor to jump to category */}
@@ -1243,13 +1480,11 @@ export function CreatorStudio({
               {selectedSection === 'culture' && (
                 <div className="space-y-4 text-xs">
                   <div className="space-y-1.5">
-                    <label className="text-zinc-400 font-medium">Giới thiệu văn hóa:</label>
-                    <textarea 
-                      value={getCultureIntroText()}
-                      onChange={(e) => updateOverrideValue(['culture', 'intro'], e.target.value)}
-                      placeholder="Mô tả chung..."
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 min-h-[60px] focus:outline-none focus:border-[#b85233]"
-                    />
+                  <LockedCopy
+                    label="Giới thiệu văn hóa"
+                    text={getCultureIntroText()}
+                    path="culture.intro"
+                  />
                   </div>
 
                   <span className="block border-t border-zinc-800 pt-2 text-[10px] font-bold text-zinc-400 uppercase">
@@ -1379,13 +1614,11 @@ export function CreatorStudio({
               {selectedSection === 'shopping' && (
                 <div className="space-y-4 text-xs">
                   <div className="space-y-1.5">
-                    <label className="text-zinc-400 font-medium">Lời mở đầu Mua Sắm:</label>
-                    <textarea 
-                      value={getShoppingIntroText()}
-                      onChange={(e) => updateOverrideValue(['shopping', 'intro'], e.target.value)}
-                      placeholder="Mô tả mua sắm..."
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-2.5 min-h-[60px] focus:outline-none focus:border-[#b85233]"
-                    />
+                  <LockedCopy
+                    label="Lời mở đầu Mua Sắm"
+                    text={getShoppingIntroText()}
+                    path="shopping.intro"
+                  />
                   </div>
 
                   <span className="block border-t border-zinc-800 pt-2 text-[10px] font-bold text-zinc-400 uppercase">
@@ -1497,6 +1730,181 @@ export function CreatorStudio({
                       </div>
                     );
                   })}
+                </div>
+              )}
+
+              {/* SECTION: PRODUCTS (trà Lục Lam) */}
+              {selectedSection === 'products' && (
+                <div className="space-y-4 text-xs">
+                  <LockedCopy
+                    label="Tiêu đề khối sản phẩm"
+                    text={(translations[activeLang] as any)?.luclam?.menuHeading ?? ''}
+                    path="luclam.menuHeading"
+                  />
+
+                  <span className="block border-t border-zinc-800 pt-2 text-[10px] font-bold text-zinc-400 uppercase">
+                    Danh sách sản phẩm ({(translations[activeLang] as any)?.luclam?.menuItems?.length || 0} sản phẩm):
+                  </span>
+
+                  {((translations[activeLang] as any)?.luclam?.menuItems || []).map(
+                    (item: any, itemIdx: number) => {
+                      const placeId = `luclam-${itemIdx}`;
+                      const currentCustom = customMedia[placeId] || { img: '', video: '' };
+
+                      return (
+                        <div
+                          key={itemIdx}
+                          id={`edit-place-${placeId}`}
+                          className="p-3 bg-zinc-950 rounded-xl border border-zinc-800 space-y-3"
+                        >
+                          <span className="text-[10px] font-bold text-amber-500 font-mono">
+                            Sản phẩm #{itemIdx + 1} ({getProductValue(itemIdx, 'name') || item.name})
+                          </span>
+
+                          <div className="space-y-1">
+                            <label className="text-zinc-500 font-semibold">Tên sản phẩm:</label>
+                            <input
+                              type="text"
+                              value={getProductValue(itemIdx, 'name')}
+                              onChange={(e) =>
+                                updateOverrideListValue(['luclam', 'menuItems'], itemIdx, 'name', e.target.value)
+                              }
+                              placeholder="Tên dòng trà..."
+                              className="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2 focus:outline-none focus:border-[#b85233]"
+                            />
+                          </div>
+
+                          <div className="space-y-1">
+                            <label className="text-zinc-500 font-semibold">Mô tả:</label>
+                            <textarea
+                              value={getProductValue(itemIdx, 'desc')}
+                              onChange={(e) =>
+                                updateOverrideListValue(['luclam', 'menuItems'], itemIdx, 'desc', e.target.value)
+                              }
+                              placeholder="Thành phần, hương vị, công dụng..."
+                              className="w-full bg-zinc-900 border border-zinc-800 rounded-lg p-2 min-h-[60px] focus:outline-none focus:border-[#b85233]"
+                            />
+                          </div>
+
+                          <div className="space-y-1">
+                            <label className="text-zinc-500 font-semibold">Giá:</label>
+                            <input
+                              type="text"
+                              value={getProductValue(itemIdx, 'price')}
+                              onChange={(e) =>
+                                updateOverrideListValue(['luclam', 'menuItems'], itemIdx, 'price', e.target.value)
+                              }
+                              placeholder="155,000 VND"
+                              className={`w-full bg-zinc-900 border rounded-lg p-2 focus:outline-none ${
+                                priceVerdict(itemIdx, item).kind === 'unparseable'
+                                  ? 'border-rose-500/70 focus:border-rose-400'
+                                  : priceVerdict(itemIdx, item).kind === 'jump'
+                                    ? 'border-amber-500/70 focus:border-amber-400'
+                                    : 'border-zinc-800 focus:border-[#b85233]'
+                              }`}
+                            />
+                            {/* The verdict is parsePrice's own, the function the
+                                generator runs. A price this rejects is dropped
+                                from the Product offer while the page keeps
+                                showing it — a failure with nothing on screen to
+                                announce it, which is why it is worth a red
+                                border here. */}
+                            {(() => {
+                              const verdict = priceVerdict(itemIdx, item);
+                              if (verdict.kind === 'unparseable') {
+                                return (
+                                  <p className="text-[9px] text-rose-400 leading-normal">
+                                    Không đọc được. Giá này sẽ <strong>bị loại khỏi structured data</strong> —
+                                    trang vẫn hiện chữ, nhưng Google và trợ lý AI không thấy giá nào cả. Dùng dạng{' '}
+                                    <span className="font-mono">155,000 VND</span>.
+                                  </p>
+                                );
+                              }
+                              if (verdict.kind === 'jump') {
+                                return (
+                                  <p className="text-[9px] text-amber-400 leading-normal">
+                                    Lệch <strong>{verdict.factor.toFixed(1)} lần</strong> so với giá gốc (
+                                    {verdict.from.toLocaleString('vi-VN')} VND). Nếu đúng thì bỏ qua; nếu gõ
+                                    nhầm một chữ số thì đây là lúc phát hiện.
+                                  </p>
+                                );
+                              }
+                              return (
+                                <p className="text-[8.5px] text-zinc-500 leading-normal">
+                                  Giữ đúng dạng <span className="font-mono text-zinc-400">155,000 VND</span>. Con số
+                                  này được công bố ra Google và trợ lý AI qua structured data, nên sai là sai công
+                                  khai.
+                                </p>
+                              );
+                            })()}
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2 border-t border-zinc-800/70 pt-2.5">
+                            <div className="space-y-1">
+                              <label className="text-zinc-400 text-[10px]">Link mua tại Lục Lam:</label>
+                              <input
+                                type="text"
+                                value={getProductValue(itemIdx, 'buyLuclam')}
+                                onChange={(e) =>
+                                  updateOverrideListValue(['luclam', 'menuItems'], itemIdx, 'buyLuclam', e.target.value)
+                                }
+                                placeholder="https://luclam.vn/..."
+                                className="w-full bg-zinc-900 border border-zinc-800 rounded p-1 text-[9px] focus:outline-none text-zinc-300"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="text-zinc-400 text-[10px]">Link mua tại Takashimaya:</label>
+                              <input
+                                type="text"
+                                value={getProductValue(itemIdx, 'buyTaka')}
+                                onChange={(e) =>
+                                  updateOverrideListValue(['luclam', 'menuItems'], itemIdx, 'buyTaka', e.target.value)
+                                }
+                                placeholder="https://online.takashimaya-vn.com/..."
+                                className="w-full bg-zinc-900 border border-zinc-800 rounded p-1 text-[9px] focus:outline-none text-zinc-300"
+                              />
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-2 border-t border-zinc-800/70 pt-2.5">
+                            <div className="space-y-1">
+                              <label className="text-zinc-400 text-[10px]">Ảnh sản phẩm:</label>
+                              <input
+                                type="text"
+                                value={currentCustom.img || item.image || ''}
+                                onChange={(e) => assignMediaToPlace(placeId, 'img', e.target.value)}
+                                placeholder="Gán link ảnh..."
+                                className="w-full bg-zinc-900 border border-zinc-800 rounded p-1 text-[9px] focus:outline-none text-zinc-300"
+                              />
+                            </div>
+                            <div className="space-y-1">
+                              <label className="text-zinc-400 text-[10px]">Video TikTok:</label>
+                              <input
+                                type="text"
+                                value={currentCustom.video || ''}
+                                onChange={(e) => assignMediaToPlace(placeId, 'video', e.target.value)}
+                                placeholder="https://www.tiktok.com/@.../video/..."
+                                className="w-full bg-zinc-900 border border-zinc-800 rounded p-1 text-[9px] focus:outline-none text-zinc-300"
+                              />
+                            </div>
+                          </div>
+                          <p className="text-[8.5px] text-zinc-500 leading-normal">
+                            Dán link TikTok để nút xem video hiện ra trên thẻ sản phẩm. Bỏ trống thì không có nút.
+                          </p>
+
+                          {(currentCustom.img || currentCustom.video) && (
+                            <button
+                              type="button"
+                              onClick={() => clearPlaceMedia(placeId)}
+                              className="text-[8.5px] text-red-400 hover:underline cursor-pointer block"
+                            >
+                              Xóa ảnh/video tùy chỉnh (khôi phục mặc định)
+                            </button>
+                          )}
+                        </div>
+                      );
+                    }
+                  )}
                 </div>
               )}
 

@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { findEmbedHeight, isTikTokOrigin } from '../embedHeight';
 import { 
   X, 
   ArrowLeft,
@@ -22,7 +23,9 @@ import {
   Settings
 } from 'lucide-react';
 import { useMediaUrl } from '../hooks/useMediaUrl';
+import { Picture } from './Picture';
 import { saveMedia } from '../indexedDBStore';
+import { creditFor } from '../mediaCredits';
 
 interface PlaceMedia {
   img: string;
@@ -51,19 +54,46 @@ interface PlaceDetailModalProps {
   isCreator?: boolean;
 }
 
+/**
+ * Shown when a place has no usable photo. It replaces "Capturing Saigon
+ * Vibes...", which was English for every reader and implied something was
+ * still loading when in fact there was nothing to load.
+ */
+const NO_PHOTO_LABEL = {
+  vi: 'Chưa có ảnh cho địa điểm này',
+  en: 'No photo yet',
+  ja: '写真はまだありません',
+  ko: '사진이 아직 없습니다',
+  zh: '暂无照片',
+  zht: '暫無照片',
+} as const;
+
+/** The @handle out of a TikTok URL, so the credit can be rendered as our own text. */
+const tiktokHandle = (url: string): string => (url.match(/tiktok\.com\/(@[\w.-]+)/i)?.[1] ?? '');
+
 const getEmbedDetails = (url: string | undefined) => {
-  if (!url) return { type: 'none' as const, embedUrl: '' };
+  if (!url) return { type: 'none' as const, embedUrl: '', handle: '', sourceUrl: '' };
 
   // TikTok Video Match
   const tiktokMatch = url.match(/tiktok\.com\/.*\/video\/(\d+)/i);
   if (tiktokMatch && tiktokMatch[1]) {
-    return { type: 'tiktok' as const, embedUrl: `https://www.tiktok.com/embed/v2/${tiktokMatch[1]}` };
+    return {
+      type: 'tiktok' as const,
+      embedUrl: `https://www.tiktok.com/embed/v2/${tiktokMatch[1]}`,
+      handle: tiktokHandle(url),
+      sourceUrl: url,
+    };
   }
 
   // YouTube match
   const ytMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i);
   if (ytMatch && ytMatch[1]) {
-    return { type: 'youtube' as const, embedUrl: `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1&mute=1&loop=1&playlist=${ytMatch[1]}` };
+    return {
+      type: 'youtube' as const,
+      embedUrl: `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1&mute=1&loop=1&playlist=${ytMatch[1]}`,
+      handle: '',
+      sourceUrl: url,
+    };
   }
 
   // General fallback if it contains tiktok.com but different format
@@ -72,12 +102,17 @@ const getEmbedDetails = (url: string | undefined) => {
     if (parts.length > 1) {
       const id = parts[1].split('?')[0];
       if (/^\d+$/.test(id)) {
-        return { type: 'tiktok' as const, embedUrl: `https://www.tiktok.com/embed/v2/${id}` };
+        return {
+          type: 'tiktok' as const,
+          embedUrl: `https://www.tiktok.com/embed/v2/${id}`,
+          handle: tiktokHandle(url),
+          sourceUrl: url,
+        };
       }
     }
   }
 
-  return { type: 'direct' as const, embedUrl: url };
+  return { type: 'direct' as const, embedUrl: url, handle: '', sourceUrl: url };
 };
 
 export function PlaceDetailModal({ 
@@ -99,6 +134,18 @@ export function PlaceDetailModal({
   const [tiktokError, setTiktokError] = useState('');
 
   const resolvedImg = useMediaUrl(media.img);
+
+  // A URL that exists but will not load is different from no URL at all, and
+  // only the second case was handled — so a dead link rendered the browser's
+  // broken-image glyph with the alt text sprawled across the hero.
+  const [heroFailed, setHeroFailed] = useState(false);
+  // null until TikTok's embed reports its own height; see the effect below.
+  const [tiktokHeight, setTiktokHeight] = useState<number | null>(null);
+  const lastHeroSrc = useRef(resolvedImg);
+  if (lastHeroSrc.current !== resolvedImg) {
+    lastHeroSrc.current = resolvedImg;
+    if (heroFailed) setHeroFailed(false);
+  }
   const resolvedVideo = useMediaUrl(media.video);
   const embedDetails = getEmbedDetails(resolvedVideo);
 
@@ -114,7 +161,23 @@ export function PlaceDetailModal({
   React.useEffect(() => {
     setTiktokUrl('');
     setTiktokError('');
+    setTiktokHeight(null);
   }, [place.id]);
+
+  // Sizes the TikTok frame to the height the embed reports. See
+  // src/embedHeight.ts for why the payload is read loosely.
+  React.useEffect(() => {
+    if (!isOpen || embedDetails.type !== 'tiktok') return;
+
+    const onMessage = (event: MessageEvent) => {
+      if (!isTikTokOrigin(event.origin)) return;
+      const height = findEmbedHeight(event.data);
+      if (height) setTiktokHeight(Math.ceil(height));
+    };
+
+    window.addEventListener('message', onMessage);
+    return () => window.removeEventListener('message', onMessage);
+  }, [isOpen, embedDetails.type, embedDetails.embedUrl]);
 
   if (!isOpen) return null;
 
@@ -145,43 +208,53 @@ export function PlaceDetailModal({
     if (isFood) {
       if (place.id.includes('food-0')) {
         return {
-          ja: 'プロのヒント: スープを飲む前に、まずはそのままの味を一口。その後、ライムを絞り、生ハーブとチリを少し加えて、自分好みの完璧な風味に整えるのが地元流。揚げパン（Quẩy）を浸して食べるのもお忘れなく！',
+          ja: '現地流のコツ: スープを飲む前に、まずはそのままの味を一口。その後、ライムを絞り、生ハーブと唐辛子を少し加えて、自分好みの風味に整えるのが地元流です。中華揚げパン（Quẩy）を浸して食べるのもお忘れなく！',
           vi: 'Mẹo địa phương: Trước khi thêm gia vị, hãy nếm thử một ngụm nước dùng nguyên bản. Sau đó vắt thêm chanh, thêm vài cọng rau húng và vài lát ớt tươi. Đừng quên gọi thêm đĩa quẩy nóng giòn để nhúng nước dùng nhé!',
-          en: 'Local Pro-Tip: Taste the broth pure first. Then squeeze some fresh lime, add wild herbs, and a few chili slices. Always order a plate of savory Chinese donuts (Quẩy) to dip into the rich broth!',
-          zh: '行家建议：喝汤前先尝一口原汤。然后挤点柠檬汁，加几叶新鲜罗勒和辣椒片。别忘了点一份热油条（Quẩy）泡汤吃，绝配！'
+          en: 'Local Pro-Tip: Taste the broth on its own first. Then squeeze in some fresh lime, add the herbs, and a few slices of chilli. Always order a plate of savoury fried dough sticks (Quẩy) to dip into the rich broth!',
+          zh: '行家建议：喝汤前先尝一口原汤。然后挤点青柠汁，加几叶新鲜罗勒和辣椒片。别忘了点一份热油条（Quẩy）泡汤吃，绝配！',
+          zht: '行家建議：喝湯前先嚐一口原湯。然後擠點檸檬汁，加幾葉新鮮羅勒和辣椒片。別忘了點一份熱油條（Quẩy）泡湯吃，絕配！',
+          ko: '현지인 꿀팁: 국물은 먼저 아무것도 넣지 말고 한 모금 그대로 맛보세요. 그다음 라임을 짜 넣고 허브잎과 고추 몇 조각을 더해 보세요. 국물에 찍어 먹는 튀김빵(Quẩy)도 꼭 같이 주문해 보세요!'
         }[lang] || place.desc;
       }
       if (place.id.includes('food-3')) { // Cafe
         return {
-          ja: 'プロのヒント: 伝統的な「フィン（Phin）」フィルターから、コンデンスミルクの入ったグラスにコーヒーがゆっくりと滴り落ちるのを眺める時間こそが、サイゴン最大の贅沢。氷の入ったグラスに移してよくかき混ぜてからお召し上がりください。',
+          ja: '現地流のコツ: 伝統的な「フィン（Phin）」フィルターから、コンデンスミルクの入ったグラスにコーヒーがゆっくりと滴り落ちるのを眺める時間こそが、サイゴン最大の贅沢。氷の入ったグラスに移してよくかき混ぜてからお召し上がりください。',
           vi: 'Mẹo địa phương: Hãy kiên nhẫn đợi từng giọt cà phê phin đậm đặc nhỏ giọt xuống ly sữa đặc. Trút toàn bộ hỗn hợp vào ly đá đầy, khuấy thật đều tay cho đến khi bọt nâu mịn nổi lên rồi thưởng thức.',
           en: 'Local Pro-Tip: The slow, patient drip of the coffee through the traditional Phin filter over sweet condensed milk is a Saigon ritual. Pour it over ice, stir vigorously until frothy, and sip slowly.',
-          zh: '行家建议：耐心等待咖啡通过传统Phin滴滤器慢慢滴入炼乳中。然后倒入满是冰块的杯中，用力搅拌均匀，直到冒出细密泡沫再享用。'
+          zh: '行家建议：耐心等待咖啡通过传统Phin滴滤器慢慢滴入炼乳中。然后倒入满是冰块的杯中，用力搅拌均匀，直到冒出细密泡沫再享用。',
+          zht: '行家建議：耐心等待咖啡透過傳統滴滴壺（Phin）慢慢滴入煉乳中。然後倒入滿是冰塊的杯中，用力攪拌均勻，直到冒出細密泡沫再享用。',
+          ko: '현지인 꿀팁: 전통 핀(Phin) 필터에서 커피가 연유 위로 한 방울씩 천천히 떨어지길 기다리는 시간, 그 여유가 사이공의 방식입니다. 얼음을 가득 채운 잔에 부은 뒤 고운 거품이 올라올 때까지 힘차게 저어 천천히 음미해 보세요.'
         }[lang] || place.desc;
       }
       return {
-        ja: 'プロのヒント: 夕方5時〜7時頃は大変混雑しますが、これこそがサイゴンの最も賑やかでエネルギッシュなストリートフードの雰囲気を味わえる最高の時間帯です。気兼ねなく地元のプラスチック椅子に座りましょう！',
+        ja: '現地流のコツ: 夕方5時〜7時頃は大変混雑しますが、これこそがサイゴンの最も賑やかな屋台の雰囲気を味わえる最高の時間帯です。気兼ねなく屋台の低いプラスチック椅子に腰かけてみましょう！',
         vi: 'Mẹo địa phương: Tầm 5h-7h tối là giờ cao điểm nhất, nhưng lại là lúc cảm nhận rõ rệt nhất không khí ẩm thực đường phố nhộn nhịp của Sài Gòn. Hãy thoải mái kéo một chiếc ghế nhựa và hòa mình vào đám đông!',
         en: 'Local Pro-Tip: 5 PM to 7 PM is peak rush hour, but it is the best time to experience Saigon’s energetic, sizzling street food culture. Sit down comfortably on a tiny plastic stool and enjoy!',
-        zh: '行家建议：傍晚5点到7点是高峰期，但也是体验西贡最具活力、最热闹的街头美食文化的最佳时机。大大方方地拉张塑料矮凳，融入人群中吧！'
+        zh: '行家建议：傍晚5点到7点是高峰期，但也是体验西贡最具活力、最热闹的街头美食文化的最佳时机。大大方方地拉张塑料矮凳，融入人群中吧！',
+        zht: '行家建議：傍晚5點到7點是尖峰時段，但也是體驗西貢最具活力、最熱鬧的街頭美食文化的最佳時機。大大方方地拉張塑膠矮凳，融入人群中吧！',
+        ko: '현지인 꿀팁: 저녁 5시에서 7시는 가장 붐비는 시간이지만, 사이공의 활기찬 길거리 음식 문화를 가장 생생하게 느낄 수 있는 때이기도 합니다. 플라스틱 간이 의자 하나 끌어다 편하게 앉아 즐겨 보세요!'
       }[lang] || place.desc;
     }
 
     if (isShopping) {
       return {
-        ja: 'プロのヒント: 市場でお買い物をする際は、笑顔を絶やさずに優しく交渉するのがコツ。提示価格の40%〜50%から交渉を始め、お互いが納得できる楽しい取引を心がけましょう！朝一番の買い物は、幸運をもたらす「開運の客（Mở hàng）」として歓迎されやすいです。',
+        ja: '現地流のコツ: 市場でお買い物をする際は、笑顔を絶やさずに優しく交渉するのがコツ。提示価格の40%〜50%から交渉を始め、お互いが納得できる楽しい取引を心がけましょう！朝一番の買い物は、幸運をもたらす「開運の客（Mở hàng）」としてとても喜ばれます。',
         vi: 'Mẹo địa phương: Khi mua sắm tại chợ truyền thống, hãy luôn mỉm cười và trả giá một cách vui vẻ. Nên bắt đầu từ khoảng 40%-50% giá người bán đưa ra. Nếu mua vào sáng sớm, bạn sẽ là khách mở hàng đầy may mắn!',
-        en: 'Local Pro-Tip: When shopping at local markets, always wear a warm smile and negotiate politely. Start bargaining around 40-50% off the initial quoted price. Buying first thing in the morning makes you the lucky "Mở hàng" opener!',
-        zh: '行家建议：传统市场购物时，保持微笑并礼貌还价。可以先从开价的四至五折开始。清晨第一个购买，你会成为让老板非常开心的“开张幸客”（Mở hàng）！'
+        en: 'Local Pro-Tip: When shopping at local markets, always wear a warm smile and negotiate politely. Open at around 40-50% of the asking price. Buying first thing in the morning makes you the lucky first customer, the "Mở hàng"!',
+        zh: '行家建议：传统市场购物时，保持微笑并礼貌还价。可以先从开价的四至五折开始。清晨第一个购买，你会成为让老板非常开心的“开张幸客”（Mở hàng）！',
+        zht: '行家建議：傳統市場購物時，保持微笑並禮貌還價。可以先從開價的四至五折開始。清晨第一個購買，你會成為讓老闆非常開心的「開張幸客」（Mở hàng）！',
+        ko: '현지인 꿀팁: 재래시장에서는 늘 웃는 얼굴로 정중하게 흥정하세요. 처음 부른 값의 40~50% 선에서 시작하면 적당합니다. 아침 첫 손님이 되면 상인들이 행운을 부르는 ‘머항(Mở hàng)’ 손님이라며 유난히 반겨 줍니다!'
       }[lang] || place.desc;
     }
 
     // Default for Culture / Check-in
     return {
-      ja: 'プロのヒント: 美しい写真を撮るなら、午前8時前、または午後4時以降の柔らかな「ゴールデンアワー」の光が最適です。また、寺院や歴史的建造物を訪れる際は、肩や膝を隠したマナーある服装でお越しください。',
+      ja: '現地流のコツ: 美しい写真を撮るなら、午前8時前、または午後4時以降の柔らかな「ゴールデンアワー」の光が最適です。また、寺院や歴史的建造物を訪れる際は、肩や膝が隠れる露出を控えた服装でお越しください。',
       vi: 'Mẹo địa phương: Để có những bức ảnh check-in nghệ thuật nhất, hãy ghé thăm trước 8h sáng hoặc sau 4h chiều để đón ánh sáng dịu. Hãy ăn mặc lịch sự che kín vai và đầu gối khi tham quan các ngôi đền, chùa cổ kính.',
-      en: 'Local Pro-Tip: For the absolute best photo captures, visit before 8 AM or after 4 PM to secure soft golden hour lighting. Please ensure shoulders and knees are covered when visiting ancient, sacred temples.',
-      zh: '行家建议：想要拍出最好看的打卡照，建议在上午8点前或下午4点后光线柔和时段前往。参拜古老庄严的寺庙和古迹时，请务必穿着得体，遮住肩膀和膝盖。'
+      en: 'Local Pro-Tip: For the best photos, come before 8 AM or after 4 PM to catch the soft golden-hour light. Please keep shoulders and knees covered when visiting ancient, sacred temples.',
+      zh: '行家建议：想要拍出最好看的打卡照，建议在上午8点前或下午4点后光线柔和时段前往。参拜古老庄严的寺庙和古迹时，请务必穿着得体，遮住肩膀和膝盖。',
+      zht: '行家建議：想要拍出最好看的打卡照，建議在上午8點前或下午4點後光線柔和的時段前往。參拜古老莊嚴的寺廟和古蹟時，請務必穿著得體，遮住肩膀和膝蓋。',
+      ko: '현지인 꿀팁: 인생샷을 남기려면 햇살이 부드러운 골든아워, 오전 8시 이전이나 오후 4시 이후에 방문하세요. 오래된 사찰과 유적을 둘러볼 때는 어깨와 무릎을 가린 단정한 옷차림을 지켜 주세요.'
     }[lang] || place.desc;
   };
 
@@ -211,27 +284,81 @@ export function PlaceDetailModal({
   };
 
   return (
+    /* Two positions, because the sheet covers a different box on each layout.
+       It used to be plain `absolute inset-0`, and the nearest positioned
+       ancestor was nothing at all — the shell it sat in has no `relative` — so
+       it fell back to the initial containing block and stretched across the
+       whole browser window. On a phone that is the right answer by accident,
+       which is why it went unnoticed; on desktop it spilled far outside the
+       860px device mockup the rest of the app lives in.
+
+       The sheet is now rendered inside that mockup. At lg and up `absolute`
+       binds to it, so the sheet fills the phone screen and is clipped to its
+       rounded corners. Below lg `fixed` reaches the viewport instead, keeping
+       the full-screen cover the mobile layout already had, including over the
+       lg:hidden header that sits outside the frame. Nothing on the way up sets
+       transform, filter or contain, so `fixed` escapes as intended. */
     <div
-      className="absolute inset-0 z-50 bg-black/60 backdrop-blur-sm flex flex-col justify-end"
+      className="fixed lg:absolute inset-0 z-50 bg-black/60 backdrop-blur-sm flex flex-col justify-end lg:justify-center lg:items-center lg:p-8"
       onClick={onClose}
     >
       
       {/* Scrollable Container styled as a premium mobile slide-up sheet */}
       <div
-        className="w-full h-[90%] bg-[#f6f3eb] rounded-t-[32px] overflow-hidden shadow-2xl flex flex-col relative animate-in slide-in-from-bottom duration-300"
+        className={`w-full h-[90%] ${embedDetails.type === 'tiktok' ? 'lg:w-[1080px] lg:h-full lg:max-h-[600px]' : 'lg:w-[920px] lg:h-auto lg:max-h-full'} lg:max-w-full bg-[#f6f3eb] rounded-t-[32px] lg:rounded-3xl overflow-hidden shadow-2xl flex flex-col lg:flex-row relative animate-in slide-in-from-bottom lg:zoom-in-95 duration-300`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="place-detail-title"
         onClick={(event) => event.stopPropagation()}
       >
+
+        {/* The clip, in a pane of its own beside everything else.
+
+            Stacked under the hero and the tabs it had only what those left:
+            42% of it was visible at 1366x768 and 66% at 1600x900. Beside them
+            it is whole at every size, and it stays on screen while the reader
+            moves between tabs.
+
+            No crop here, unlike the stacked version below lg. The crop hides
+            TikTok's handle, caption and Watch-now bar by showing only the top
+            of an over-tall iframe, and it holds only while the box is no
+            taller than the video inside. Their embed draws that video at a
+            fixed height whatever width the iframe is given — measured,
+            276x491 cropped cleanly, 338x600 showed the bar, 420x747 showed
+            the caption — so keeping the crop honest meant pinning the box at
+            315x560 and living with black bands either side of it.
+
+            So the pane is the embed's own width and its own height instead.
+            No letterbox, and the chrome is part of what is shown. When the
+            embed runs past the dialog the pane scrolls, and what scrolls is
+            the caption: the clip is at the top and always whole.
+
+            w-[340px] is TikTok's own embed width plus the padding. */}
+        {embedDetails.type === 'tiktok' && (
+          <aside className="hidden lg:block w-[340px] shrink-0 bg-black overflow-y-auto p-2.5">
+            <iframe
+              src={embedDetails.embedUrl}
+              className="w-full border-0 rounded-2xl block"
+              style={{ height: tiktokHeight ?? 760 }}
+              allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+              allowFullScreen
+              loading="lazy"
+              scrolling="no"
+              title="TikTok Video Embed"
+            />
+          </aside>
+        )}
+
+        {/* Everything else, in a column beside it. */}
+        <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         
         {/* Top visual bar for dragging effect */}
-        <div className="absolute top-2 left-1/2 -translate-x-1/2 w-12 h-1 bg-white/40 rounded-full z-40"></div>
+        <div className="lg:hidden absolute top-2 left-1/2 -translate-x-1/2 w-12 h-1 bg-white/40 rounded-full z-40"></div>
 
         {/* --- HERO MEDIA HEADER --- */}
         <div 
           onClick={isCreator ? handleHeroClick : undefined}
-          className={`w-full h-[230px] bg-zinc-950 relative overflow-hidden shrink-0 ${isCreator ? 'group/hero cursor-pointer' : ''}`}
+          className={`w-full h-[230px] lg:h-[330px] bg-zinc-950 relative overflow-hidden shrink-0 ${isCreator ? 'group/hero cursor-pointer' : ''}`}
           title={isCreator ? (lang === 'vi' ? 'Nhấp vào đây để tải lên ảnh hoặc video cho địa điểm này' : 'Click to upload custom photo or video') : undefined}
         >
           {/* Hidden File Input */}
@@ -246,18 +373,33 @@ export function PlaceDetailModal({
           )}
 
           {/* Main Visual Display */}
-          {resolvedImg ? (
-            <img 
-              src={resolvedImg} 
-              alt={place.name} 
+          {resolvedImg && !heroFailed ? (
+            <Picture
+              src={resolvedImg}
+              alt={place.name}
+              width={1280}
+              height={720}
+              loading="lazy"
+              decoding="async"
+              onError={() => setHeroFailed(true)}
               className={`w-full h-full object-cover transition-transform duration-500 ${isCreator ? 'group-hover/hero:scale-105' : ''}`}
               referrerPolicy="no-referrer"
             />
           ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-900 text-zinc-500">
-              <Compass className="w-12 h-12 text-[#b85233]/40 animate-pulse mb-2" />
-              <span className="text-xs font-serif italic">Capturing Saigon Vibes...</span>
+            <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-900 text-zinc-500 gap-2">
+              <Compass className="w-12 h-12 text-[#b85233]/40" />
+              <span className="text-xs font-serif italic">
+                {NO_PHOTO_LABEL[lang as keyof typeof NO_PHOTO_LABEL] ?? NO_PHOTO_LABEL.en}
+              </span>
             </div>
+          )}
+
+          {/* CC BY-SA requires the author to be credited wherever the image
+              appears, whoever hosts it. */}
+          {creditFor(resolvedImg) && (
+            <p className="absolute bottom-1 right-2 max-w-[85%] truncate text-[9px] text-white/75 bg-black/50 px-1.5 py-0.5 rounded pointer-events-none">
+              {creditFor(resolvedImg)}
+            </p>
           )}
 
           {/* Upload Hover Overlay */}
@@ -383,7 +525,12 @@ export function PlaceDetailModal({
         </div>
 
         {/* --- MAIN SCROLLABLE CONTENT --- */}
-        <div className="flex-1 overflow-y-auto p-5 space-y-5">
+        {/* lg:max-w-[680px]: the dialog is 920px because that is the measure
+            every page uses, but prose wants a narrower one. At the full width a
+            description ran about 110 characters to the line, against the 45-75
+            that is worth aiming for. The frame keeps its width; the reading
+            inside it does not have to. */}
+        <div className="flex-1 overflow-y-auto p-5 lg:p-7 space-y-5">
           
           {/* TAB 1: ABOUT DESCRIPTION */}
           {activeTab === 'about' && (
@@ -409,24 +556,32 @@ export function PlaceDetailModal({
                 </div>
               )}
 
-              <div className="flex items-center gap-1 text-[#b85233]">
-                <Star className="w-4 h-4 fill-current" />
-                <Star className="w-4 h-4 fill-current" />
-                <Star className="w-4 h-4 fill-current" />
-                <Star className="w-4 h-4 fill-current" />
-                <Star className="w-4 h-4 fill-current" />
-                <span className="text-[10px] font-bold ml-1.5 text-zinc-600 font-mono">5.0 (Lục Lam Pick)</span>
-              </div>
-              
-              <div className="p-1">
-                <p className="text-xs leading-relaxed text-zinc-700 font-light whitespace-pre-line">
-                  {place.desc}
-                </p>
-              </div>
+              {/* The words and the clip side by side above lg. Stacked, the
+                  clip's 578px sat beneath a rating and a description in a
+                  content area 514px tall, so two thirds of it was behind the
+                  footer. Beside them it starts at the top and has the height
+                  to itself. Below lg this wrapper does nothing. */}
+              <div className="lg:flex lg:items-start lg:gap-6">
+                <div className="space-y-3 lg:flex-1 lg:min-w-0">
+                <div className="flex items-center gap-1 text-[#b85233]">
+                  <Star className="w-4 h-4 fill-current" />
+                  <Star className="w-4 h-4 fill-current" />
+                  <Star className="w-4 h-4 fill-current" />
+                  <Star className="w-4 h-4 fill-current" />
+                  <Star className="w-4 h-4 fill-current" />
+                  <span className="text-[10px] font-bold ml-1.5 text-zinc-600 font-mono">5.0 (Lục Lam Pick)</span>
+                </div>
+                
+                <div className="p-1">
+                  <p className="text-xs leading-relaxed text-zinc-700 font-light whitespace-pre-line">
+                    {place.desc}
+                  </p>
+                </div>
+                </div>
 
               {/* Dynamic Video Showcase Block */}
               {resolvedVideo && (
-                <div className="mt-4 space-y-2">
+                <div className="mt-4 space-y-2 lg:hidden">
                   <div className="flex items-center gap-2 text-zinc-800 border-b border-zinc-100 pb-2">
                     <div className="w-6 h-6 bg-amber-500/10 rounded-md flex items-center justify-center">
                       <Play className="w-3.5 h-3.5 text-amber-600 fill-current" />
@@ -437,14 +592,74 @@ export function PlaceDetailModal({
                   </div>
                   
                   {embedDetails.type === 'tiktok' ? (
-                    <div className="relative w-full max-w-[320px] mx-auto aspect-[9/16] rounded-2xl overflow-hidden shadow-lg border border-zinc-200/50 bg-black">
-                      <iframe
-                        src={embedDetails.embedUrl}
-                        className="absolute inset-0 w-full h-full border-0"
-                        allow="autoplay; encrypted-media; picture-in-picture"
-                        allowFullScreen
-                        title="TikTok Video Embed"
-                      />
+                    /* Height, not an aspect ratio, and generous rather than
+                       measured.
+
+                       A TikTok embed is more than its video: below the clip come
+                       the handle, the caption with its hashtags, the track name
+                       and a call-to-action bar. Sizing the frame 9/16 fitted the
+                       clip alone, so TikTok's own layout overflowed inside the
+                       iframe and scrolled there — the scrollbar, the clipped
+                       caption, the button sitting over the text.
+
+                       Two boxes, and they are deliberately different sizes. The
+                       outer one is the clip's own 9/16 and crops; the iframe
+                       inside is given far more room than that.
+
+                       A TikTok embed is the clip plus a caption, hashtags, a
+                       track credit and a call-to-action bar, and it publishes no
+                       height for the whole assembly. Matching the iframe to the
+                       outer box made TikTok's layout overflow and scroll inside
+                       itself; making the outer box tall enough for the assembly
+                       left a blank slab under short captions, because caption
+                       length decides the total and captions vary. Neither can be
+                       fixed by a better number — the number is not knowable from
+                       out here.
+
+                       So the iframe gets 1000px, which is more than the assembly
+                       ever needs, and therefore never scrolls; and the crop
+                       shows the clip alone, which is what was wanted from this
+                       and is always exactly 9/16. The chrome is still rendered,
+                       just outside the visible box.
+
+                       What the crop hides, the line below restores in our own
+                       markup: the handle, linking to the original. That is
+                       better than TikTok's own credit for this site, because
+                       text we render is in the HTML a crawler reads, while
+                       everything inside the iframe is invisible to it.
+
+                       lazy because this is a third-party player: it stays
+                       unfetched until scrolled into view, and the modal only
+                       mounts on a click, so no page load carries it. */
+                    <div className="w-full max-w-[325px] mx-auto space-y-1.5">
+                      <div className="relative w-full aspect-[9/16] rounded-2xl overflow-hidden shadow-lg border border-zinc-200/50 bg-black">
+                        <iframe
+                          src={embedDetails.embedUrl}
+                          className="absolute inset-x-0 top-0 w-full border-0"
+                          style={{ height: tiktokHeight ?? 1000 }}
+                          allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+                          allowFullScreen
+                          loading="lazy"
+                          scrolling="no"
+                          title="TikTok Video Embed"
+                        />
+                      </div>
+                      {embedDetails.sourceUrl && (
+                        <a
+                          href={embedDetails.sourceUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="block text-[9px] text-zinc-500 hover:text-zinc-800 transition-colors truncate"
+                        >
+                          {embedDetails.handle
+                            ? `${embedDetails.handle} — ${lang === 'vi' ? 'xem trên TikTok' : lang === 'ja' ? 'TikTok で見る' : 'watch on TikTok'}`
+                            : lang === 'vi'
+                              ? 'Xem video gốc trên TikTok'
+                              : lang === 'ja'
+                                ? 'TikTok で元動画を見る'
+                                : 'Watch the original on TikTok'}
+                        </a>
+                      )}
                     </div>
                   ) : embedDetails.type === 'youtube' ? (
                     <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-lg border border-zinc-200/50 bg-black">
@@ -471,6 +686,7 @@ export function PlaceDetailModal({
                   )}
                 </div>
               )}
+              </div>
 
               {isCreator && (
                 <div className="mt-4 space-y-2 rounded-xl border border-amber-200 bg-amber-50 p-3">
@@ -529,22 +745,11 @@ export function PlaceDetailModal({
                       {lang === 'vi' ? 'Địa chỉ' : lang === 'ja' ? '住所' : lang === 'zh' ? '地址' : 'Address'}
                     </span>
                     <p className="text-xs text-zinc-700 font-medium leading-relaxed break-words">{place.addr}</p>
-                    <button 
-                      onClick={handleCopyAddress}
-                      className="mt-1.5 inline-flex items-center gap-1 text-[9px] text-[#0b433f] font-semibold hover:underline cursor-pointer"
-                    >
-                      {copied ? (
-                        <>
-                          <Check className="w-2.5 h-2.5 text-emerald-500" />
-                          <span className="text-emerald-600">{lang === 'vi' ? 'Đã sao chép!' : 'Copied!'}</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-2.5 h-2.5" />
-                          <span>{lang === 'vi' ? 'Sao chép địa chỉ' : 'Copy address'}</span>
-                        </>
-                      )}
-                    </button>
+                    {/* A second "copy address" stood here, calling the same
+                        handler and carrying the same label as the button in the
+                        footer — both on screen at once, one of them below the
+                        fold. The footer keeps it, because that bar is present on
+                        every tab. */}
                   </div>
                 </div>
 
@@ -576,23 +781,10 @@ export function PlaceDetailModal({
 
               </div>
 
-              {/* Map Call-to-Action Card */}
-              <div className="bg-gradient-to-tr from-[#0b433f] to-[#125e59] text-white rounded-2xl p-4 flex justify-between items-center shadow-md">
-                <div className="space-y-1 pr-3">
-                  <h4 className="text-xs font-bold font-serif">{lang === 'vi' ? 'Tìm đường đi' : lang === 'ja' ? 'ナビゲーション' : 'Get Directions'}</h4>
-                  <p className="text-[10px] text-zinc-200 leading-normal font-light">
-                    {lang === 'vi' ? 'Mở Google Maps và dẫn đường trực tiếp' : lang === 'ja' ? 'Googleマップでルート案内を開く' : 'Launch navigation with Google Maps'}
-                  </p>
-                </div>
-                <a
-                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name + ' ' + place.addr)}`}
-                  target="_blank"
-                  rel="noreferrer referrer"
-                  className="bg-white text-[#0b433f] rounded-full p-2.5 shadow hover:scale-105 active:scale-95 transition-transform"
-                >
-                  <Navigation className="w-4 h-4" />
-                </a>
-              </div>
+              {/* The "Get Directions" card stood here. It opened the same URL
+                  as the Open in Maps button in the footer, which is on screen on
+                  every tab and never scrolls away — so this was a second, larger
+                  copy of a control the reader could already see. */}
             </div>
           )}
 
@@ -612,17 +804,24 @@ export function PlaceDetailModal({
                 </p>
               </div>
 
-              {/* Safety notice for travelers */}
-              <div className="bg-zinc-100 rounded-2xl p-4 flex gap-3 text-[10px] text-zinc-600 leading-relaxed items-start">
-                <Info className="w-4 h-4 text-zinc-500 shrink-0 mt-0.5" />
-                <p>
-                  {lang === 'vi' 
-                    ? 'Bạn có thể chỉnh sửa mô tả địa điểm này, hình ảnh và video hiển thị trực tiếp từ bảng Creator Studio ở góc màn hình!' 
-                    : lang === 'ja'
-                    ? 'この場所の紹介文、写真、動画は、画面の隅にある「Creator Studio」から直接編集できます。'
-                    : 'You can modify this description, photo, and playing video directly from the Creator Studio panel on the desktop layout!'}
-                </p>
-              </div>
+              {/* Instructions for whoever maintains the guide, not for its
+                  readers — it points at a panel a visitor has no way to open.
+                  The comment above this block used to call it a safety notice
+                  for travellers, which is how it ended up shown to everyone.
+                  Every other editing affordance in this file is already behind
+                  isCreator; this one had been missed. */}
+              {isCreator && (
+                <div className="bg-zinc-100 rounded-2xl p-4 flex gap-3 text-[10px] text-zinc-600 leading-relaxed items-start">
+                  <Info className="w-4 h-4 text-zinc-500 shrink-0 mt-0.5" />
+                  <p>
+                    {lang === 'vi'
+                      ? 'Bạn có thể chỉnh sửa mô tả địa điểm này, hình ảnh và video hiển thị trực tiếp từ bảng Creator Studio ở góc màn hình!'
+                      : lang === 'ja'
+                      ? 'この場所の紹介文、写真、動画は、画面の隅にある「Creator Studio」から直接編集できます。'
+                      : 'You can modify this description, photo, and playing video directly from the Creator Studio panel on the desktop layout!'}
+                  </p>
+                </div>
+              )}
             </div>
           )}
 
@@ -657,6 +856,7 @@ export function PlaceDetailModal({
           </a>
         </div>
 
+        </div>
       </div>
     </div>
   );

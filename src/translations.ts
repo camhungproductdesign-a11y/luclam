@@ -4,6 +4,26 @@ export const translations = {
   ja: {
     title: 'サイゴン・ポケットガイド',
     subtitle: 'サイゴン散策＆限定おもてなしガイド',
+    faq: [
+      { q: 'ルクラムはホーチミン市のどこにありますか？', a: 'ルクラムは{{address}}にあります。' },
+      { q: 'ルクラムの営業時間は？', a: '年中無休、{{hours}}です。' },
+      { q: 'サイゴンでの移動はどうすれば安全ですか？', a: '配車アプリ（{{apps}}）なら料金が事前に表示されます。流しのタクシーなら{{taxis}}が安心で、メーターが動いているか確認してください。' },
+      { q: 'サイゴンでの移動費用はどれくらいですか？', a: 'バイクの短距離で約{{fareBike}}、車なら{{fareCar}}ほどです。天候や時間帯で変わります。' },
+      { q: 'ベンタイン市場はどこにありますか？', a: 'ホーチミン市1区ベンタイン坊にあります。' },
+      { q: 'ルクラムではどんなお茶を扱っていますか？', a: '{{teas}}。価格は{{priceFrom}}からです。' },
+      { q: 'このガイドは何語で読めますか？', a: '{{languages}}。' },
+      { q: 'バイクの多い道路はどう渡ればいいですか？', a: 'ゆっくり一定の速度で歩き、立ち止まったり走ったりしないでください。運転者は歩行者の進路を見て、後ろを回って避けてくれます。' },
+      { q: 'ルクラムの店舗はどこにありますか？', a: '{{storeCount}}店舗あります：{{stores}}。お問い合わせは{{phone}}または{{email}}へ。' },
+    ],
+    contact: {
+      heading: 'ルクラムへのお問い合わせ',
+      stores: '店舗一覧',
+      phone: '電話',
+      email: 'メール',
+      office: '本社',
+      licence: '事業登録番号',
+    },
+    faqHeading: 'よくある質問',
     brand: 'LỤC LAM',
     author: 'ルックラム (Lục Lam)',
     pages: {
@@ -32,6 +52,7 @@ shopping: 'お買い物',
       highlight: 'サイゴンが、あなたを待っています。',
       videoTitle: '\\\\ 旅の動画 //',
       videoDesc: 'サイゴンの魅力を動画でチェック！街の雰囲気やおすすめスポットを紹介しています。',
+      coffeeTitle: '塩コーヒー & ココナッツコーヒー',
       features: [
         { title: 'フレンドリーな人々', desc: 'サイゴンの人々は明るく親切。道を尋ねても、笑顔で助けてくれます。' },
         { title: '美食の街', desc: 'フォーやバインミー、コーヒーまで。食の楽しみは尽きません。' },
@@ -131,10 +152,10 @@ shopping: 'お買い物',
         }
       ],
       options: [
-        { name: 'Grab Bike (バイク便)', desc: '最も安く、渋滞をすり抜けて最速で移動できる手段。ヘルメットが支給されます。' },
-        { name: 'Grab Car (普通車)', desc: '快適でエアコンが効いた安全な移動手段。最大4〜7名まで乗車可能。' },
-        { name: 'メトロ (都市鉄道)', desc: 'サイゴン初の都市鉄道。1区から隣接エリアを快適に結びます。' },
-        { name: '一般タクシー', desc: 'ビナサンやマイリンなど。メーター制で信頼性が高く、街頭で拾うのに適しています。' }
+        { name: 'Grab Bike (バイク便)', desc: '最も安く、渋滞をすり抜けて最速で移動できる手段。ヘルメットが支給されます。', payment: 'アプリ / 現金', fares: ['15k-25k', '25k-40k', '40k-70k'] },
+        { name: 'Grab Car (普通車)', desc: '快適でエアコンが効いた安全な移動手段。最大4〜7名まで乗車可能。', payment: 'アプリ / 現金', fares: ['40k-70k', '70k-120k', '120k-200k'] },
+        { name: 'メトロ (都市鉄道)', desc: 'サイゴン初の都市鉄道。1区から隣接エリアを快適に結びます。', payment: 'カード / 現金', fares: ['7k-10k', '10k-15k', '15k-20k'] },
+        { name: '一般タクシー', desc: 'ビナサンやマイリンなど。メーター制で信頼性が高く、街頭で拾うのに適しています。', payment: '現金 / カード', fares: ['20k-40k', '50k-90k', '90k-150k'] }
       ],
       tableTitle: '料金の目安 (VND)',
       tableHeaders: ['移動手段', '1-2 km', '3-5 km', '5-10 km', '支払方法'],
@@ -545,7 +566,7 @@ shopping: 'お買い物',
       {
         category: 'spiritual',
         name: '永厳寺 (ビンギエム寺)',
-        sub: '南部最大級 of 敷地を誇る、格調高い仏教寺院',
+        sub: '南部最大級の敷地を誇る、格調高い仏教寺院',
         desc: '見事な彫刻が施された高さ40メートルの七重の石塔が有名。ベトナム北部の伝統的な伽藍配置を近代的なコンクリート技術で再現した名刹です。',
         addr: '339 Nam Kỳ Khởi Nghĩa, Võ Thị Sáu, Quận 3',
         hours: '07:00 - 20:00',
@@ -636,7 +657,7 @@ shopping: 'お買い物',
         category: 'modern',
         name: 'バイクで行く市内探検ツアー',
         sub: 'サイゴンの圧倒的な生活の鼓動をダイレクトに体験',
-        desc: 'ローカルライダーの背中に乗って細い路地をすり抜け、溢れかえるバイク of 波と一体になる体験。ストリートの喧騒と美しい夜風を一度に浴びる、最もリアルな旅。',
+        desc: 'ローカルライダーの背中に乗って細い路地をすり抜け、溢れかえるバイクの波と一体になる体験。ストリートの喧騒と美しい夜風を一度に浴びる、最もリアルな旅。',
         addr: 'ホーチミン市中心部全域',
         hours: '終日・夜間（フレキシブル）',
         price: 'ツアー会社による',
@@ -737,7 +758,7 @@ shopping: 'お買い物',
     },
     luclam: {
       title: 'Lục Lam 伝統文化休憩所',
-      subtitle: 'Trạm Dừng Chân Lục Lam',
+      subtitle: 'Lục Lam 伝統文化休憩所',
       intro: 'ベトナムの香り高い手作りハーブティー、自家焙煎コーヒー、そして優しい伝統のお菓子でおもてなし。伝統と安らぎが調和する、旅人のオアシス。',
       aboutHeading: 'Lục Lam（ルックラム）について',
       aboutText: '都会の喧騒から離れた路地にひっそりと佇むルックラムは、ベトナム全国から厳選したオーガニック草本茶、手作りのお茶菓子、そして温かい職人魂の工芸品を集めた伝統文化スペースです。レトロなインドシナ様式のインテリアに囲まれながら、ベトナムに古くから伝わる伝統健康法や、ゆったりとした時間をご堪能ください。',
@@ -747,31 +768,31 @@ shopping: 'お買い物',
           name: 'Red Lava (レッドラヴァ ハーブティー)',
           desc: 'ハイビスカス（ローゼル）、鮮やかなオレンジ、シナモンのブレンド。甘酸っぱく香り高いビタミンCたっぷりのハーブティー。',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/frame_vu_ng_tet__12__bdc76c1b293c45c5ae8e8711482ea43a_large.png'
+          image: '/uploads/external/f999d37a9141.png'
         },
         {
           name: 'Velvet Rose (ベルベットローズ ティー)',
           desc: '厳選されたフレンチローズとジャスミンの優雅なハーモニー。華やかな香りで心を潤し、美肌効果をもたらす人気ティー。',
           price: '175,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/105_fbb0f752824b4b008cd70dabecbcdeb3_large.png'
+          image: '/uploads/external/08f6bea23e45.png'
         },
         {
           name: 'Violet Jasmine (バイオレットジャスミン ティー)',
           desc: '高山オーガニック緑茶に天然ジャスミンの花香を熟成。澄んだ高貴な香りが心身を爽やかに包み込みます。',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/106_d09a9c06a44742e58bd5765025c6ded7_large.png'
+          image: '/uploads/external/36b26e2fbdad.png'
         },
         {
           name: 'Golden Peach (ゴールデンピーチ ハーブティー)',
           desc: '芳醇な黄桃の甘香と天然ハチミツ、ハーブの優しくフルーティーな調和。心満たされる爽快な味わい。',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/103_37d008a17e654d88822f5e985a659700_large.png'
+          image: '/uploads/external/1f59277c65ac.png'
         },
         {
           name: 'Zen Relaxing (ゼンリラクシング ティー)',
           desc: 'カモミール、ハスの実の芯、ラベンダーの優しいハーモニー。旅の緊張をほぐし、心地よい眠りへと誘います。',
           price: '185,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/107_13b87a4b48264fef9e08be066a6e9d4d_large.png'
+          image: '/uploads/external/4a7899959ecc.png'
         }
       ],
       voucherHeading: '旅行者様限定・特別クーポン',
@@ -813,6 +834,26 @@ shopping: 'お買い物',
   vi: {
     title: 'Cẩm Nang Bỏ Túi Sài Gòn',
     subtitle: 'Hướng dẫn dạo phố & ưu đãi độc quyền',
+    faq: [
+      { q: 'Lục Lam ở đâu tại Thành phố Hồ Chí Minh?', a: 'Lục Lam nằm tại {{address}}.' },
+      { q: 'Lục Lam mở cửa mấy giờ?', a: 'Mở cửa tất cả các ngày, từ {{hours}}.' },
+      { q: 'Đi lại ở Sài Gòn thế nào cho an toàn?', a: 'Dùng ứng dụng gọi xe ({{apps}}) vì giá hiện trước khi đặt. Nếu bắt taxi dọc đường, hãy chọn {{taxis}} và đảm bảo đồng hồ tính tiền được bật.' },
+      { q: 'Đi lại ở Sài Gòn tốn khoảng bao nhiêu?', a: 'Khoảng {{fareBike}} cho một chặng ngắn bằng xe máy, {{fareCar}} nếu đi ô tô. Giá thay đổi theo thời tiết và giờ cao điểm.' },
+      { q: 'Chợ Bến Thành nằm ở đâu?', a: 'Chợ Bến Thành thuộc Phường Bến Thành, Quận 1, Thành phố Hồ Chí Minh.' },
+      { q: 'Lục Lam bán những loại trà nào?', a: '{{teas}}. Giá từ {{priceFrom}}.' },
+      { q: 'Cẩm nang này có những ngôn ngữ nào?', a: '{{languages}}.' },
+      { q: 'Làm sao qua đường giữa dòng xe máy?', a: 'Đi chậm và đều bước, không dừng lại cũng không chạy. Người lái xe máy quan sát quỹ đạo của bạn và sẽ lách qua phía sau.' },
+      { q: 'Lục Lam có những cửa hàng nào?', a: 'Có {{storeCount}} cửa hàng: {{stores}}. Gọi {{phone}} hoặc email {{email}} để được hỗ trợ.' },
+    ],
+    contact: {
+      heading: 'Liên hệ Lục Lam',
+      stores: 'Hệ thống cửa hàng',
+      phone: 'Điện thoại',
+      email: 'Email',
+      office: 'Trụ sở',
+      licence: 'Giấy phép kinh doanh',
+    },
+    faqHeading: 'Câu hỏi thường gặp',
     brand: 'LỤC LAM',
     author: 'Lục Lam',
     pages: {
@@ -841,6 +882,7 @@ shopping: 'Mua sắm',
       highlight: 'Sài Gòn luôn chào đón bạn với vòng tay rộng mở!',
       videoTitle: '\\\\ Video Hành Trình //',
       videoDesc: 'Khám phá vẻ đẹp Sài Gòn qua những thước phim chân thực, sống động nhất!',
+      coffeeTitle: 'Cà Phê Muối & Cà Phê Dừa',
       features: [
         { title: 'Con người thân thiện', desc: 'Người Sài Gòn hào sảng, hiếu khách. Họ sẵn sàng chỉ đường tận tình với nụ cười ấm áp.' },
         { title: 'Thiên đường ẩm thực', desc: 'Từ Phở, Bánh mì đến ly cà phê sữa đá đậm đà, ẩm thực Sài Gòn làm say lòng mọi du khách.' },
@@ -940,10 +982,10 @@ shopping: 'Mua sắm',
         }
       ],
       options: [
-        { name: 'Grab Bike (Xe ôm)', desc: 'Cách nhanh nhất và tiết kiệm nhất để di chuyển qua những con phố đông đúc. Được trang bị mũ bảo hiểm.' },
-        { name: 'Grab Car (Ô tô)', desc: 'Di chuyển an toàn, mát mẻ và thoải mái. Thích hợp cho nhóm từ 4-7 người.' },
-        { name: 'Metro (Đường sắt đô thị)', desc: 'Tuyến đường sắt đô thị đầu tiên của Sài Gòn, kết nối Quận 1 với các khu vực lân cận.' },
-        { name: 'Taxi truyền thống', desc: 'Các hãng lớn uy tín như Vinasun, Mai Linh. Thích hợp khi bắt trực tiếp trên đường.' }
+        { name: 'Grab Bike (Xe ôm)', desc: 'Cách nhanh nhất và tiết kiệm nhất để di chuyển qua những con phố đông đúc. Được trang bị mũ bảo hiểm.', payment: 'App / Tiền mặt', fares: ['15k-25k', '25k-40k', '40k-70k'] },
+        { name: 'Grab Car (Ô tô)', desc: 'Di chuyển an toàn, mát mẻ và thoải mái. Thích hợp cho nhóm từ 4-7 người.', payment: 'App / Tiền mặt', fares: ['40k-70k', '70k-120k', '120k-200k'] },
+        { name: 'Metro (Đường sắt đô thị)', desc: 'Tuyến đường sắt đô thị đầu tiên của Sài Gòn, kết nối Quận 1 với các khu vực lân cận.', payment: 'Thẻ / Tiền mặt', fares: ['7k-10k', '10k-15k', '15k-20k'] },
+        { name: 'Taxi truyền thống', desc: 'Các hãng lớn uy tín như Vinasun, Mai Linh. Thích hợp khi bắt trực tiếp trên đường.', payment: 'Tiền mặt / Thẻ', fares: ['20k-40k', '50k-90k', '90k-150k'] }
       ],
       tableTitle: 'Bảng giá ước tính (VND)',
       tableHeaders: ['Phương tiện', '1-2 km', '3-5 km', '5-10 km', 'Thanh toán'],
@@ -1556,31 +1598,31 @@ shopping: 'Mua sắm',
           name: 'Trà Red Lava (Nham Thạch Đỏ)',
           desc: 'Sự kết hợp rực rỡ giữa hoa atiso đỏ (hibiscus), cam lát sấy và quế thơm. Vị chua thanh, nồng nã, giàu vitamin C giúp xua tan mệt mỏi hành trình.',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/frame_vu_ng_tet__12__bdc76c1b293c45c5ae8e8711482ea43a_large.png'
+          image: '/uploads/external/f999d37a9141.png'
         },
         {
           name: 'Trà Velvet Rose (Hồng Nhung)',
           desc: 'Nụ hoa hồng Pháp chọn lọc kết hợp cùng nụ nhài và cúc la mã. Hương thơm nồng nàn quyến rũ, nuôi dưỡng làn da và giúp tâm trí thư thái.',
           price: '175,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/105_fbb0f752824b4b008cd70dabecbcdeb3_large.png'
+          image: '/uploads/external/08f6bea23e45.png'
         },
         {
           name: 'Trà Violet Jasmine (Lài Tím)',
           desc: 'Trà xanh hữu cơ ướp hoa lài tự nhiên tinh khiết. Hương hoa thanh tao quyến rũ giúp tâm trí nhẹ nhàng, tươi mát sảng khoái.',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/106_d09a9c06a44742e58bd5765025c6ded7_large.png'
+          image: '/uploads/external/36b26e2fbdad.png'
         },
         {
           name: 'Trà Golden Peach (Đào Hoàng Kim)',
           desc: 'Thảo mộc vị đào hoàng kim dịu ngọt hòa quyện cùng mật ong thiên nhiên. Vị ngọt hậu thanh mát, đượm hương trái cây nhiệt đới.',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/103_37d008a17e654d88822f5e985a659700_large.png'
+          image: '/uploads/external/1f59277c65ac.png'
         },
         {
           name: 'Trà Zen Relaxing (Thư Giãn Định Tâm)',
           desc: 'Sự kết hợp dịu nhẹ giữa hoa cúc La Mã, tâm sen và oải hương. Liệu pháp tự nhiên giảm căng thẳng, xoa dịu thần kinh và mang lại giấc ngủ an lành.',
           price: '185,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/107_13b87a4b48264fef9e08be066a6e9d4d_large.png'
+          image: '/uploads/external/4a7899959ecc.png'
         }
       ],
       voucherHeading: 'Quà Tặng Đặc Quyền Cho Du Khách',
@@ -1622,6 +1664,26 @@ shopping: 'Mua sắm',
   zh: {
     title: '西贡口袋指南',
     subtitle: '西贡漫步与独家款待指南',
+    faq: [
+      { q: '绿蓝（Lục Lam）在胡志明市的哪里？', a: '绿蓝位于{{address}}。' },
+      { q: '绿蓝的营业时间是？', a: '每天营业，{{hours}}。' },
+      { q: '在西贡怎样出行才安全？', a: '使用打车应用（{{apps}}），下单前就能看到价格。路边拦车请选择{{taxis}}，并确认打表。' },
+      { q: '在西贡出行大概要花多少钱？', a: '摩托车短途约{{fareBike}}，汽车约{{fareCar}}。价格随天气和高峰时段浮动。' },
+      { q: '滨城市场在哪里？', a: '位于胡志明市第一郡滨城坊。' },
+      { q: '绿蓝有哪些茶？', a: '{{teas}}。价格自{{priceFrom}}起。' },
+      { q: '这本指南有哪些语言版本？', a: '{{languages}}。' },
+      { q: '摩托车很多的路口该怎么过？', a: '保持匀速慢慢走，不要停下也不要跑。骑手会预判你的路线，从你身后绕过去。' },
+      { q: '在哪里可以买到绿蓝的茶？', a: '共{{storeCount}}家门店：{{stores}}。可拨打{{phone}}或发送邮件至{{email}}。' },
+    ],
+    contact: {
+      heading: '联系绿蓝',
+      stores: '门店一览',
+      phone: '电话',
+      email: '邮箱',
+      office: '总部',
+      licence: '营业执照号',
+    },
+    faqHeading: '常见问题',
     brand: 'LỤC LAM',
     author: 'Lục Lam',
     pages: {
@@ -1650,6 +1712,7 @@ shopping: '特色购物',
       highlight: '西贡伸出双臂，随时热烈欢迎您的到来！',
       videoTitle: '\\\\ 旅途影像 //',
       videoDesc: '通过精美真实的镜头，抢先领略西贡散步的独特魅力与风情！',
+      coffeeTitle: '海盐咖啡 & 椰子咖啡',
       features: [
         { title: '热情的本地人', desc: '西贡人性格豪爽且乐于助人，总是带着温暖的微笑为您指路。' },
         { title: '美食的天堂', desc: '从经典的越南粉、法包到浓郁的冰奶咖啡，每一口都是西贡专属的极致味觉。' },
@@ -1749,10 +1812,10 @@ shopping: '特色购物',
         }
       ],
       options: [
-        { name: 'Grab Bike (摩托车)', desc: '最快且最省钱 of 出行方式，可以轻松穿过拥堵的街道。司机会提供头盔。' },
-        { name: 'Grab Car (汽车)', desc: '安全、凉爽且舒适的选择。适合4-7人的团体。' },
-        { name: '地铁 (城市轨道交通)', desc: '西贡首条城市轨道交通线，连接第1区和周边区域。' },
-        { name: '传统出租车', desc: '如 Vinasun 和 Mai Linh 等正规大品牌，适合在路边直接招手拦车。' }
+        { name: 'Grab Bike (摩托车)', desc: '最快且最省钱的出行方式，可以轻松穿过拥堵的街道。司机会提供头盔。', payment: 'App / 现金', fares: ['15k-25k', '25k-40k', '40k-70k'] },
+        { name: 'Grab Car (汽车)', desc: '安全、凉爽且舒适的选择。适合4-7人的团体。', payment: 'App / 现金', fares: ['40k-70k', '70k-120k', '120k-200k'] },
+        { name: '地铁 (城市轨道交通)', desc: '西贡首条城市轨道交通线，连接第1区和周边区域。', payment: '刷卡 / 现金', fares: ['7k-10k', '10k-15k', '15k-20k'] },
+        { name: '传统出租车', desc: '如 Vinasun 和 Mai Linh 等正规大品牌，适合在路边直接招手拦车。', payment: '现金 / 刷卡', fares: ['20k-40k', '50k-90k', '90k-150k'] }
       ],
       tableTitle: '估算价格表 (VND)',
       tableHeaders: ['出行方式', '1-2 公里', '3-5 公里', '5-10 公里', '支付方式'],
@@ -2355,7 +2418,7 @@ shopping: '特色购物',
     },
     luclam: {
       title: 'Lục Lam 传统文化驿站',
-      subtitle: 'Trạm Dừng Chân Lục Lam',
+      subtitle: 'Lục Lam 传统文化驿站',
       intro: '融合了精湛手作草本茶、匠心纯咖啡及精美传统手工艺术品。在这个温馨怀旧的慢空间中，体会纯粹的越南好客款待。',
       aboutHeading: '关于 Lục Lam',
       aboutText: '隐蔽在西贡古雅里弄中的 Lục Lam，是一座源于对越南草本文化、精品手冲咖啡和传统器物热爱的文化歇脚点。在充满19世纪印度支那（Indochine）风情的光影与香气里，我们为您奉上调理身心的古法茶饮，让您在繁华都市中独享一份安宁。',
@@ -2365,31 +2428,31 @@ shopping: '特色购物',
           name: 'Red Lava (红熔岩草本茶)',
           desc: '精选红宝石洛神花（玫瑰茄）、鲜橙片与桂皮的完美融汇。酸甜馥郁，富含天然维C与抗氧化成分，舒缓旅途劳顿。',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/frame_vu_ng_tet__12__bdc76c1b293c45c5ae8e8711482ea43a_large.png'
+          image: '/uploads/external/f999d37a9141.png'
         },
         {
           name: 'Velvet Rose (丝绒玫瑰茶)',
           desc: '严选法国粉玫瑰花蕾，搭配清雅茉莉与甘菊。花香缭绕优雅，滋润肌肤并舒缓身心压力。',
           price: '175,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/105_fbb0f752824b4b008cd70dabecbcdeb3_large.png'
+          image: '/uploads/external/08f6bea23e45.png'
         },
         {
           name: 'Violet Jasmine (紫罗兰茉莉茶)',
           desc: '高山有机绿茶吸融鲜采茉莉花香，辅以紫罗兰天然芳草。清甜回甘，令人神清气爽。',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/106_d09a9c06a44742e58bd5765025c6ded7_large.png'
+          image: '/uploads/external/36b26e2fbdad.png'
         },
         {
           name: 'Golden Peach (金桃草本茶)',
           desc: '多汁黄桃果香与天然野蜂蜜及草本精香揉合。口感甘甜清爽，是暖心夏日的沁凉首选。',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/103_37d008a17e654d88822f5e985a659700_large.png'
+          image: '/uploads/external/1f59277c65ac.png'
         },
         {
           name: 'Zen Relaxing (禅意舒缓茶)',
           desc: '天然洋甘菊、莲子芯与薰衣草的精妙拼配。有助于安神定志、平抚焦虑，引导您进入甜美梦乡。',
           price: '185,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/107_13b87a4b48264fef9e08be066a6e9d4d_large.png'
+          image: '/uploads/external/4a7899959ecc.png'
         }
       ],
       voucherHeading: '旅行者独家尊享礼遇',
@@ -2431,6 +2494,26 @@ shopping: '特色购物',
   zht: {
     title: '西貢口袋指南',
     subtitle: '西貢漫步與獨家款待指南',
+    faq: [
+      { q: '綠藍（Lục Lam）在胡志明市的哪裡？', a: '綠藍位於{{address}}。' },
+      { q: '綠藍的營業時間是？', a: '每天營業，{{hours}}。' },
+      { q: '在西貢怎樣出行才安全？', a: '使用叫車應用程式（{{apps}}），下單前就能看到價格。路邊攔車請選擇{{taxis}}，並確認跳表。' },
+      { q: '在西貢出行大概要花多少錢？', a: '機車短途約{{fareBike}}，汽車約{{fareCar}}。價格隨天氣和尖峰時段浮動。' },
+      { q: '濱城市場在哪裡？', a: '位於胡志明市第一郡濱城坊。' },
+      { q: '綠藍有哪些茶？', a: '{{teas}}。價格自{{priceFrom}}起。' },
+      { q: '這本指南有哪些語言版本？', a: '{{languages}}。' },
+      { q: '機車很多的路口該怎麼過？', a: '保持等速慢慢走，不要停下也不要跑。騎士會預判你的路線，從你身後繞過去。' },
+      { q: '在哪裡可以買到綠藍的茶？', a: '共{{storeCount}}家門市：{{stores}}。可撥打{{phone}}或寄信至{{email}}。' },
+    ],
+    contact: {
+      heading: '聯絡綠藍',
+      stores: '門市一覽',
+      phone: '電話',
+      email: '信箱',
+      office: '總部',
+      licence: '營業執照號',
+    },
+    faqHeading: '常見問題',
     brand: 'LỤC LAM',
     author: 'Lục Lam',
     pages: {
@@ -2459,6 +2542,7 @@ shopping: '特色購物',
       highlight: '西貢伸出雙臂，隨時熱烈歡迎您的到來！',
       videoTitle: '\\\\ 旅途影像 //',
       videoDesc: '通過精美真實的鏡頭，搶先領略西貢散步的獨特魅力與風情！',
+      coffeeTitle: '海鹽咖啡 & 椰子咖啡',
       features: [
         { title: '熱情的本地人', desc: '西貢人性格豪爽且樂於助人，總是帶著溫暖的微笑為您指路。' },
         { title: '美食的天堂', desc: '從經典的越南粉、法包到濃郁的冰奶咖啡，每一口都是西貢專屬的極致味覺。' },
@@ -2558,10 +2642,10 @@ shopping: '特色購物',
         }
       ],
       options: [
-        { name: 'Grab Bike (摩托車)', desc: '最快且最省錢 of 出行方式，可以輕松穿過擁堵的街道。司機會提供頭盔。' },
-        { name: 'Grab Car (汽車)', desc: '安全、涼爽且舒適的選擇。適合4-7人的團體。' },
-        { name: '地鐵 (城市軌道交通)', desc: '西貢首條城市軌道交通線，連接第1區和周邊區域。' },
-        { name: '傳統出租車', desc: '如 Vinasun 和 Mai Linh 等正規大品牌，適合在路邊直接招手攔車。' }
+        { name: 'Grab Bike (摩托車)', desc: '最快且最省錢的出行方式，可以輕鬆穿過擁堵的街道。司機會提供頭盔。', payment: 'App / 現金', fares: ['15k-25k', '25k-40k', '40k-70k'] },
+        { name: 'Grab Car (汽車)', desc: '安全、涼爽且舒適的選擇。適合4-7人的團體。', payment: 'App / 現金', fares: ['40k-70k', '70k-120k', '120k-200k'] },
+        { name: '地鐵 (城市軌道交通)', desc: '西貢首條城市軌道交通線，連接第1區和周邊區域。', payment: '刷卡 / 現金', fares: ['7k-10k', '10k-15k', '15k-20k'] },
+        { name: '傳統出租車', desc: '如 Vinasun 和 Mai Linh 等正規大品牌，適合在路邊直接招手攔車。', payment: '現金 / 刷卡', fares: ['20k-40k', '50k-90k', '90k-150k'] }
       ],
       tableTitle: '估算價格表 (VND)',
       tableHeaders: ['出行方式', '1-2 公里', '3-5 公里', '5-10 公里', '支付方式'],
@@ -3164,7 +3248,7 @@ shopping: '特色購物',
     },
     luclam: {
       title: 'Lục Lam 傳統文化驛站',
-      subtitle: 'Trạm Dừng Chân Lục Lam',
+      subtitle: 'Lục Lam 傳統文化驛站',
       intro: '融合了精湛手作草本茶、匠心純咖啡及精美傳統手工藝術品。在這個溫馨懷舊的慢空間中，體會純粹的越南好客款待。',
       aboutHeading: '關於 Lục Lam',
       aboutText: '隱蔽在西貢古雅裡弄中的 Lục Lam，是一座源於對越南草本文化、精品手沖咖啡和傳統器物熱愛的文化歇腳點。在充滿19世紀印度支那（Indochine）風情的光影與香氣裡，我們為您奉上調理身心的古法茶飲，讓您在繁華都市中獨享一份安寧。',
@@ -3174,31 +3258,31 @@ shopping: '特色購物',
           name: 'Red Lava (紅熔岩草本茶)',
           desc: '精選紅寶石洛神花（玫瑰茄）、鮮橙片與桂皮的完美融匯。酸甜馥鬱，富含天然維C與抗氧化成分，舒緩旅途勞頓。',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/frame_vu_ng_tet__12__bdc76c1b293c45c5ae8e8711482ea43a_large.png'
+          image: '/uploads/external/f999d37a9141.png'
         },
         {
           name: 'Velvet Rose (絲絨玫瑰茶)',
           desc: '嚴選法國粉玫瑰花蕾，搭配清雅茉莉與甘菊。花香繚繞優雅，滋潤肌膚並舒緩身心壓力。',
           price: '175,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/105_fbb0f752824b4b008cd70dabecbcdeb3_large.png'
+          image: '/uploads/external/08f6bea23e45.png'
         },
         {
           name: 'Violet Jasmine (紫羅蘭茉莉茶)',
           desc: '高山有機綠茶吸融鮮採茉莉花香，輔以紫羅蘭天然芳草。清甜回甘，令人神清氣爽。',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/106_d09a9c06a44742e58bd5765025c6ded7_large.png'
+          image: '/uploads/external/36b26e2fbdad.png'
         },
         {
           name: 'Golden Peach (金桃草本茶)',
           desc: '多汁黃桃果香與天然野蜂蜜及草本精香揉合。口感甘甜清爽，是暖心夏日的沁涼首選。',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/103_37d008a17e654d88822f5e985a659700_large.png'
+          image: '/uploads/external/1f59277c65ac.png'
         },
         {
           name: 'Zen Relaxing (禪意舒緩茶)',
           desc: '天然洋甘菊、蓮子芯與薰衣草的精妙複配。有助於安神定志、平撫焦慮，引導您進入甜美夢鄉。',
           price: '185,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/107_13b87a4b48264fef9e08be066a6e9d4d_large.png'
+          image: '/uploads/external/4a7899959ecc.png'
         }
       ],
       voucherHeading: '旅行者獨家尊享禮遇',
@@ -3240,6 +3324,26 @@ shopping: '特色購物',
   en: {
     title: 'Saigon Pocket Guide',
     subtitle: 'Saigon strolls & exclusive hospitality guide',
+    faq: [
+      { q: 'Where is Lục Lam in Ho Chi Minh City?', a: 'Lục Lam is at {{address}}.' },
+      { q: 'What are Lục Lam’s opening hours?', a: 'Open every day, {{hours}}.' },
+      { q: 'How do I get around Saigon safely?', a: 'Use a ride-hailing app ({{apps}}) — the fare is shown before you book. For street taxis, {{taxis}} are the reliable brands; check the meter is running.' },
+      { q: 'How much does getting around Saigon cost?', a: 'Around {{fareBike}} for a short motorbike trip and {{fareCar}} by car. Fares vary with weather and rush hour.' },
+      { q: 'Where is Bến Thành Market?', a: 'Bến Thành Market is in Bến Thành Ward, District 1, Ho Chi Minh City.' },
+      { q: 'What teas does Lục Lam sell?', a: '{{teas}}. Prices from {{priceFrom}}.' },
+      { q: 'Which languages is this guide available in?', a: '{{languages}}.' },
+      { q: 'How do I cross a street full of motorbikes?', a: 'Walk slowly at a steady pace, and do not stop or run. Riders read your path and steer around behind you.' },
+      { q: 'Where can I buy Lục Lam tea?', a: '{{storeCount}} shops: {{stores}}. Call {{phone}} or email {{email}}.' },
+    ],
+    contact: {
+      heading: 'Contact Lục Lam',
+      stores: 'Our shops',
+      phone: 'Phone',
+      email: 'Email',
+      office: 'Head office',
+      licence: 'Business registration',
+    },
+    faqHeading: 'Frequently asked questions',
     brand: 'LỤC LAM',
     author: 'Luc Lam',
     pages: {
@@ -3268,6 +3372,7 @@ shopping: 'Shop Local',
       highlight: 'Saigon welcomes you with warm hearts!',
       videoTitle: '\\\\ Journey Reel //',
       videoDesc: 'Discover the ultimate charm of Saigon street strolls in this cinematic video compilation!',
+      coffeeTitle: 'Salt Coffee & Coconut Coffee',
       features: [
         { title: 'Friendly Locals', desc: 'Saigonese are notoriously warm and helpful. Ask for directions, and you will receive genuine smiles.' },
         { title: 'Foodies’ Paradise', desc: 'From classic Pho and Banh Mi to robust iced filter coffee, eating is a non-stop pleasure.' },
@@ -3367,10 +3472,10 @@ shopping: 'Shop Local',
         }
       ],
       options: [
-        { name: 'Grab Bike (Motorbike)', desc: 'The fastest and cheapest way to navigate through busy streets. Driver provides a helmet.' },
-        { name: 'Grab Car (Car)', desc: 'Safe, cool, and comfortable transit option. Suitable for groups of 4-7 people.' },
-        { name: 'Metro (Urban Rail)', desc: 'Saigon\'s first urban railway line, connecting District 1 with neighboring areas.' },
-        { name: 'Traditional Taxi', desc: 'Reputable brands like Vinasun and Mai Linh, ideal for hailing on the street.' }
+        { name: 'Grab Bike (Motorbike)', desc: 'The fastest and cheapest way to navigate through busy streets. Driver provides a helmet.', payment: 'App / Cash', fares: ['15k-25k', '25k-40k', '40k-70k'] },
+        { name: 'Grab Car (Car)', desc: 'Safe, cool, and comfortable transit option. Suitable for groups of 4-7 people.', payment: 'App / Cash', fares: ['40k-70k', '70k-120k', '120k-200k'] },
+        { name: 'Metro (Urban Rail)', desc: 'Saigon\'s first urban railway line, connecting District 1 with neighboring areas.', payment: 'Card / Cash', fares: ['7k-10k', '10k-15k', '15k-20k'] },
+        { name: 'Traditional Taxi', desc: 'Reputable brands like Vinasun and Mai Linh, ideal for hailing on the street.', payment: 'Cash / Card', fares: ['20k-40k', '50k-90k', '90k-150k'] }
       ],
       tableTitle: 'Estimated Pricing (VND)',
       tableHeaders: ['Type', '1-2 km', '3-5 km', '5-10 km', 'Payment'],
@@ -3973,7 +4078,7 @@ shopping: 'Shop Local',
     },
     luclam: {
       title: 'Lục Lam Cultural Rest Stop',
-      subtitle: 'Trạm Dừng Chân Lục Lam',
+      subtitle: 'Lục Lam Cultural Rest Stop',
       intro: 'A cultural tea oasis blending artisan Vietnamese herbal teas, organic coffee, and handmade traditional delicacies. Find absolute peace in our cozy Indochine sanctuary.',
       aboutHeading: 'About Lục Lam',
       aboutText: 'Tucked away in a tranquil corner of Saigon, Lục Lam is a cultural stop born from our deep passion for organic Vietnamese tea, heritage coffee, and traditional handicraft. Set in a charming, nostalgic Indochine atmosphere, we offer a place to slow down, nourish your senses, and experience the timeless hospitality of Vietnam.',
@@ -3983,31 +4088,31 @@ shopping: 'Shop Local',
           name: 'Red Lava Herbal Tea',
           desc: 'Vibrant fusion of hibiscus flowers, dried orange slices, and cinnamon. Tangy, aromatic, rich in Vitamin C and antioxidants.',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/frame_vu_ng_tet__12__bdc76c1b293c45c5ae8e8711482ea43a_large.png'
+          image: '/uploads/external/f999d37a9141.png'
         },
         {
           name: 'Velvet Rose Tea',
           desc: 'Selected French rosebuds harmonized with jasmine and chamomile. Elegant floral notes that soothe the spirit and nurture healthy skin.',
           price: '175,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/105_fbb0f752824b4b008cd70dabecbcdeb3_large.png'
+          image: '/uploads/external/08f6bea23e45.png'
         },
         {
           name: 'Violet Jasmine Tea',
           desc: 'Organic green tea infused with natural jasmine blossoms and purple botanical accents. Delicate floral aroma for peaceful relaxation.',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/106_d09a9c06a44742e58bd5765025c6ded7_large.png'
+          image: '/uploads/external/36b26e2fbdad.png'
         },
         {
           name: 'Golden Peach Herbal Tea',
           desc: 'Succulent golden peach notes blended with natural wild honey and herbs. Naturally sweet and refreshing aftertaste.',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/103_37d008a17e654d88822f5e985a659700_large.png'
+          image: '/uploads/external/1f59277c65ac.png'
         },
         {
           name: 'Zen Relaxing Tea',
           desc: 'Soothing blend of chamomile flowers, lotus plumule, and lavender notes. Reduces stress and promotes peaceful, restorative sleep.',
           price: '185,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/107_13b87a4b48264fef9e08be066a6e9d4d_large.png'
+          image: '/uploads/external/4a7899959ecc.png'
         }
       ],
       voucherHeading: 'Exclusive Gift for Travelers',
@@ -4049,6 +4154,26 @@ shopping: 'Shop Local',
   ko: {
     title: '사이곤 포켓 가이드',
     subtitle: '사이곤 산책 & 독점 케어 가이드',
+    faq: [
+      { q: '룩람은 호찌민시 어디에 있나요?', a: '룩람은 {{address}}에 있습니다.' },
+      { q: '룩람 영업시간은 어떻게 되나요?', a: '연중무휴, {{hours}}입니다.' },
+      { q: '사이곤에서 안전하게 이동하려면?', a: '차량 호출 앱({{apps}})은 예약 전에 요금이 표시됩니다. 길에서 택시를 잡을 때는 {{taxis}}를 고르고, 미터기가 켜져 있는지 확인하세요.' },
+      { q: '사이곤에서 이동 비용은 얼마인가요?', a: '오토바이 단거리는 약 {{fareBike}}, 승용차는 {{fareCar}} 정도입니다. 날씨와 혼잡 시간대에 따라 달라집니다.' },
+      { q: '벤탄 시장은 어디에 있나요?', a: '호찌민시 1군 벤탄동에 있습니다.' },
+      { q: '룩람에서는 어떤 차를 파나요?', a: '{{teas}}. 가격은 {{priceFrom}}부터입니다.' },
+      { q: '이 가이드는 어떤 언어로 볼 수 있나요?', a: '{{languages}}.' },
+      { q: '오토바이가 많은 길은 어떻게 건너나요?', a: '천천히 일정한 속도로 걷고, 멈추거나 뛰지 마세요. 운전자들이 보행자의 경로를 보고 뒤쪽으로 돌아 지나갑니다.' },
+      { q: '룩람 매장은 어디에 있나요?', a: '매장 {{storeCount}}곳: {{stores}}. 문의는 {{phone}} 또는 {{email}}.' },
+    ],
+    contact: {
+      heading: '룩람 연락처',
+      stores: '매장 안내',
+      phone: '전화',
+      email: '이메일',
+      office: '본사',
+      licence: '사업자등록번호',
+    },
+    faqHeading: '자주 묻는 질문',
     brand: 'LỤC LAM',
     author: '룩람',
     pages: {
@@ -4077,6 +4202,7 @@ shopping: 'Shop Local',
       highlight: '사이곤이 당신을 기다립니다.',
       videoTitle: '\\\\ 여행 비디오 //',
       videoDesc: '비디오를 통해 사이곤의 매력을 만나보세요! 활기찬 도시 분위기와 주요 명소를 소개합니다.',
+      coffeeTitle: '소금 커피 & 코코넛 커피',
       features: [
         { title: '친절한 현지인들', desc: '사이곤 사람들은 매우 밝고 친절합니다. 길을 물어보면 언제나 미소로 도와줄 것입니다.' },
         { title: '미식의 천국', desc: '쌀국수(포)부터 반미, 향긋한 커피까지, 매 순간 새로운 미식의 즐거움이 가득합니다.' },
@@ -4146,8 +4272,51 @@ shopping: 'Shop Local',
             { name: 'Vinasun (비나선)', desc: '흰색 차체에 녹색/적색 스트라이프 디자인. 신뢰받는 정통 오리지널 택시 브랜드입니다.' },
             { name: 'Mai Linh (마이린)', desc: '대표적인 녹색 택시. 전국 어디서나 쉽게 볼 수 있으며 미터제 요금이 칼같이 적용됩니다.' }
           ]
+        },
+        {
+          id: 'crossing',
+          title: '사이곤에서 길 건너는 요령',
+          description: '끝없이 밀려오는 오토바이 물결 사이로 길을 건너는 것은 짜릿한 경험입니다. 아래 두 가지 원칙만 지키면 안전하게 건널 수 있습니다.',
+          options: [
+            { name: '일정한 속도로 걷고, 갑자기 멈추지 않기', desc: '뛰거나 멈추거나 되돌아가지 마세요. 오토바이 운전자들은 보행자의 이동 경로를 미리 예측해 뒤쪽으로 부드럽게 피해 갑니다.' },
+            { name: '눈을 마주치고 손으로 신호하기', desc: '다가오는 운전자를 바라보며 "보고 있다"는 신호를 주고, 손을 아래로 살짝 들어 건너겠다는 뜻을 전하세요. 속도를 줄여 줍니다.' }
+          ]
         }
-      ]
+      ],
+      safetyTips: [
+        '길에서 휴대폰을 보며 걷지 마세요. 오토바이 날치기의 표적이 되기 가장 쉽습니다. 지도를 확인해야 한다면 큰 상점 안이나 입구 쪽으로 들어가서 보세요.',
+        '크로스백은 차도 반대쪽으로 메고, 걷거나 오토바이를 탈 때는 가방을 가슴 쪽으로 바짝 끌어안으세요.'
+      ],
+      popupDetails: [
+        {
+          title: 'Grab 사용 팁',
+          text: '앱 설치와 휴대폰 인증, 카드 등록은 한국에서 미리 끝내 두세요. 본인 명의로 문자(SMS)를 받을 수 있을 때 해두어야 합니다. 그래야 공항에 내리자마자 바로 차를 불러 투명한 요금으로 호텔까지 갈 수 있습니다.'
+        },
+        {
+          title: '가짜 택시 주의',
+          text: '공항과 주요 관광지 주변에는 Vinasun이나 Mai Linh의 색상과 로고를 거의 똑같이 흉내 낸 가짜 택시가 많습니다. 타기 전에 차 문에 적힌 대표 전화번호와 기사의 사원증을 반드시 확인하세요.'
+        },
+        {
+          title: '길 건널 때 당황하지 않기',
+          text: '오토바이가 몰려오면 멈추거나 뒤로 물러서고 싶어지지만, 이것이 사고의 가장 큰 원인입니다. 운전자가 보행자의 방향을 예측할 수 없게 되기 때문입니다. 당황하지 말고 침착하게 계속 걸으세요.'
+        }
+      ],
+      options: [
+        { name: 'Grab Bike (오토바이)', desc: '복잡한 도심을 가장 빠르고 저렴하게 이동하는 방법. 헬멧은 기사가 제공합니다.', payment: '앱 / 현금', fares: ['15k-25k', '25k-40k', '40k-70k'] },
+        { name: 'Grab Car (승용차)', desc: '안전하고 시원하며 편안한 이동 수단. 4~7인 그룹에 적합합니다.', payment: '앱 / 현금', fares: ['40k-70k', '70k-120k', '120k-200k'] },
+        { name: 'Metro (도시철도)', desc: '사이곤 최초의 도시철도 노선으로, 1군과 인근 지역을 연결합니다.', payment: '카드 / 현금', fares: ['7k-10k', '10k-15k', '15k-20k'] },
+        { name: '일반 택시', desc: 'Vinasun, Mai Linh 등 신뢰할 수 있는 대형 브랜드. 길에서 직접 잡을 때 적합합니다.', payment: '현금 / 카드', fares: ['20k-40k', '50k-90k', '90k-150k'] }
+      ],
+      tableTitle: '예상 요금 (VND)',
+      tableHeaders: ['이동 수단', '1-2 km', '3-5 km', '5-10 km', '결제'],
+      tableNote: '* 실제 요금은 날씨와 혼잡 시간대에 따라 달라질 수 있습니다.',
+      pointsTitle: '이동 팁',
+      points: [
+        'Grab과 Xanh SM 앱 미리 설치하기',
+        '신용카드를 연동해 현금 없이 결제하기',
+        '길에서 잡을 때는 Vinasun 또는 Mai Linh만 타기'
+      ],
+      rideApps: '추천 차량 호출 앱'
     },
     stay: {
       heading: '머물기 & 힐링',
@@ -4588,7 +4757,7 @@ shopping: 'Shop Local',
     },
     luclam: {
       title: 'Lục Lam 문화적 오아시스',
-      subtitle: 'Trạm Dừng Chân Lục Lam',
+      subtitle: 'Lục Lam 문화적 오아시스',
       intro: '베트남의 엄선된 유기농 허브차, 프리미엄 스페셜티 커피, 그리고 전통 공예품이 만나는 아늑한 문화 공간입니다.',
       aboutHeading: '룩람 소개',
       aboutText: '바쁜 도시 한가운데 숨겨진 평화로운 안식처, 룩람(Lục Lam)은 베트남 허브티, 청정 커피, 그리고 장인정신이 깃든 고유 공예품에 대한 깊은 사랑으로 탄생했습니다. 고풍스러운 인도차이나(Indochine) 풍 디자인 속에서 오감을 치유하고, 베트남의 따뜻한 환대 문화를 경험해 보세요.',
@@ -4598,31 +4767,31 @@ shopping: 'Shop Local',
           name: 'Red Lava (레드 라바 허브티)',
           desc: '히비스커스 꽃과 오렌지, 시나몬이 빚어내는 정열적인 수색의 대표 허브티. 상큼한 비타민 C가 풍부하여 여행 피로를 풀어줍니다.',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/frame_vu_ng_tet__12__bdc76c1b293c45c5ae8e8711482ea43a_large.png'
+          image: '/uploads/external/f999d37a9141.png'
         },
         {
           name: 'Velvet Rose (벨벳 로즈 티)',
           desc: '우아한 프랑스 장미 꽃봉오리와 자스민의 은은한 조화. 마음을 평온하게 해주고 피부 미용에 탁월한 프리미엄 블렌딩.',
           price: '175,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/105_fbb0f752824b4b008cd70dabecbcdeb3_large.png'
+          image: '/uploads/external/08f6bea23e45.png'
         },
         {
           name: 'Violet Jasmine (바이올렛 자스민 티)',
           desc: '유기농 녹차에 천연 자스민 꽃향기를 머금은 감성 차. 깊고 청아한 꽃향기로 마음에 기분 좋은 청량감을 선사합니다.',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/106_d09a9c06a44742e58bd5765025c6ded7_large.png'
+          image: '/uploads/external/36b26e2fbdad.png'
         },
         {
           name: 'Golden Peach (골든 피치 허브티)',
           desc: '달콤한 황도 복숭아 향과 천연 꿀, 은은한 허브의 조화. 마신 뒤 은은하게 남아 피로를 잊게 해주는 머스트 해브 힐링 차.',
           price: '155,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/103_37d008a17e654d88822f5e985a659700_large.png'
+          image: '/uploads/external/1f59277c65ac.png'
         },
         {
           name: 'Zen Relaxing (젠 리랙싱 티)',
           desc: '카모마일, 연심(연꽃 씨앗 심), 은은한 라벤더가 선사하는 평온함. 여행 중 지친 신경을 이완시키고 꿀잠을 도와줍니다.',
           price: '185,000 VND',
-          image: 'https://cdn.hstatic.net/products/200000432665/107_13b87a4b48264fef9e08be066a6e9d4d_large.png'
+          image: '/uploads/external/4a7899959ecc.png'
         }
       ],
       voucherHeading: '외국인 여행객 독점 특별 혜택',

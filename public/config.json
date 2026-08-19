@@ -1,185 +1,126 @@
 {
-  "overrides": {},
+  "overrides": {
+    "vi": {
+      "luclam": {
+        "menuItems": [
+          {
+            "price": "155,000 VND"
+          },
+          {
+            "price": "175,000 VND"
+          }
+        ]
+      }
+    }
+  },
   "customMedia": {
-    "cover": {
-      "img": "/uploads/cover_benthanh.jpg",
-      "video": ""
-    },
-    "food-0-0": {
-      "img": "/uploads/cover_benthanh.jpg",
-      "video": ""
-    },
-    "food-0-1": {
-      "img": "/uploads/cover_benthanh.jpg",
-      "video": ""
-    },
-    "food-0-2": {
-      "img": "/uploads/cover_benthanh.jpg",
-      "video": ""
-    },
-    "food-1-0": {
-      "img": "/uploads/cover_benthanh.jpg",
-      "video": ""
-    },
-    "food-1-1": {
-      "img": "/uploads/cover_benthanh.jpg",
-      "video": ""
-    },
-    "food-1-2": {
-      "img": "/uploads/cover_benthanh.jpg",
-      "video": ""
-    },
-    "food-2-0": {
-      "img": "/uploads/cover_benthanh.jpg",
-      "video": ""
-    },
-    "food-2-1": {
-      "img": "/uploads/cover_benthanh.jpg",
-      "video": ""
-    },
-    "food-2-2": {
-      "img": "/uploads/cover_benthanh.jpg",
-      "video": ""
-    },
-    "food-3-0": {
-      "img": "/uploads/cover_benthanh.jpg",
-      "video": ""
-    },
-    "food-3-1": {
-      "img": "/uploads/cover_benthanh.jpg",
-      "video": ""
-    },
-    "food-3-2": {
-      "img": "/uploads/cover_benthanh.jpg",
-      "video": ""
-    },
     "food-4-0": {
-      "img": "https://file.hstatic.net/200000432665/file/11_01cbf04e827e45b784d8f19354047388_1024x1024.png",
+      "img": "/uploads/external/takashimaya-saigon-centre.jpg",
       "video": ""
     },
     "food-4-1": {
-      "img": "https://saucefish.com/wp-content/uploads/2025/04/5-top-eats-at-ben-thanh-market.png",
+      "img": "/uploads/external/ben-thanh-market-food-court.jpg",
       "video": ""
     },
     "food-4-2": {
-      "img": "https://static.chotot.com/storage/chotot-kinhnghiem/nha/2025/11/4a0c8374-chung-cu-42-nguyen-hue-1.jpeg",
-      "video": ""
-    },
-    "culture-0": {
-      "img": "/uploads/cover_benthanh.jpg",
-      "video": ""
-    },
-    "culture-1": {
-      "img": "/uploads/cover_benthanh.jpg",
+      "img": "/uploads/external/42-nguyen-hue-cafe-apartment.jpg",
       "video": ""
     },
     "culture-2": {
-      "img": "https://upload.wikimedia.org/wikipedia/commons/4/4a/Ayuntamiento%2C_Ciudad_Ho_Chi_Minh%2C_Vietnam%2C_2013-08-14%2C_DD_01.JPG",
-      "video": ""
-    },
-    "culture-3": {
-      "img": "https://vi.wikipedia.org/wiki/Nh%C3%A0_h%C3%A1t_Th%C3%A0nh_ph%E1%BB%91_H%E1%BB%93_Ch%C3%AD_Minh",
-      "video": ""
-    },
-    "culture-4": {
-      "img": "/uploads/cover_benthanh.jpg",
-      "video": ""
+      "img": "/uploads/external/ho-chi-minh-city-hall.jpg",
+      "video": "https://www.tiktok.com/@hoamoclan2212/video/7641101449178483989"
     },
     "culture-5": {
-      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Vietnam_History_Museum_HCMC.JPG/960px-Vietnam_History_Museum_HCMC.JPG",
+      "img": "/uploads/external/hcmc-museum-of-history.jpg",
       "video": ""
     },
     "culture-6": {
-      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/B%E1%BA%A3o_t%C3%A0ng_M%E1%BB%B9_thu%E1%BA%ADt_Th%C3%A0nh_ph%E1%BB%91_H%E1%BB%93_Ch%C3%AD_Minh.jpg/960px-B%E1%BA%A3o_t%C3%A0ng_M%E1%BB%B9_thu%E1%BA%ADt_Th%C3%A0nh_ph%E1%BB%91_H%E1%BB%93_Ch%C3%AD_Minh.jpg",
+      "img": "/uploads/external/hcmc-museum-of-fine-arts.jpg",
       "video": ""
     },
     "culture-7": {
-      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Bas%C3%ADlica_de_Nuestra_Se%C3%B1ora%2C_Ciudad_Ho_Chi_Minh%2C_Vietnam%2C_2013-08-14%2C_DD_05.JPG/500px-Bas%C3%ADlica_de_Nuestra_Se%C3%B1ora%2C_Ciudad_Ho_Chi_Minh%2C_Vietnam%2C_2013-08-14%2C_DD_05.JPG",
+      "img": "/uploads/external/saigon-notre-dame-cathedral.jpg",
       "video": ""
     },
     "culture-8": {
-      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/T%C3%A2n_%C4%90%E1%BB%8Bnh_Church_20190922.jpg/500px-T%C3%A2n_%C4%90%E1%BB%8Bnh_Church_20190922.jpg",
+      "img": "/uploads/external/tan-dinh-pink-church.jpg",
       "video": ""
     },
     "culture-9": {
-      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Ph%C6%B0%E1%BB%9Bc_H%E1%BA%A3i_T%E1%BB%B1.jpg/960px-Ph%C6%B0%E1%BB%9Bc_H%E1%BA%A3i_T%E1%BB%B1.jpg",
+      "img": "/uploads/external/jade-emperor-pagoda.jpg",
       "video": ""
     },
     "culture-10": {
-      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/C%E1%BB%95ng_ch%C3%B9a_V%C4%A9nh_Nghi%C3%AAm.jpg/960px-C%E1%BB%95ng_ch%C3%B9a_V%C4%A9nh_Nghi%C3%AAm.jpg",
+      "img": "/uploads/external/vinh-nghiem-pagoda.jpg",
       "video": ""
     },
     "culture-11": {
-      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Thien_Hau_Pagoda_%2810017896294%29.jpg/960px-Thien_Hau_Pagoda_%2810017896294%29.jpg",
+      "img": "/uploads/external/ba-thien-hau-temple.jpg",
       "video": ""
     },
     "culture-12": {
-      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Landmark81_582018_NhonHuynh.jpg/960px-Landmark81_582018_NhonHuynh.jpg",
+      "img": "/uploads/external/landmark-81.jpg",
       "video": ""
     },
     "culture-13": {
-      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Gi%E1%BA%BFng_tr%E1%BB%9Di_Ga_B%E1%BA%BFn_Th%C3%A0nh_25-12-2024.jpg/960px-Gi%E1%BA%BFng_tr%E1%BB%9Di_Ga_B%E1%BA%BFn_Th%C3%A0nh_25-12-2024.jpg",
+      "img": "/uploads/external/ben-thanh-metro-station.jpg",
       "video": ""
     },
     "culture-14": {
-      "img": "https://go2joy.s3.ap-southeast-1.amazonaws.com/blog/wp-content/uploads/2022/08/23150553/pho-di-bo-nguyen-hue-o-dau.jpg",
-      "video": ""
-    },
-    "culture-15": {
-      "img": "/uploads/cover_benthanh.jpg",
+      "img": "/uploads/external/nguyen-hue-walking-street-at-night.jpg",
       "video": ""
     },
     "culture-16": {
-      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Bui_Vien_Walking_Street_1.jpg/960px-Bui_Vien_Walking_Street_1.jpg",
-      "video": ""
-    },
-    "culture-17": {
-      "img": "/uploads/cover_benthanh.jpg",
+      "img": "/uploads/external/bui-vien-walking-street.jpg",
       "video": ""
     },
     "culture-18": {
-      "img": "https://upload.wikimedia.org/wikipedia/commons/3/3b/Water_puppets_Hanoi.jpg",
+      "img": "/uploads/external/rong-vang-water-puppet-theatre.jpg",
       "video": ""
     },
     "culture-19": {
-      "img": "https://motogo.vn/wp-content/uploads/2025/06/tour-xe-may-pho-co-ha-noi-9.jpg",
+      "img": "/uploads/external/motorbike-city-tour.jpg",
       "video": ""
     },
     "culture-20": {
-      "img": "https://lalago.vn/wp-content/uploads/2025/04/xe-buyt-2-tang-ha-noi-1.jpg",
+      "img": "/uploads/external/double-decker-bus-tour.jpg",
       "video": ""
     },
     "culture-21": {
-      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/W_C%E1%BB%A7_Chi_%C4%90%E1%BB%8Ba_%C4%91%E1%BA%A1o_C%E1%BB%A7_Chi_ng%E1%BB%A5y_trang.JPG/960px-W_C%E1%BB%A7_Chi_%C4%90%E1%BB%8Ba_%C4%91%E1%BA%A1o_C%E1%BB%A7_Chi_ng%E1%BB%A5y_trang.JPG",
+      "img": "/uploads/external/cu-chi-tunnels.jpg",
       "video": ""
     },
     "culture-22": {
-      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/97/Lo_ren_river.jpg/960px-Lo_ren_river.jpg",
+      "img": "/uploads/external/can-gio-mangrove-biosphere-reserve.jpg",
       "video": ""
     },
     "culture-23": {
-      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Th%E1%BA%A3o_C%E1%BA%A7m_vi%C3%AAn%2C_quan_1%2C_saigon%2C_vietnam_-_panoramio.jpg/960px-Th%E1%BA%A3o_C%E1%BA%A7m_vi%C3%AAn%2C_quan_1%2C_saigon%2C_vietnam_-_panoramio.jpg",
+      "img": "/uploads/external/saigon-zoo-botanical-gardens.jpg",
       "video": ""
     },
     "culture-24": {
-      "img": "https://upload.wikimedia.org/wikipedia/commons/5/54/C%C3%B4ng_vi%C3%AAn_Tao_%C4%90%C3%A0n.jpg",
+      "img": "/uploads/external/tao-dan-park.jpg",
       "video": ""
     },
     "culture-25": {
-      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/C%C3%B4ng_Vi%C3%AAn_23_Th%C3%A1ng_9_-_Ho_Chi_Minh_City%2C_Vietnam_-_DSC01084.JPG/960px-C%C3%B4ng_Vi%C3%AAn_23_Th%C3%A1ng_9_-_Ho_Chi_Minh_City%2C_Vietnam_-_DSC01084.JPG",
+      "img": "/uploads/external/september-23rd-park.jpg",
       "video": ""
     },
     "shopping-0": {
-      "img": "indexeddb-media://media-1784612627512-c75z7",
+      "img": "",
       "video": ""
     },
     "shopping-1": {
-      "img": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Binh_Tay_Market%2C_Ho_Chi_Minh_City%2C_Vietnam%2826152581294%29.jpg/960px-Binh_Tay_Market%2C_Ho_Chi_Minh_City%2C_Vietnam%2826152581294%29.jpg",
+      "img": "/uploads/external/binh-tay-market.jpg",
       "video": ""
     },
-    "shopping-2": {
-      "img": "/uploads/cover_benthanh.jpg",
+    "cover": {
+      "img": "/uploads/cover-benthanh.jpg",
       "video": ""
+    },
+    "culture-0": {
+      "img": "",
+      "video": "https://www.tiktok.com/@hoamoclan2212/video/7641101449178483989"
     }
   }
 }

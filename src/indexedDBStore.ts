@@ -2,6 +2,8 @@
 // Client-side IndexedDB Media Store for Saigon Pocket Guide
 // ==========================================================================
 
+import { authHeaders, UNAUTHORIZED_MESSAGE } from './adminToken';
+
 const DB_NAME = 'SaigonGuideDB';
 const DB_VERSION = 1;
 const STORE_NAME = 'media';
@@ -29,13 +31,16 @@ export async function uploadMediaToServer(file: File): Promise<{ url: string }> 
   const base64 = await fileToBase64(file);
   const response = await fetch('/api/upload', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: authHeaders(),
     body: JSON.stringify({
       file: base64,
       fileName: file.name,
       fileType: file.type
     })
   });
+  if (response.status === 401) {
+    throw new Error(UNAUTHORIZED_MESSAGE);
+  }
   if (!response.ok) {
     throw new Error('Failed to upload file to server');
   }

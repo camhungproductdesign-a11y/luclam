@@ -1,12 +1,69 @@
-@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Noto+Sans+JP:wght@300;400;500;700;900&family=Noto+Sans+SC:wght@300;400;500;700;900&family=Outfit:wght@300;400;500;600;700;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
+/* Outfit was dropped from this import: nothing references it now that body text
+   is Be Vietnam Pro, so it was six weights downloaded for nothing.
+
+   Playfair Display was dropped for the same reason — the interface is sans
+   throughout now, so no rule asks for it. Its four weights left with it.
+
+   Two weights were added in its place, because the call sites that used to ask
+   Playfair for them were being answered with fakes: Playfair shipped 400/600/700
+   plus italic 400, while the cover h1 asks for 900 and the subtitle for italic
+   600. The browser slanted and smeared the nearest weight it had. Be Vietnam Pro
+   now supplies both for real.
+
+   Noto Sans JP and SC went too, and they were the expensive pair. The font
+   files themselves were never a cost — a browser only downloads a webfont once
+   text actually needs it, and no rule ever asked for these. The bill was the
+   stylesheet that declared them: Google Fonts cuts a CJK family into more than
+   a hundred unicode-range slices, so five weights of two families came to 1,125
+   extra @font-face blocks. Measured, the response fell from 1,142,404 bytes to
+   10,454 — and it is render-blocking, fetched before the first paint on every
+   page load.
+
+   Nothing changes on screen. Japanese, Chinese and Korean were already being
+   drawn by the reader's system fonts, because no component ever applied these
+   families; --font-sans falls through Be Vietnam Pro, which carries no CJK, to
+   system-ui and then to the OS fallback. Those system faces are sans, which is
+   what the rest of the interface is now. */
+/* Served from this origin. The Google Fonts URL that used to sit here made the
+   browser walk three round trips before it could draw a word — fetch this
+   stylesheet, parse it, discover fonts.googleapis.com and shake hands with it,
+   then discover fonts.gstatic.com and shake hands again — all of it blocking
+   the render. And fonts.googleapis.com is blocked in mainland China, where the
+   Simplified Chinese edition of this guide is aimed, so for those readers the
+   request did not arrive late so much as never, holding the stylesheet open
+   until it timed out. See scripts/fetch-fonts.ts. */
+@import "./fonts.css";
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Outfit", system-ui, sans-serif;
-  --font-serif: "Playfair Display", Georgia, serif;
-  --font-ja: "Noto Sans JP", sans-serif;
-  --font-zh: "Noto Sans SC", sans-serif;
-  --font-vi: "Be Vietnam Pro", sans-serif;
+  /* Body text is Be Vietnam Pro, not Outfit. Outfit ships only the latin and
+     latin-ext subsets, and latin-ext stops short of U+1EA0-U+1EF1 — which is
+     where most Vietnamese tone-marked vowels live (ạ ấ ầ ậ ắ ế ệ ố ộ ớ ợ ụ ứ ự).
+     Those characters fell back to a system font, so a single Vietnamese word
+     rendered in two typefaces. Be Vietnam Pro covers the full range. */
+  --font-sans: "Be Vietnam Pro", system-ui, sans-serif;
+  /* Not a serif any more — the interface is sans throughout by request.
+     The name stays because 37 call sites spell it `font-serif`, and there it
+     reads as "display text": the cover h1, section eyebrows, the wordmark.
+     Keeping one token means the display face can be swapped, or the serif
+     restored, by editing this line alone.
+
+     Pointing it at the same family as --font-sans is deliberate rather than
+     lazy. A contrasting display face is the usual way to keep hierarchy, but
+     the last one cost us: Outfit stops short of U+1EA0-U+1EF1, so Vietnamese
+     headings rendered half in Outfit and half in a system fallback. Hierarchy
+     here comes from weight, size and tracking, which those call sites already
+     carry — uppercase, tracking-[0.3em], font-black. */
+  --font-serif: "Be Vietnam Pro", system-ui, sans-serif;
+  /* --font-ja, --font-zh and --font-vi lived here and are gone. No component
+     ever spelled font-ja, font-zh or font-vi, so all three were declarations
+     nothing read. The first two had to go with the import — a token naming a
+     family that is no longer fetched is a claim the stylesheet cannot keep —
+     and --font-vi was a second name for --font-sans.
+
+     If per-language faces are wanted later, the place for them is a :lang()
+     rule, and the decision to make first is whether to serve CJK webfonts at
+     all: they are large, and every modern OS already ships a good CJK sans. */
 }
 
 /* Premium global transition for smooth dark/light mode toggles */
@@ -33,5 +90,293 @@
 }
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(184, 82, 51, 0.4);
+}
+
+/* --------------------------------------------------------------------------
+   App shell height
+
+   100vh on iOS Safari and Chrome Android means the viewport with the browser
+   chrome collapsed, not the area currently visible. On load, with the URL bar
+   showing, the real height is 60-100px less — enough to push the bottom
+   navigation off screen until a scroll collapses the bar.
+
+   dvh tracks the visible area as that chrome comes and goes. The vh line is
+   kept as a fallback, though the build currently strips it: every browser in
+   Vite's target range supports dvh, so the minifier drops the first
+   declaration. It stays for the day those targets widen again.
+
+   Declared here rather than as a Tailwind class because an arbitrary utility
+   cannot express two declarations for the same property.
+   -------------------------------------------------------------------------- */
+.app-shell {
+  height: 100vh;
+  height: 100dvh;
+}
+
+/* --------------------------------------------------------------------------
+   Pages must not squash their own content
+
+   Each page is a flex column that scrolls. Flex items shrink by default, so
+   once a page's content is taller than the frame the blocks inside get
+   compressed rather than the page simply scrolling — and any block carrying
+   overflow-hidden then clips whatever no longer fits.
+
+   Measured on the atmosphere page at 440x956: the closing tip banner wanted
+   151px, was squeezed to 24px, and hid the rest behind its own overflow. It
+   read as though something were covering it, which sent three fixes chasing
+   the floating language selector instead.
+   -------------------------------------------------------------------------- */
+.page-section > * {
+  flex-shrink: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Do not let a swipe leave the guide
+
+   This whole app is navigated by swiping sideways, which is the one gesture
+   the browser has already claimed. On iOS Safari, and on Chrome for Android,
+   a horizontal swipe that runs past the end of a scrollable element chains up
+   to the browser itself and triggers back-navigation. So a reader on page one
+   who swipes right to check whether there is anything before it does not get
+   a rubber band — they get thrown out of the site, and come back to a fresh
+   load with the language, the page and every open panel reset.
+
+   The vertical axis has the mirror problem: each page scrolls its own content,
+   and pulling down at the top of one fires Chrome for Android's
+   pull-to-refresh, which reloads and discards the same state.
+
+   `contain` keeps the scroll inside the element that owns it. It is the whole
+   fix, it is two declarations, and it is invisible until the moment it saves
+   someone — which is why nothing in a Lighthouse run would ever have flagged
+   it. Firefox, Chrome and Edge have supported it for years; Safari from 16,
+   which is below this build's floor of 16.4 anyway.
+   -------------------------------------------------------------------------- */
+#phone-screen-viewport {
+  overscroll-behavior: contain;
+}
+
+.page-section {
+  overscroll-behavior-y: contain;
+}
+
+/* --------------------------------------------------------------------------
+   Skip the nine pages that are not on screen
+
+   All ten pages live in one horizontal snap carousel, so pages two to ten sit
+   off to the side rather than far down a long document — and Chrome's lazy
+   threshold, several thousand pixels on a slow connection, reads that as
+   imminent. Ten images belonging to other pages were fetched before the cover
+   had finished drawing, about 137KB of them, and every one of those pages was
+   laid out and styled in full. Measured: 628KB transferred down to 517KB, and
+   Style & Layout from 1172ms to 601ms.
+
+   Sizing is unaffected — these sections take their width and height from the
+   flex container, not from their contents — so the carousel measures the same
+   and the snap points do not move.
+
+   This was removed once, on the theory that it was why Chrome recorded no LCP
+   on routes that deep-link into the carousel. It was not: with the property
+   gone the metric was still absent, three runs out of three. That fault is
+   older than this rule and belongs to how the carousel reaches page N — worth
+   its own investigation, not worth paying 111KB for a guess.
+   -------------------------------------------------------------------------- */
+.page-section {
+  content-visibility: auto;
+  /* Only consulted while a section is skipped, and only for its contents. Any
+     plausible figure keeps the scroll extent stable; the frame is 430px wide. */
+  contain-intrinsic-size: auto 430px auto 900px;
+}
+
+
+/* --------------------------------------------------------------------------
+   Mobile type floor
+
+   The interface was drawn to be read inside the 430px device mockup on a
+   desktop screen, at arm's length — which is why 161 sizes sit between 6px and
+   11px. Below lg the mockup is gone and this is a real phone held close to the
+   face, where 8px is not readable. Apple and Google both put the floor for
+   secondary text around 11px.
+
+   Raising the whole ladder here rather than editing 200 call sites in App.tsx:
+   the ordering between sizes is preserved, so the visual hierarchy survives.
+   These rules sit outside any cascade layer, so they beat Tailwind's utilities
+   regardless of source order.
+
+   The floor is 11px, which is where both Apple and Google put the smallest
+   text they will name a role for. The ceiling is 14px, so nothing lifted here
+   can outgrow text-sm.
+
+   Tailwind's own scale is left alone — text-xs is already 12px, and lifting it
+   would reach into Creator Studio, a dense admin panel that is not the problem
+   being solved.
+
+   Trade-off worth knowing: larger text on mobile pushes back against fitting a
+   page into one screen. Page 02 in particular was tuned to the frame height.
+   -------------------------------------------------------------------------- */
+@media (max-width: 1023px) {
+  .text-\[6px\]    { font-size: 11px; }
+  .text-\[6\.5px\] { font-size: 11px; }
+  .text-\[7px\]    { font-size: 11.5px; }
+  .text-\[7\.5px\] { font-size: 11.5px; }
+  .text-\[8px\]    { font-size: 12px; }
+  .text-\[8\.5px\] { font-size: 12px; }
+  .text-\[9px\]    { font-size: 12.5px; }
+  .text-\[9\.5px\] { font-size: 12.5px; }
+  .text-\[10px\]   { font-size: 13px; }
+  .text-\[10\.5px\]{ font-size: 13px; }
+  .text-\[11px\]   { font-size: 13.5px; }
+  .text-\[11\.5px\]{ font-size: 14px; }
+  .text-\[12px\]   { font-size: 14px; }
+}
+
+/* --------------------------------------------------------------------------
+   Desktop type floor
+
+   The rule above stops at 1023px because of an assumption that is no longer
+   true: that on a desktop this design sat inside a 430px phone mockup, drawn
+   small on purpose. It does not any more — a page fills the screen.
+
+   Measured on the culture page before this block existed: desktop rendered text
+   at 8, 9, 10 and 11px while the same page on a phone rendered it at 12, 12.5,
+   13 and 13.5px. The desktop version had *smaller* text than the phone, on a
+   screen held twice as far from the reader's face. That is the whole of "the
+   components are hard to look at on desktop"; it was never really a layout
+   problem.
+
+   Half a pixel above the mobile tier at each rung, for that extra viewing
+   distance, and the same ceiling so nothing lifted here outgrows text-sm. The
+   ladder's ordering is preserved, so the hierarchy each page was drawn with
+   survives intact.
+   -------------------------------------------------------------------------- */
+@media (min-width: 1024px) {
+  .page-section .text-\[6px\],
+  .page-section .text-\[6\.5px\] { font-size: 13px; }
+  .page-section .text-\[7px\],
+  .page-section .text-\[7\.5px\] { font-size: 13.5px; }
+  .page-section .text-\[8px\],
+  .page-section .text-\[8\.5px\] { font-size: 14px; }
+  .page-section .text-\[9px\],
+  .page-section .text-\[9\.5px\] { font-size: 14.5px; }
+  .page-section .text-\[10px\],
+  .page-section .text-\[10\.5px\] { font-size: 15px; }
+  .page-section .text-\[11px\],
+  .page-section .text-\[11\.5px\] { font-size: 15.5px; }
+  .page-section .text-\[12px\]   { font-size: 16px; }
+  /* The one size in App.tsx above the ladder, and it is the place-card title.
+     Leaving it at 15px while the subtitle beneath it lifted to 15.5px made the
+     subtitle the larger of the two and the hierarchy read backwards. Whatever
+     the ladder lifts has to bring along what sits above it. */
+  .page-section .text-\[15px\]   { font-size: 19px; }
+
+  /* Tailwind's own steps have to move with them or the hierarchy flattens: a
+     caption lifted to 15px sitting beside a text-sm label still at 14px reads
+     as though the caption were the more important of the two. Scoped to
+     .page-section so Creator Studio, a dense admin panel that is not the
+     problem being solved, keeps the scale it was built with. */
+  .page-section .text-xs   { font-size: 15px; line-height: 1.55; }
+  .page-section .text-sm   { font-size: 16.5px; line-height: 1.6; }
+  .page-section .text-base { font-size: 18px; line-height: 1.6; }
+}
+
+/* --------------------------------------------------------------------------
+   A page is a card on a surface, not a screen to be filled
+
+   Measured on the introduction page at 2333x1573: the section stretched to the
+   full 1493px of viewport height while its content came to 328px. The other
+   1166px — 78% of the screen — was void, because `justify-between` pins the
+   closing note to the bottom of the section and the section is `h-full`.
+
+   No amount of rearranging fixes that, because there is no more content to
+   arrange. What changes is where the space sits: a page sized to its own
+   content, centred, turns the same pixels from a hole inside the page into
+   margin around it, which is what whitespace is supposed to look like.
+
+   `safe center` rather than plain `center`: a centred flex container whose
+   content overflows clips the top and makes it unreachable, which would break
+   the culture page at 1504px of content. `safe` falls back to flex-start
+   exactly then. Chrome 93, Safari 16, Firefox 63 — all below this build's
+   floor of Safari 16.4.
+   -------------------------------------------------------------------------- */
+/* --------------------------------------------------------------------------
+   One measure per page, for everything in it
+
+   The columns were capped at 920px on the content wrapper, and nothing else
+   was. So the closing note under every page ran the full 1800px of a wide
+   monitor while the text above it stopped at 920, and the cover — which has no
+   column wrapper at all, being a single hero — stretched its masthead and its
+   call to action from edge to edge. A rule that spans a screen and a half is
+   not a rule, it is a line.
+
+   Capping the section's children instead of one wrapper inside it gives every
+   block on every page the same measure, including the ones added later.
+
+   Absolutely positioned children are exempt: the cover photograph is one, and
+   it is meant to bleed to the edges.
+   -------------------------------------------------------------------------- */
+/* --------------------------------------------------------------------------
+   A heading never ends a column
+
+   Blocks are allowed to break across the column boundary now, which is what
+   lets the columns balance — before this a tall block could not split, so it
+   moved to the second column whole and left the first one half empty. The cost
+   of allowing it is that a break can land between a heading and the thing it
+   introduces, which reads as two unrelated fragments.
+   -------------------------------------------------------------------------- */
+@media (min-width: 1024px) {
+  .page-section h1,
+  .page-section h2,
+  .page-section h3,
+  .page-section h4,
+  .page-section h5,
+  .page-section h6 {
+    break-after: avoid;
+  }
+}
+@media (min-width: 1024px) {
+  .page-section > *:not(.absolute) {
+    width: 100%;
+    max-width: 920px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+@media (min-width: 1024px) {
+  /**
+   * The page furniture crosses both columns; the content still flows in them.
+   *
+   * A two-column flow fills column one top to bottom before starting column
+   * two, so a heading low in column one leaves its own items at the TOP of
+   * column two — level with the page title. On page 09 that put tea #2 above
+   * the heading that introduces tea #1, and it happened on seven of eight
+   * pages.
+   *
+   * A spanning element interrupts the flow: everything after it restarts at
+   * the top of column one. So the title, the intro and the tab strip go full
+   * width, and each list begins underneath its own heading.
+   *
+   * Spanning rather than dropping multicol for a grid, because the columns are
+   * what make these pages fit one screen at all — they pack the furniture two
+   * up as well as the cards. Measured: a grid layout cost every page between
+   * 165px and 646px of scroll, against 0-183px for this.
+   *
+   * column-span has been in Chrome, Firefox and Safari well below this
+   * project's floor of Safari 16.4.
+   */
+  .lm-spread > .lm-head,
+  .lm-spread > p,
+  .lm-spread > [role='tablist'],
+  .lm-spread > .lm-span {
+    column-span: all;
+  }
+
+  .page-section {
+    justify-content: safe center;
+    /* 2.5rem of gap and 3rem top and bottom spent 136px of a 820px screen on
+       frame, and six pages were scrolling by less than that. The trim is worth
+       more here than the air. The horizontal 3.5rem is untouched — that is the
+       part actually holding the columns off the edge of the spread. */
+    gap: 1.75rem;
+    padding: 2rem 3.5rem;
+  }
 }
 
