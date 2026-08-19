@@ -2726,11 +2726,14 @@ export default function App() {
                       {faqFor(lang, t).map((entry, idx) => (
                         <details
                           key={idx}
-                          className="bg-white rounded-xl border border-zinc-200/60 shadow-sm overflow-hidden"
+                          className="group bg-white rounded-xl lg:rounded-2xl border border-zinc-200/60 shadow-sm overflow-hidden"
                         >
                           <summary className="text-[9px] font-bold text-[#0b433f] p-3 cursor-pointer list-none flex justify-between items-center gap-2 marker:hidden">
                             <span>{entry.q}</span>
-                            <ChevronRight className="w-3 h-3 shrink-0 text-zinc-400" />
+                            {/* Xoay khi mo, giong het the san pham tra. Mot mui ten chi sang
+                                phai tren mot muc dang mo la noi rang "bam de mo"
+                                trong khi no da mo roi. */}
+                            <ChevronRight className="w-3 h-3 lg:w-4 lg:h-4 shrink-0 text-zinc-400 transition-transform duration-200 group-open:rotate-90 group-open:text-[#0b433f]" />
                           </summary>
                           <p className="text-[9px] text-zinc-500 leading-normal font-light px-3 pb-3">
                             {entry.a}
