@@ -773,9 +773,15 @@ export default function App() {
   const t = resolveContent(lang, overrides);
 
 
+  // lg, not md: the row direction exists to put the sidebar beside the pages,
+  // and the sidebar is `hidden lg:flex`. Splitting them left 768px to 1023px —
+  // iPad mini and Air in portrait — laying the children out as a row with no
+  // sidebar in it, so the mobile top bar became the first column: 220px wide,
+  // the full height of the screen, holding a wordmark and a language select and
+  // nothing else. The two switch together now.
   return (
     <div
-      className="app-shell w-full flex flex-col md:flex-row overflow-hidden bg-[#0b1513] text-zinc-200"
+      className="app-shell w-full flex flex-col lg:flex-row overflow-hidden bg-[#0b1513] text-zinc-200"
       id="saigon-guide-root"
     >
       
