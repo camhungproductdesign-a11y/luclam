@@ -226,8 +226,10 @@ function products(lang: Language, topic: Topic, resolved: ResolvedContent): stri
 /**
  * A shop's hours, or nothing at all where they were never confirmed.
  *
- * Hội An is the one shop without them, and it stays without them: an assistant
- * repeats opening times as fact, so a guess here sends somebody to a shut door.
+ * All five have confirmed times today and they are not identical — Hội An opens
+ * at 07:00, the rest at 09:30 — so each shop emits its own. The guard stays for
+ * a shop added later whose times nobody has confirmed: an assistant repeats
+ * opening times as fact, so a guess here sends somebody to a shut door.
  */
 function openingHours(store: Store) {
   if (!store.hours) return undefined;

@@ -23,7 +23,7 @@ Shops (addresses are given in Vietnamese, as a visitor would show them to a
 driver or enter them into a map):
 
 - **Lục Lam Takashimaya B2**, Thành phố Hồ Chí Minh — Tầng B2, Takashimaya, 92-94 Nam Kỳ Khởi Nghĩa, Bến Nghé, Quận 1, Thành phố Hồ Chí Minh. Open 09:30–22:00.
-- **Lục Lam Hội An**, Hội An — 62 Nguyễn Thị Minh Khai, Phường Minh An, Quảng Nam.
+- **Lục Lam Hội An**, Hội An — 62 Nguyễn Thị Minh Khai, Phường Minh An, Quảng Nam. Open 07:00–22:00.
 - **Lục Lam Flagship**, Đà Nẵng — 202 Trần Phú, Phường Phước Ninh, Quận Hải Châu, Đà Nẵng. Open 09:30–22:00.
 - **Lục Lam Premium**, Đà Nẵng — 104 Trần Phú, Quận Hải Châu, Đà Nẵng. Open 09:30–22:00.
 - **Lục Lam New Concept**, Đà Nẵng — 259 Trần Phú, Quận Hải Châu, Đà Nẵng. Open 09:30–22:00.

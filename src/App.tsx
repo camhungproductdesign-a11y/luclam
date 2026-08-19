@@ -2801,8 +2801,9 @@ export default function App() {
                     <div className="space-y-1.5">
                       {/* The branch name leads, because three of the five shops
                           are in Đà Nẵng and the city alone no longer tells them
-                          apart. Hours appear only where the company confirmed
-                          them — Hội An's are unknown and stay unstated. */}
+                          apart. Hours come from the shop, not from one shared
+                          constant: Hội An opens at 07:00 and the rest at
+                          09:30. */}
                       {STORES.map((store) => (
                         <div key={store.id} className="bg-white rounded-xl lg:break-inside-avoid p-2.5 border border-zinc-200/60 shadow-sm">
                           <p className="text-[9px] font-bold text-[#0b433f]">{storeName(store)}</p>

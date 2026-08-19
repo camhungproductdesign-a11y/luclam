@@ -52,8 +52,9 @@ const TOPIC_EN: Record<Topic, string> = {
 
 function shopLines(): string {
   return STORES.map((store) => {
-    // The shop carries its own hours, or none. Hội An's are unconfirmed, and an
-    // assistant reading this file repeats what it says as fact.
+    // Each shop's own hours, because they differ — Hội An opens at 07:00 and
+    // the rest at 09:30. A shop with none confirmed prints none: an assistant
+    // reading this file repeats what it says as fact.
     const hours = store.hours ? ` Open ${store.hours.opens}–${store.hours.closes}.` : '';
     return `- **${storeName(store)}**, ${store.city} — ${store.street}, ${store.locality}, ${store.region}.${hours}`;
   }).join('\n');

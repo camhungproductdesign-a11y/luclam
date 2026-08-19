@@ -51,8 +51,11 @@ export type Store = {
   flag?: string;
 };
 
-/** Opening hours, confirmed for the Saigon counter and the three Đà Nẵng shops. */
-export const FLAGSHIP_HOURS = { opens: '09:30', closes: '22:00' };
+/** The hours four of the five shops keep: Saigon and all three in Đà Nẵng. */
+export const STANDARD_HOURS = { opens: '09:30', closes: '22:00' };
+
+/** Hội An opens two and a half hours earlier and shuts at the same time. */
+export const HOI_AN_HOURS = { opens: '07:00', closes: '22:00' };
 
 /**
  * Every shop, and the only list of them.
@@ -64,9 +67,11 @@ export const FLAGSHIP_HOURS = { opens: '09:30', closes: '22:00' };
  * assistant reading the schema gave different answers about where to buy this
  * tea. Everything renders from here now.
  *
- * Hội An has no confirmed hours, so it carries none — times that were guessed
- * are worse than times that are absent, because an assistant repeats them as
- * fact.
+ * Every shop carries its own hours rather than borrowing one constant, because
+ * they are not all the same: Hội An opens at 07:00 and the other four at 09:30.
+ * `hours` stays optional so a shop whose times nobody has confirmed can be
+ * listed without them — a guessed time is worse than an absent one, since an
+ * assistant repeats it as fact and sends somebody to a shut door.
  */
 export const STORES: Store[] = [
   {
@@ -78,7 +83,7 @@ export const STORES: Store[] = [
     locality: 'Bến Nghé, Quận 1',
     region: 'Thành phố Hồ Chí Minh',
     geo: { latitude: 10.7733, longitude: 106.7011 },
-    hours: FLAGSHIP_HOURS,
+    hours: STANDARD_HOURS,
     mapUrl: 'https://maps.app.goo.gl/8tExfsHC1m2E4bxH7',
   },
   {
@@ -89,6 +94,7 @@ export const STORES: Store[] = [
     street: '62 Nguyễn Thị Minh Khai',
     locality: 'Phường Minh An',
     region: 'Quảng Nam',
+    hours: HOI_AN_HOURS,
   },
   {
     id: 'danang-tran-phu-202',
@@ -98,7 +104,7 @@ export const STORES: Store[] = [
     street: '202 Trần Phú',
     locality: 'Phường Phước Ninh, Quận Hải Châu',
     region: 'Đà Nẵng',
-    hours: FLAGSHIP_HOURS,
+    hours: STANDARD_HOURS,
     photo: { src: '/uploads/external/c561cd48f545.jpg', width: 800, height: 533 },
   },
   {
@@ -109,7 +115,7 @@ export const STORES: Store[] = [
     street: '104 Trần Phú',
     locality: 'Quận Hải Châu',
     region: 'Đà Nẵng',
-    hours: FLAGSHIP_HOURS,
+    hours: STANDARD_HOURS,
   },
   {
     id: 'danang-tran-phu-259',
@@ -119,7 +125,7 @@ export const STORES: Store[] = [
     street: '259 Trần Phú',
     locality: 'Quận Hải Châu',
     region: 'Đà Nẵng',
-    hours: FLAGSHIP_HOURS,
+    hours: STANDARD_HOURS,
     flag: 'New Concept Open!',
   },
 ];
