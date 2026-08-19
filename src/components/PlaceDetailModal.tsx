@@ -318,7 +318,7 @@ export function PlaceDetailModal({
         {/* --- HERO MEDIA HEADER --- */}
         <div 
           onClick={isCreator ? handleHeroClick : undefined}
-          className={`w-full h-[230px] lg:h-[300px] bg-zinc-950 relative overflow-hidden shrink-0 ${isCreator ? 'group/hero cursor-pointer' : ''}`}
+          className={`w-full h-[230px] lg:h-[210px] bg-zinc-950 relative overflow-hidden shrink-0 ${isCreator ? 'group/hero cursor-pointer' : ''}`}
           title={isCreator ? (lang === 'vi' ? 'Nhấp vào đây để tải lên ảnh hoặc video cho địa điểm này' : 'Click to upload custom photo or video') : undefined}
         >
           {/* Hidden File Input */}
@@ -490,7 +490,7 @@ export function PlaceDetailModal({
             description ran about 110 characters to the line, against the 45-75
             that is worth aiming for. The frame keeps its width; the reading
             inside it does not have to. */}
-        <div className="flex-1 overflow-y-auto p-5 lg:p-7 space-y-5 lg:max-w-[680px] lg:mx-auto lg:w-full">
+        <div className="flex-1 overflow-y-auto p-5 lg:p-7 space-y-5">
           
           {/* TAB 1: ABOUT DESCRIPTION */}
           {activeTab === 'about' && (
@@ -516,24 +516,32 @@ export function PlaceDetailModal({
                 </div>
               )}
 
-              <div className="flex items-center gap-1 text-[#b85233]">
-                <Star className="w-4 h-4 fill-current" />
-                <Star className="w-4 h-4 fill-current" />
-                <Star className="w-4 h-4 fill-current" />
-                <Star className="w-4 h-4 fill-current" />
-                <Star className="w-4 h-4 fill-current" />
-                <span className="text-[10px] font-bold ml-1.5 text-zinc-600 font-mono">5.0 (Lục Lam Pick)</span>
-              </div>
-              
-              <div className="p-1">
-                <p className="text-xs leading-relaxed text-zinc-700 font-light whitespace-pre-line">
-                  {place.desc}
-                </p>
-              </div>
+              {/* The words and the clip side by side above lg. Stacked, the
+                  clip's 578px sat beneath a rating and a description in a
+                  content area 514px tall, so two thirds of it was behind the
+                  footer. Beside them it starts at the top and has the height
+                  to itself. Below lg this wrapper does nothing. */}
+              <div className="lg:flex lg:items-start lg:gap-6">
+                <div className="space-y-3 lg:flex-1 lg:min-w-0">
+                <div className="flex items-center gap-1 text-[#b85233]">
+                  <Star className="w-4 h-4 fill-current" />
+                  <Star className="w-4 h-4 fill-current" />
+                  <Star className="w-4 h-4 fill-current" />
+                  <Star className="w-4 h-4 fill-current" />
+                  <Star className="w-4 h-4 fill-current" />
+                  <span className="text-[10px] font-bold ml-1.5 text-zinc-600 font-mono">5.0 (Lục Lam Pick)</span>
+                </div>
+                
+                <div className="p-1">
+                  <p className="text-xs leading-relaxed text-zinc-700 font-light whitespace-pre-line">
+                    {place.desc}
+                  </p>
+                </div>
+                </div>
 
               {/* Dynamic Video Showcase Block */}
               {resolvedVideo && (
-                <div className="mt-4 space-y-2">
+                <div className="mt-4 lg:mt-0 space-y-2 lg:w-[300px] lg:shrink-0">
                   <div className="flex items-center gap-2 text-zinc-800 border-b border-zinc-100 pb-2">
                     <div className="w-6 h-6 bg-amber-500/10 rounded-md flex items-center justify-center">
                       <Play className="w-3.5 h-3.5 text-amber-600 fill-current" />
@@ -638,6 +646,7 @@ export function PlaceDetailModal({
                   )}
                 </div>
               )}
+              </div>
 
               {isCreator && (
                 <div className="mt-4 space-y-2 rounded-xl border border-amber-200 bg-amber-50 p-3">
