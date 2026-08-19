@@ -159,6 +159,23 @@
   overscroll-behavior-y: contain;
 }
 
+/**
+ * Breathing room above the bottom nav on a phone.
+ *
+ * The language selector used to sit in a strip between the pages and the tab
+ * bar, and it was quietly doing this job — about 44px of it. Taking the strip
+ * away left the last card 24px from the bar, close enough to read as a mistake
+ * rather than a margin.
+ *
+ * Below lg only: from lg up there is no bottom nav, and the desktop padding is
+ * already tuned against how much each page has to fit into one screen.
+ */
+@media (max-width: 1023px) {
+  .page-section {
+    padding-bottom: 3rem;
+  }
+}
+
 /* --------------------------------------------------------------------------
    Skip the nine pages that are not on screen
 
