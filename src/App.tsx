@@ -54,6 +54,24 @@ import { authHeaders, saveFailedMessage, UNAUTHORIZED_MESSAGE } from './adminTok
 import { resolveContent } from './resolveContent';
 import { pathFor, parsePath, TOPICS, type Topic } from './routes';
 
+/**
+ * Keep a hyphenated word whole when a navigation label has to wrap.
+ *
+ * "Văn Hóa & Điểm Check-In" broke as "…Check-" / "In" in the sidebar, because a
+ * hyphen is a line-break opportunity: at weight 400 the first line measured
+ * 166px inside 167px of room, so it fit by a single pixel and the browser took
+ * it. Selecting the item made the text bold, that pixel disappeared, and the
+ * break moved to the space — the same label wrapped two different ways
+ * depending on whether you had clicked it.
+ *
+ * U+2011 draws as a hyphen and offers no break, so the wrap point stops
+ * depending on a pixel. Only the navigation labels get it: these same strings
+ * go into <title>, the breadcrumb and the meta description, and those keep the
+ * plain ASCII hyphen a crawler expects to match.
+ */
+const unbreakableHyphens = (label: string): string =>
+  label.replace(/(\p{L})-(\p{L})/gu, '$1‑$2');
+
 const supportedLanguages: Language[] = ['ja', 'vi', 'zh', 'zht', 'en', 'ko'];
 const htmlLanguage: Record<Language, string> = {
   ja: 'ja', vi: 'vi', zh: 'zh-CN', zht: 'zh-TW', en: 'en', ko: 'ko'
@@ -912,13 +930,19 @@ export default function App() {
             <ul className="space-y-1" id="desktop-nav-menu">
               {pagesList.map((pageName, idx) => (
                 <li key={pageName}>
+                  {/* border-l-4 on both states, colour on one.
+                      It used to sit only on the selected item, so selecting a
+                      page took 4px off its own text box — measured, 269px
+                      unselected against 265px selected. A label near a wrap
+                      point therefore re-wrapped the moment you clicked it. The
+                      border is always there now; only its colour turns on. */}
                   <button
                     id={`desktop-nav-item-${idx}`}
                     onClick={() => navigateToPage(idx)}
-                    className={`w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl transition-all duration-300 text-left ${
+                    className={`w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl transition-all duration-300 text-left border-l-4 ${
                       currentPage === idx
-                        ? 'bg-[#b85233]/15 text-[#d98a6e] font-semibold border-l-4 border-[#b85233]'
-                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
+                        ? 'bg-[#b85233]/15 text-[#d98a6e] font-semibold border-[#b85233]'
+                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5 border-transparent'
                     }`}
                   >
                     <div className="flex items-center gap-3 min-w-0">
@@ -926,8 +950,12 @@ export default function App() {
                           #7b7f86 against the sidebar and measured 4.23:1, just
                           under the 4.5:1 this size needs. 90 keeps it quieter
                           than the label beside it and measures 5.75:1. */}
-                      <span className="font-serif text-xs opacity-90 shrink-0">0{idx + 1}</span>
-                      <span className="text-sm">{t.pages[pageName]}</span>
+                      {/* padStart, not a literal "0" in front: the tenth page
+                          read "010". */}
+                      <span className="font-serif text-xs opacity-90 shrink-0">
+                        {String(idx + 1).padStart(2, '0')}
+                      </span>
+                      <span className="text-sm">{unbreakableHyphens(t.pages[pageName])}</span>
                     </div>
                     {/* zinc-400 on zinc-800 is 5.81:1; zinc-500 was 3.08:1. */}
                     {/* shrink-0 + whitespace-nowrap: justify-between de ca hai con deu co
