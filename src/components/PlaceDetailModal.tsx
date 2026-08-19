@@ -305,7 +305,7 @@ export function PlaceDetailModal({
       
       {/* Scrollable Container styled as a premium mobile slide-up sheet */}
       <div
-        className={`w-full h-[90%] ${embedDetails.type === 'tiktok' ? 'lg:w-[1080px]' : 'lg:w-[920px]'} lg:max-w-full lg:h-auto lg:max-h-full bg-[#f6f3eb] rounded-t-[32px] lg:rounded-3xl overflow-hidden shadow-2xl flex flex-col lg:flex-row relative animate-in slide-in-from-bottom lg:zoom-in-95 duration-300`}
+        className={`w-full h-[90%] ${embedDetails.type === 'tiktok' ? 'lg:w-[1080px] lg:h-full lg:max-h-[600px]' : 'lg:w-[920px] lg:h-auto lg:max-h-full'} lg:max-w-full bg-[#f6f3eb] rounded-t-[32px] lg:rounded-3xl overflow-hidden shadow-2xl flex flex-col lg:flex-row relative animate-in slide-in-from-bottom lg:zoom-in-95 duration-300`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="place-detail-title"
@@ -324,8 +324,12 @@ export function PlaceDetailModal({
             supports. The iframe is still 1000px and still cropped, for the
             reason set out where the stacked one used to be. */}
         {embedDetails.type === 'tiktok' && (
-          <aside className="hidden lg:flex w-[300px] shrink-0 bg-black items-center justify-center p-3">
-            <div className="relative w-full aspect-[9/16] rounded-2xl overflow-hidden bg-black">
+          <aside className="hidden lg:flex shrink-0 bg-black items-center justify-center p-3">
+            {/* Height leads, width follows: h-full with a 9/16 ratio makes the
+                width the height times 9/16, so the clip grows with the screen
+                instead of sitting at one size on all of them. Capped at 747px
+                tall — past that it stops being a clip and becomes a pillar. */}
+            <div className="relative h-full max-h-[560px] aspect-[9/16] rounded-2xl overflow-hidden bg-black">
               <iframe
                 src={embedDetails.embedUrl}
                 className="absolute inset-x-0 top-0 w-full border-0"
@@ -349,7 +353,7 @@ export function PlaceDetailModal({
         {/* --- HERO MEDIA HEADER --- */}
         <div 
           onClick={isCreator ? handleHeroClick : undefined}
-          className={`w-full h-[230px] lg:h-[210px] bg-zinc-950 relative overflow-hidden shrink-0 ${isCreator ? 'group/hero cursor-pointer' : ''}`}
+          className={`w-full h-[230px] lg:h-[330px] bg-zinc-950 relative overflow-hidden shrink-0 ${isCreator ? 'group/hero cursor-pointer' : ''}`}
           title={isCreator ? (lang === 'vi' ? 'Nhấp vào đây để tải lên ảnh hoặc video cho địa điểm này' : 'Click to upload custom photo or video') : undefined}
         >
           {/* Hidden File Input */}
