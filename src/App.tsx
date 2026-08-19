@@ -915,22 +915,26 @@ export default function App() {
                   <button
                     id={`desktop-nav-item-${idx}`}
                     onClick={() => navigateToPage(idx)}
-                    className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 text-left ${
+                    className={`w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl transition-all duration-300 text-left ${
                       currentPage === idx
                         ? 'bg-[#b85233]/15 text-[#d98a6e] font-semibold border-l-4 border-[#b85233]'
                         : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5'
                     }`}
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
                       {/* opacity-90, not 75: at 75 the numeral resolved to
                           #7b7f86 against the sidebar and measured 4.23:1, just
                           under the 4.5:1 this size needs. 90 keeps it quieter
                           than the label beside it and measures 5.75:1. */}
-                      <span className="font-serif text-xs opacity-90">0{idx + 1}</span>
+                      <span className="font-serif text-xs opacity-90 shrink-0">0{idx + 1}</span>
                       <span className="text-sm">{t.pages[pageName]}</span>
                     </div>
                     {/* zinc-400 on zinc-800 is 5.81:1; zinc-500 was 3.08:1. */}
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded uppercase ${
+                    {/* shrink-0 + whitespace-nowrap: justify-between de ca hai con deu co
+                        duoc, nen "Pg 7" bi bop thanh hai dong khi nhan ben canh
+                        dai — dung cai loi da sua o PageHeading. Nua ngan phai
+                        duoc ghim de nua dai xuong dong. */}
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded uppercase shrink-0 whitespace-nowrap ${
                       currentPage === idx ? 'bg-[#b85233] text-white' : 'bg-zinc-800 text-zinc-400'
                     }`}>
                       Pg {idx + 1}
