@@ -696,22 +696,11 @@ export function PlaceDetailModal({
                       {lang === 'vi' ? 'Địa chỉ' : lang === 'ja' ? '住所' : lang === 'zh' ? '地址' : 'Address'}
                     </span>
                     <p className="text-xs text-zinc-700 font-medium leading-relaxed break-words">{place.addr}</p>
-                    <button 
-                      onClick={handleCopyAddress}
-                      className="mt-1.5 inline-flex items-center gap-1 text-[9px] text-[#0b433f] font-semibold hover:underline cursor-pointer"
-                    >
-                      {copied ? (
-                        <>
-                          <Check className="w-2.5 h-2.5 text-emerald-500" />
-                          <span className="text-emerald-600">{lang === 'vi' ? 'Đã sao chép!' : 'Copied!'}</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-2.5 h-2.5" />
-                          <span>{lang === 'vi' ? 'Sao chép địa chỉ' : 'Copy address'}</span>
-                        </>
-                      )}
-                    </button>
+                    {/* A second "copy address" stood here, calling the same
+                        handler and carrying the same label as the button in the
+                        footer — both on screen at once, one of them below the
+                        fold. The footer keeps it, because that bar is present on
+                        every tab. */}
                   </div>
                 </div>
 
@@ -743,26 +732,10 @@ export function PlaceDetailModal({
 
               </div>
 
-              {/* Map Call-to-Action Card */}
-              <div className="bg-gradient-to-tr from-[#0b433f] to-[#125e59] text-white rounded-2xl p-4 flex justify-between items-center shadow-md">
-                <div className="space-y-1 pr-3">
-                  <h4 className="text-xs font-bold font-serif">{lang === 'vi' ? 'Tìm đường đi' : lang === 'ja' ? 'ナビゲーション' : 'Get Directions'}</h4>
-                  <p className="text-[10px] text-zinc-200 leading-normal font-light">
-                    {lang === 'vi' ? 'Mở Google Maps và dẫn đường trực tiếp' : lang === 'ja' ? 'Googleマップでルート案内を開く' : 'Launch navigation with Google Maps'}
-                  </p>
-                </div>
-                {/* shrink-0 or the round button squashes to an oval when the
-                    label beside it runs long — the Japanese string is the
-                    widest of the three. */}
-                <a
-                  href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name + ' ' + place.addr)}`}
-                  target="_blank"
-                  rel="noreferrer referrer"
-                  className="bg-white text-[#0b433f] rounded-full p-2.5 shadow hover:scale-105 active:scale-95 transition-transform shrink-0"
-                >
-                  <Navigation className="w-4 h-4" />
-                </a>
-              </div>
+              {/* The "Get Directions" card stood here. It opened the same URL
+                  as the Open in Maps button in the footer, which is on screen on
+                  every tab and never scrolls away — so this was a second, larger
+                  copy of a control the reader could already see. */}
             </div>
           )}
 
