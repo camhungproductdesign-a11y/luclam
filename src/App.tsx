@@ -1988,8 +1988,12 @@ export default function App() {
                     {t.food.intro}
                   </p>
 
-                  {/* Horizontal scrollable category tabs */}
-                  <div className="flex gap-1.5 overflow-x-auto pb-1 pt-1 no-scrollbar" id="food-category-tabs">
+                  {/* Scrolls sideways on a phone, wraps on a desktop. A row that
+                      scrolls hides whatever is past its right edge, and a tab
+                      a reader cannot see is a tab they will not press. On a
+                      380px phone there is nowhere else for them to go; in a
+                      440px column there is. */}
+                  <div className="flex gap-1.5 lg:gap-2 overflow-x-auto lg:overflow-visible lg:flex-wrap pb-1 pt-1 no-scrollbar" id="food-category-tabs">
                     {t.food.categories.map((cat: any, idx: number) => (
                       <button
                         key={idx}
