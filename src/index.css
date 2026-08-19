@@ -341,6 +341,34 @@
   }
 }
 @media (min-width: 1024px) {
+  /**
+   * The page furniture crosses both columns; the content still flows in them.
+   *
+   * A two-column flow fills column one top to bottom before starting column
+   * two, so a heading low in column one leaves its own items at the TOP of
+   * column two — level with the page title. On page 09 that put tea #2 above
+   * the heading that introduces tea #1, and it happened on seven of eight
+   * pages.
+   *
+   * A spanning element interrupts the flow: everything after it restarts at
+   * the top of column one. So the title, the intro and the tab strip go full
+   * width, and each list begins underneath its own heading.
+   *
+   * Spanning rather than dropping multicol for a grid, because the columns are
+   * what make these pages fit one screen at all — they pack the furniture two
+   * up as well as the cards. Measured: a grid layout cost every page between
+   * 165px and 646px of scroll, against 0-183px for this.
+   *
+   * column-span has been in Chrome, Firefox and Safari well below this
+   * project's floor of Safari 16.4.
+   */
+  .lm-spread > .lm-head,
+  .lm-spread > p,
+  .lm-spread > [role='tablist'],
+  .lm-spread > .lm-span {
+    column-span: all;
+  }
+
   .page-section {
     justify-content: safe center;
     /* 2.5rem of gap and 3rem top and bottom spent 136px of a 820px screen on

@@ -63,9 +63,12 @@ export function PageHeading({
 }: Props) {
   const palette = PALETTE[tone];
 
+  // lm-head makes this cross both columns on desktop, so no list item is ever
+  // painted level with — or above — the title of its own page. See the
+  // .lm-spread rules in index.css.
   return (
     <div
-      className={`flex flex-wrap items-baseline gap-x-3 gap-y-0.5 border-b-[1.5px] ${palette.rule} pb-1.5 ${padTop}`}
+      className={`lm-head flex flex-wrap items-baseline gap-x-3 gap-y-0.5 border-b-[1.5px] ${palette.rule} pb-1.5 ${padTop}`}
     >
       <span
         className={`text-[11px] font-bold tracking-widest uppercase ${palette.label} ${

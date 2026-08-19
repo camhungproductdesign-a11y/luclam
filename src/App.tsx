@@ -2044,7 +2044,7 @@ export default function App() {
                   PAGE 06: FOOD (Legends Must-Eat)
                   ========================================================================== */}
               <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto" id="food-page-section">
-                <div className="space-y-4 lg:columns-2 lg:gap-6">
+                <div className="space-y-4 lg:columns-2 lg:gap-6 lm-spread">
                   <PageHeading number="06" title={t.pages.food} kicker="Must-Eat Legends" />
 
                   <p className="text-xs leading-relaxed text-zinc-600 font-light">
@@ -2144,7 +2144,7 @@ export default function App() {
                   PAGE 07: CULTURE & LANDMARKS
                   ========================================================================== */}
               <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
-                <div className="space-y-4 lg:columns-2 lg:gap-6">
+                <div className="space-y-4 lg:columns-2 lg:gap-6 lm-spread">
                   <PageHeading number="07" title={t.pages.culture} kicker="Heritage & Check-in" />
 
                   <p className="text-xs leading-relaxed text-zinc-600 font-light">
@@ -2311,7 +2311,7 @@ export default function App() {
                   PAGE 09: LỤC LAM TRẠM DỪNG CHÂN (Signature Experience)
                   ========================================================================== */}
               <section className="w-full h-full shrink-0 snap-start bg-[#0b1513] text-[#f6f3eb] flex flex-col justify-between page-section p-6 overflow-y-auto">
-                <div className="space-y-5 lg:columns-2 lg:gap-6">
+                <div className="space-y-5 lg:columns-2 lg:gap-6 lm-spread">
                   {/* Eyebrow in English by design, like the other eight pages.
                       This one was the only Vietnamese hold-out. */}
                   <PageHeading
@@ -2322,8 +2322,13 @@ export default function App() {
                     icon={<Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />}
                   />
 
-                  {/* Stunning Shimmering Indochine Intro Card */}
-                  <div className="bg-gradient-to-br from-[#0c2b27] via-[#081e1b] to-black rounded-2xl p-4.5 border border-amber-500/20 shadow-xl relative overflow-hidden">
+                  {/* Stunning Shimmering Indochine Intro Card.
+
+                      lm-span, like the intro paragraph on the other eight
+                      pages: without it this card flows into column two and
+                      leaves a column-high void beside the title, because there
+                      is nothing above it to fill column one. */}
+                  <div className="lm-span bg-gradient-to-br from-[#0c2b27] via-[#081e1b] to-black rounded-2xl p-4.5 border border-amber-500/20 shadow-xl relative overflow-hidden">
                     <div className="absolute -right-4 -bottom-4 opacity-5 pointer-events-none">
                       <Coffee className="w-40 h-40 text-amber-400" />
                     </div>
@@ -2740,7 +2745,7 @@ export default function App() {
                   PAGE 10: USEFUL INFO (Safety, Cash & SIM)
                   ========================================================================== */}
               <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
-                <div className="space-y-4 lg:columns-2 lg:gap-6">
+                <div className="space-y-4 lg:columns-2 lg:gap-6 lm-spread">
                   <PageHeading number="10" title={t.pages.info} kicker="Security & Backup" />
 
                   <p className="text-xs leading-relaxed text-zinc-600 font-light">
