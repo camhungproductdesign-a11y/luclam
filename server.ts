@@ -8,12 +8,38 @@
 import "dotenv/config";
 
 import express from "express";
+import compression from "compression";
 import path from "path";
 import fs from "fs";
 import crypto from "crypto";
 import sharp from "sharp";
 
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
+
+/**
+ * The port, from the environment, defaulting to the 3000 this was pinned to.
+ *
+ * Hardcoded it could only ever be 3000, so a host that hands its port over in
+ * $PORT — which is how most of them do it — would have had the app listening
+ * somewhere nothing was looking.
+ *
+ * Validated rather than trusted: Number("") is 0 and Number("abc") is NaN, and
+ * either would be passed to listen() as a silent request for a random free
+ * port. Refusing to start is easier to diagnose than a server nobody can reach.
+ */
+const PORT = (() => {
+  const raw = process.env.PORT;
+  if (raw === undefined || raw.trim() === "") return 3000;
+  const port = Number(raw);
+  if (!Number.isInteger(port) || port < 1 || port > 65535) {
+    console.error(
+      `PORT không hợp lệ: "${raw}". Cần một số nguyên từ 1 đến 65535.\n` +
+        "Bỏ trống biến này để dùng cổng mặc định 3000."
+    );
+    process.exit(1);
+  }
+  return port;
+})();
 
 if (!ADMIN_TOKEN) {
   console.error(
@@ -25,7 +51,20 @@ if (!ADMIN_TOKEN) {
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+
+  /**
+   * Compress before anything else answers, so it covers static files too.
+   *
+   * The built site is 1761KB of HTML, JS, CSS, XML and text against 555KB
+   * gzipped — measured across the 69 compressible files in dist. Without this
+   * every uncached visit paid the difference. GitHub Pages compresses on its
+   * own, so this only ever mattered for the self-hosted path, which is exactly
+   * the path that had no compression at all.
+   *
+   * Images are already AVIF/WebP and gzip cannot improve them; the default
+   * filter skips them by content type, so there is nothing to configure.
+   */
+  app.use(compression());
 
   // Setup JSON parser with large limit to allow rich custom configurations and media arrays
   app.use(express.json({ limit: "20mb" }));
