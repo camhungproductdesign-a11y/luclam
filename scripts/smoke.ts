@@ -165,9 +165,26 @@ async function main() {
     // /blog answered 200, the canonical named a real page, and all seventeen
     // links out of it were 404 — a crawler arrives, finds the index, and cannot
     // reach a single article. Nothing that looks only at /blog can see that.
+    // Both link shapes, because AEO emits different ones depending on whether
+    // the brand knows its custom domain: /blog/<article> once declared,
+    // /<brand-slug>/blog/<article> before that. The first version of this
+    // pattern required a segment in front of /blog/ and matched only the
+    // second. When the domain was declared it silently stopped matching
+    // anything — the counter vanished from the output and the check reported
+    // success by finding nothing to test.
     const outbound = [...new Set(
-      [...blogHtml.matchAll(/<a [^>]*href="(\/[^"]*\/blog\/[^"#?]+)"/g)].map((m) => m[1])
+      [...blogHtml.matchAll(/<a [^>]*href="(\/(?:[^"]*\/)?blog\/[^"#?]+)"/g)].map((m) => m[1])
     )].slice(0, 20);
+
+    // A blog index with no links out of it is not a pass. Either AEO changed
+    // its markup and this pattern needs updating, or the index really is a dead
+    // end — and those two look identical from here, so both have to fail.
+    check(
+      outbound.length > 0,
+      'Không tìm thấy link bài viết nào trên /blog để kiểm. Trang index không có ' +
+        'link nào, hoặc AEO đổi cách viết href và regex trong smoke.ts đã lạc hậu — ' +
+        'mở https://gift.luclam.vn/blog xem href thật đang là gì.'
+    );
 
     if (outbound.length) {
       const results = await inBatches(outbound, 6, async (href) => {
