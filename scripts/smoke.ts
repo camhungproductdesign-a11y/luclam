@@ -291,11 +291,27 @@ async function main() {
       `${asset} trả về không nén (content-encoding: ${enc || 'không có'}) — bật gzip trong nginx`
     );
     const cache = res.headers.get('cache-control') ?? '';
-    warn(
+    check(
       /immutable|max-age=\d{6,}/.test(cache),
-      `${asset} có tên chứa hash nhưng cache-control là "${cache || 'không có'}" — nên đặt immutable`
+      `${asset} có tên chứa hash nhưng cache-control là "${cache || 'không có'}" — ` +
+        'mỗi lượt quay lại tải lại toàn bộ JS và CSS. Kiểm handler /assets trong server.ts.'
     );
-    console.log(`  ${asset.split('/').pop()} nén bằng ${enc || 'không'}`);
+
+    // The inverse, and the one worth failing over. Hashed assets cached too
+    // briefly cost bandwidth; HTML cached too long costs correctness — the
+    // sixty pages are rewritten at the same URLs every time Creator Studio
+    // publishes, so a year-long cache means an editor fixes a price and
+    // returning readers keep reading the old one until 2027. Nothing sets that
+    // today; this check exists so that widening the /assets rule to cover all
+    // of dist fails here instead of silently in six months.
+    const homeCache = (await fetch(`${BASE}/`)).headers.get('cache-control') ?? '';
+    check(
+      !/immutable/.test(homeCache) && !/max-age=\d{5,}/.test(homeCache),
+      `Trang chủ có cache-control "${homeCache}" — HTML bị cache quá lâu. Nội dung do ` +
+        'Creator Studio sửa được ghi đè lên đúng URL cũ, nên bản đã sửa sẽ không tới người đọc.'
+    );
+    console.log(`  ${asset.split('/').pop()} nén bằng ${enc || 'không'} · cache "${cache}"`);
+    console.log(`  HTML cache "${homeCache || 'không đặt'}"`);
   }
 
   // ---- the write API, where there is one -------------------------------
