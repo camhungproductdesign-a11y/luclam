@@ -61,13 +61,25 @@ export function SectionTabs<Id extends string>({
   const palette = PALETTE[tone];
 
   return (
-    // role="tablist" without aria-controls: the panels are siblings the caller
-    // owns, and a wrong id here would be worse than none. The accessible name
-    // carries what the group is for.
+    /* A group of toggle buttons, not an ARIA tablist.
+     *
+     * It was role="tablist" with role="tab" on each pill and no aria-controls,
+     * because the panels are siblings the caller owns and a wrong id would be
+     * worse than none. That reasoning was right about the ids and wrong about
+     * the conclusion: "tab" announces a relationship to a tabpanel, and
+     * promising one that does not exist leaves a screen reader user hearing
+     * "tab" with no way to find what it controls and no panel to jump to. Half
+     * the pattern is worse than none of it.
+     *
+     * These are filter chips — pick one, the list below changes — so they are
+     * buttons that say whether they are pressed, inside a group that says what
+     * the choice is for. That is the whole truth about them, and it matches the
+     * strips on pages 06 and 07, which were always plain buttons.
+     */
     <div
-      role="tablist"
+      role="group"
       aria-label={label}
-      className="flex gap-1.5 lg:gap-2 overflow-x-auto lg:overflow-visible lg:flex-wrap pb-1 pt-0.5 no-scrollbar"
+      className="lm-span flex gap-1.5 lg:gap-2 overflow-x-auto lg:overflow-visible lg:flex-wrap pb-1 pt-0.5 no-scrollbar"
     >
       {tabs.map((tab) => {
         const selected = tab.id === active;
@@ -75,8 +87,7 @@ export function SectionTabs<Id extends string>({
           <button
             key={tab.id}
             type="button"
-            role="tab"
-            aria-selected={selected}
+            aria-pressed={selected}
             onClick={() => onChange(tab.id)}
             className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full text-[9px] font-medium transition-all duration-300 shrink-0 border focus-visible:outline-none focus-visible:ring-2 ${palette.ring} ${
               selected ? palette.on : palette.off
