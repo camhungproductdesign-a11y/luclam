@@ -5,3 +5,9 @@ dist/
 !.env.example
 *.log
 .DS_Store
+
+# Written beside public/config.json when Creator Studio saves: the previous
+# good version, and the temp file the atomic rename swaps in. Both are local
+# runtime state, and the .bak is a copy of content that is already committed.
+public/config.json.bak
+public/config.json.*.tmp

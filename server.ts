@@ -348,18 +348,64 @@ async function startServer() {
   });
 
   // API to save/sync custom guides
+  /** A plain object, not an array and not a string that happens to be truthy. */
+  const isPlainObject = (value: unknown): value is Record<string, unknown> =>
+    typeof value === "object" && value !== null && !Array.isArray(value);
+
+  /**
+   * Saving is atomic, and the version it replaces is kept.
+   *
+   * This wrote straight over config.json. A process killed mid-write — an OOM
+   * during a build on a small VPS is the likely one — leaves the file truncated,
+   * and the prerenderer refuses to build on invalid JSON by design. So a half
+   * written save did not cost one edit, it blocked every deploy until somebody
+   * repaired the file by hand, with no earlier copy to repair it from.
+   *
+   * Writing to a temp file in the same directory and renaming makes the swap
+   * atomic: rename(2) on one filesystem either happens or does not, so a reader
+   * sees the old file or the new one and never half of either. The previous good
+   * version is kept beside it, which is the difference between an accident and a
+   * loss — Creator Studio's export button is the only other copy that exists.
+   */
   app.post("/api/config", requireAdmin, async (req, res) => {
     try {
       const { overrides, customMedia } = req.body;
+
+      // `overrides || {}` accepted a string, which would be written out and then
+      // read back by the prerenderer as content it cannot use.
+      if (overrides !== undefined && !isPlainObject(overrides)) {
+        return res.status(400).json({ error: "overrides phải là một object" });
+      }
+      if (customMedia !== undefined && !isPlainObject(customMedia)) {
+        return res.status(400).json({ error: "customMedia phải là một object" });
+      }
+
       const dataToSave = {
-        overrides: overrides || {},
-        customMedia: customMedia || {},
+        overrides: overrides ?? {},
+        customMedia: customMedia ?? {},
       };
-      await fs.promises.writeFile(
-        CONFIG_PATH,
-        JSON.stringify(dataToSave, null, 2),
-        "utf-8"
-      );
+      const serialised = JSON.stringify(dataToSave, null, 2);
+
+      // Parsed back before it is allowed near the real file: a value that cannot
+      // survive the round trip is one the prerenderer would choke on later.
+      JSON.parse(serialised);
+
+      if (fs.existsSync(CONFIG_PATH)) {
+        await fs.promises.copyFile(CONFIG_PATH, `${CONFIG_PATH}.bak`);
+      }
+
+      const tmp = `${CONFIG_PATH}.${process.pid}.tmp`;
+      const handle = await fs.promises.open(tmp, "w");
+      try {
+        await handle.writeFile(serialised, "utf-8");
+        // Flush before the rename, or the rename can land while the bytes are
+        // still in the page cache and a crash leaves an empty file behind it.
+        await handle.sync();
+      } finally {
+        await handle.close();
+      }
+      await fs.promises.rename(tmp, CONFIG_PATH);
+
       res.json({ status: "success" });
     } catch (e: any) {
       console.error("Error saving config:", e);
@@ -401,8 +447,33 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, HOST, () => {
+  const server = app.listen(PORT, HOST, () => {
     console.log(`Server running on http://${HOST}:${PORT}`);
+  });
+
+  /**
+   * A busy port should say so, not throw a stack trace.
+   *
+   * listen() reports failure as an 'error' event, and with nothing listening for
+   * it Node rethrows as an unhandled exception. Under systemd with
+   * Restart=always that is a crash loop, restarting every few seconds against a
+   * port that is not going to free itself, with the reason buried in a trace.
+   */
+  server.on("error", (e: NodeJS.ErrnoException) => {
+    if (e.code === "EADDRINUSE") {
+      console.error(
+        `Cổng ${PORT} đang bị tiến trình khác chiếm trên ${HOST}.\n` +
+          "Dừng tiến trình đó, hoặc đặt PORT sang cổng khác trong .env."
+      );
+    } else if (e.code === "EACCES") {
+      console.error(
+        `Không có quyền mở cổng ${PORT}. Cổng dưới 1024 cần quyền root — ` +
+          "hãy để nginx nhận 80/443 và chạy server này ở cổng cao."
+      );
+    } else {
+      console.error(`Không mở được cổng ${PORT}: ${e.message}`);
+    }
+    process.exit(1);
   });
 }
 
