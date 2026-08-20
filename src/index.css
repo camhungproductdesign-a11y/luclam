@@ -384,7 +384,6 @@
    */
   .lm-spread > .lm-head,
   .lm-spread > p,
-  .lm-spread > [role='tablist'],
   .lm-spread > .lm-span {
     column-span: all;
   }
