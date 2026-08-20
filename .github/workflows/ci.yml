@@ -1,0 +1,46 @@
+name: CI
+
+# What is left of deploy-pages.yml.
+#
+# gift.luclam.vn is served from the container on the VM now, behind nginx and
+# HAProxy, so the deploy half of that workflow published to a GitHub Pages site
+# nobody visits. Deploying nothing is the point; checking is not, and deleting
+# the file outright would have taken the repository's only CI with it.
+#
+# There is no automated deploy to replace it. Releasing means SSH to the VM,
+# git pull, docker compose up -d --build, then `docker compose exec app npm run
+# build` to re-bake the sixty pages against the live public/config.json. A green
+# run here means the commit builds and verifies — not that it is live anywhere.
+
+on:
+  push:
+    branches: [main]
+  # Added rather than inherited: the old workflow ran only on pushes to main, so
+  # a pull request could sit for days looking fine and break the build on merge.
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Build
+        run: npm run build
+      # Reads the sixty generated pages off disk and checks canonicals, hreflang
+      # alternates, headings and the sitemap. `npm run smoke` is deliberately not
+      # here: it needs a running deployment, which CI has not got.
+      - name: Verify generated output
+        run: npm run verify
