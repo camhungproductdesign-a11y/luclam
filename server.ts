@@ -13,6 +13,13 @@ import path from "path";
 import fs from "fs";
 import crypto from "crypto";
 import sharp from "sharp";
+import { Readable } from "stream";
+import {
+  AEO_UPSTREAM,
+  AEO_BRAND_SLUG,
+  AEO_LEGACY_BLOG_PREFIX,
+  BLOG_PATH,
+} from "./src/aeoBlog";
 
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
 
@@ -89,6 +96,72 @@ if (ADMIN_TOKEN.length < MIN_TOKEN_LENGTH) {
   process.exit(1);
 }
 
+/**
+ * /blog is another server's pages, answering as if they were this site's.
+ *
+ * The articles live in AEO and are served from app.aeo.how. Proxying them under
+ * this domain rather than linking out is the whole point: a link hands the
+ * ranking to app.aeo.how, while a rewrite keeps it on gift.luclam.vn, where the
+ * rest of the site already earns it.
+ *
+ * The addresses themselves live in src/aeoBlog.ts, because smoke.ts asserts
+ * against the same ones.
+ */
+
+/** Long enough for a cold render upstream, short enough to fail rather than hang. */
+const BLOG_TIMEOUT_MS = 15_000;
+
+/**
+ * Sent upstream. An allowlist, because the two headers that must not travel are
+ * dangerous in ways a denylist tends to miss on the next edit.
+ *
+ * Host is the first: Cloudflare answers 403 to a Host it does not have a custom
+ * hostname for, so forwarding the visitor's Host — which is what every proxy
+ * tutorial tells you to do — breaks this outright. fetch sets Host from the URL,
+ * so the fix is simply never to copy it.
+ *
+ * Cookie is the second. Blog pages are public and need no identity, and this
+ * site's cookies belong to this site.
+ *
+ * accept-encoding is absent on purpose; see BLOG_STRIP_HEADERS.
+ */
+const BLOG_FORWARD_HEADERS = [
+  "accept",
+  "accept-language",
+  "user-agent",
+  "referer",
+  "if-none-match",
+  "if-modified-since",
+] as const;
+
+/**
+ * Dropped from the upstream response.
+ *
+ * The hop-by-hop names are the usual list — they describe one connection and
+ * mean nothing on the next.
+ *
+ * content-encoding and content-length are the subtle pair. fetch decompresses
+ * the body before handing it over, so by the time it is piped out it is plain
+ * bytes while the upstream headers still say gzip and give the compressed
+ * length. Copying either sends the browser to decode something already decoded.
+ * Dropping both leaves the response uncompressed and unmeasured, which is
+ * exactly the state compression() above knows how to handle — it compresses
+ * anything without a Content-Encoding, so the visitor still gets gzip, just
+ * this server's rather than AEO's.
+ */
+const BLOG_STRIP_HEADERS = new Set([
+  "connection",
+  "keep-alive",
+  "transfer-encoding",
+  "upgrade",
+  "proxy-authenticate",
+  "proxy-authorization",
+  "te",
+  "trailer",
+  "content-encoding",
+  "content-length",
+]);
+
 async function startServer() {
   const app = express();
 
@@ -105,6 +178,131 @@ async function startServer() {
    * filter skips them by content type, so there is nothing to configure.
    */
   app.use(compression());
+
+  /**
+   * The blog, proxied. See AEO_UPSTREAM above for why it is proxied at all.
+   *
+   * Position in the middleware stack is load-bearing in both directions, which
+   * is why this sits wedged between two things rather than anywhere tidy.
+   *
+   * It must come after compression(), so the decompressed upstream body gets
+   * gzipped on the way out — a blog index is 95KB of HTML, and serving that
+   * uncompressed to a crawler undoes the reason for hosting it here.
+   *
+   * It must come before express.json(), which would otherwise read and buffer
+   * the body of every request through here against a 20MB limit, and before the
+   * static handler and the catch-all far below, which answer 404 for anything
+   * without a file on disk. /blog has no file on disk. Move this line down and
+   * the blog stops existing.
+   *
+   * Mounted with app.use, so it takes /blog and everything under it — and only
+   * those: Express matches mount paths on segment boundaries, so /blogging is
+   * left alone.
+   */
+  app.use(BLOG_PATH, async (req, res) => {
+    // Read-only, and stated rather than assumed. Anything else would reach
+    // upstream with no body, since express.json() has not run yet, and fail
+    // there in a way that reads as AEO being broken.
+    if (req.method !== "GET" && req.method !== "HEAD") {
+      res.setHeader("Allow", "GET, HEAD");
+      return res.status(405).json({ error: "Blog chỉ phục vụ đọc" });
+    }
+
+    // From originalUrl rather than req.url: inside a mount, Express rewrites
+    // req.url to the remainder and turns "/blog?page=2" into "/?page=2", which
+    // would reach upstream as "/blog/?page=2" — a different URL, and one that
+    // redirects. Slicing the prefix off originalUrl keeps the query attached to
+    // the path the visitor actually asked for.
+    const rest = req.originalUrl.slice(BLOG_PATH.length);
+    const target = `${AEO_UPSTREAM}${AEO_LEGACY_BLOG_PREFIX}${rest}`;
+
+    const headers: Record<string, string> = {};
+    for (const name of BLOG_FORWARD_HEADERS) {
+      const value = req.get(name);
+      if (value) headers[name] = value;
+    }
+
+    let upstream: Awaited<ReturnType<typeof fetch>>;
+    try {
+      upstream = await fetch(target, {
+        method: req.method,
+        headers,
+        // Followed here, a redirect would be fetched server-side and returned
+        // as though it were the original URL, so the visitor's address bar
+        // never learns anything moved. Handed back instead, the browser follows
+        // it and the URL stays honest.
+        redirect: "manual",
+        signal: AbortSignal.timeout(BLOG_TIMEOUT_MS),
+      });
+    } catch (e: any) {
+      const why =
+        e?.name === "TimeoutError"
+          ? `không trả lời trong ${BLOG_TIMEOUT_MS / 1000}s`
+          : e?.message ?? "lỗi không rõ";
+      console.error(`Blog upstream ${target} — ${why}`);
+      return res
+        .status(502)
+        .type("text/plain; charset=utf-8")
+        .send("Blog tạm thời không truy cập được. Phần còn lại của trang vẫn hoạt động.");
+    }
+
+    res.status(upstream.status);
+    upstream.headers.forEach((value, name) => {
+      if (!BLOG_STRIP_HEADERS.has(name.toLowerCase())) res.setHeader(name, value);
+    });
+
+    // What ProxyPassReverse does in Apache. A redirect upstream writes names
+    // app.aeo.how, and a visitor who follows one leaves this domain mid-visit
+    // and lands on a URL whose canonical points back here — so the trip is both
+    // visible and pointless. Set after the copy loop, so it overwrites.
+    const location = upstream.headers.get("location");
+    if (location) {
+      res.setHeader(
+        "location",
+        location.replace(`${AEO_UPSTREAM}${AEO_LEGACY_BLOG_PREFIX}`, BLOG_PATH)
+      );
+    }
+
+    // HEAD, 304 and friends carry no body.
+    if (!upstream.body) return res.end();
+
+    Readable.fromWeb(upstream.body as any)
+      .on("error", (e: Error) => {
+        // Headers are already sent, so there is no status left to change —
+        // dropping the connection is the only honest signal available.
+        console.error(`Blog upstream ${target} đứt giữa chừng — ${e.message}`);
+        res.destroy();
+      })
+      .pipe(res);
+  });
+
+  /**
+   * The blog's own links, caught and sent to the path this site actually serves.
+   *
+   * AEO writes internal links from the custom domain declared against the brand.
+   * With none declared it falls back to its own layout and every link on the
+   * blog index reads /<brand-slug>/blog/<article>. That path is not proxied
+   * here, matches no generated file, and so answers 404 — measured at seventeen
+   * out of seventeen. The blog index itself was a perfectly healthy 200 the
+   * whole time, which is what made it easy to miss: a crawler arrives, indexes
+   * one page, follows every link out of it into a wall, and the articles this
+   * integration exists to promote are never read.
+   *
+   * Declaring the domain in AEO is the actual fix and makes this dead code. It
+   * stays because dead is the point — the day AEO's config is lost, restored
+   * from an older backup, or edited by someone who does not know what depends on
+   * it, the difference between this line existing and not is whether the blog
+   * degrades or disappears.
+   *
+   * 301 rather than a second proxy mount, because two paths serving identical
+   * articles is a duplicate-content problem, and a permanent redirect is the one
+   * signal that tells a crawler to keep the destination and forget the source.
+   * It cannot loop: it only ever points into BLOG_PATH, which proxies.
+   */
+  app.use(AEO_LEGACY_BLOG_PREFIX, (req, res) => {
+    const rest = req.originalUrl.slice(AEO_LEGACY_BLOG_PREFIX.length);
+    res.redirect(301, `${BLOG_PATH}${rest}`);
+  });
 
   // Setup JSON parser with large limit to allow rich custom configurations and media arrays
   app.use(express.json({ limit: "20mb" }));

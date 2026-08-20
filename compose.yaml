@@ -18,6 +18,11 @@ services:
     # Generate one with:
     #   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
     # The server refuses to start below 32 characters.
+    #
+    # AEO_BRAND_SLUG rides along from the same file when it is set, which is why
+    # it is absent from the `environment` block below: unlike HOST and PORT,
+    # pointing /blog at a different brand is a thing someone might legitimately
+    # want to do per deployment, and forcing it here would take that away.
     env_file:
       - .env
 

@@ -219,6 +219,22 @@ export function renderContent(
     )
     .join('');
 
+  /**
+   * The blog, which no other link on this site reaches.
+   *
+   * /blog is proxied from AEO at request time (see server.ts), so it appears in
+   * no sitemap this build writes and in no route table — nothing in dist knows
+   * it exists. A crawler that only follows links would never find it, and the
+   * whole reason for hosting the articles under this domain is that they collect
+   * ranking here.
+   *
+   * One entry appended to the nav every page already carries puts it on all
+   * sixty. It is deliberately not in TOPICS: the pages there are prerendered
+   * files with language variants, and this is a single path served by another
+   * server in whatever languages it has.
+   */
+  const blogNav = `<li><a href="/blog">${escapeHtml(t.blog)}</a></li>`;
+
   const languageNav = (['vi', 'en', 'ja', 'ko', 'zh', 'zht'] as Language[])
     .filter((other) => other !== lang)
     .map(
@@ -243,7 +259,7 @@ export function renderContent(
     renderContact(topic, t),
     renderImages(images),
     '</article>',
-    `<nav aria-label="${escapeHtml(t.pages.info)}"><ul>${topicNav}</ul></nav>`,
+    `<nav aria-label="${escapeHtml(t.pages.info)}"><ul>${topicNav}${blogNav}</ul></nav>`,
     `<nav aria-label="Languages"><ul>${languageNav}</ul></nav>`,
   ].join('\n');
 }

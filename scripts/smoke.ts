@@ -17,6 +17,7 @@
  * Exits non-zero on failure, so a deploy script can gate the symlink swap on it.
  */
 import { ALL_ROUTES } from '../src/routes';
+import { AEO_LEGACY_BLOG_PREFIX } from '../src/aeoBlog';
 
 const BASE = (process.argv[2] ?? 'http://localhost:4177').replace(/\/$/, '');
 
@@ -99,6 +100,123 @@ async function main() {
   check(urls >= 10, `sitemap chỉ có ${urls} URL`);
   check(images >= 60, `sitemap chỉ có ${images} ảnh`);
   console.log(`  llms.txt ${links} liên kết · sitemap ${urls} URL, ${images} ảnh`);
+
+  // ---- the blog, which is another server's pages wearing this domain ---
+  //
+  // /blog is proxied to app.aeo.how. Nothing about that is visible on disk, so
+  // `npm run verify` cannot see it and this is the only place it gets checked.
+  //
+  // The canonical assertion is the one that matters, and it is not the same
+  // question the homepage's canonical asks below. AEO builds blog canonicals
+  // from its own database, not from the Host header, so a brand whose custom
+  // domain has not been filled in serves perfectly good pages that all claim to
+  // live at app.aeo.how. The proxy works, every status code is 200, and Google
+  // hands the credit to app.aeo.how — measured on this brand before the domain
+  // was declared. Asserting the negative rather than matching BASE is what lets
+  // the same check run against localhost, where the canonical is correctly
+  // gift.luclam.vn and a match against BASE would be wrong.
+  const [blog, blogSitemap] = await Promise.all([
+    fetch(`${BASE}/blog`, { redirect: 'follow' }).catch(() => null),
+    fetch(`${BASE}/blog/sitemap.xml`, { redirect: 'follow' }).catch(() => null),
+  ]);
+
+  check(
+    blog?.status === 200,
+    `/blog trả ${blog?.status ?? 'lỗi mạng'} — proxy chưa chạy. Kiểm thứ tự middleware ` +
+      'trong server.ts: proxy phải đứng trước express.static và trước catch-all 404. ' +
+      'Trên GitHub Pages thì không có proxy nào cả, đây là đường chỉ VPS mới có.'
+  );
+  check(
+    blogSitemap?.status === 200,
+    `/blog/sitemap.xml trả ${blogSitemap?.status ?? 'lỗi mạng'} — crawler đọc sitemap này qua ` +
+      'dòng Sitemap trong robots.txt, nên nó 404 là blog không được index'
+  );
+
+  if (blog?.status === 200) {
+    const blogHtml = await blog.text();
+    const blogCanonical = blogHtml.match(/<link rel="canonical" href="([^"]+)"/)?.[1] ?? '';
+
+    // Two things go wrong here and one assertion has to catch both, because a
+    // 200 proves neither. Written the obvious way — "canonical must not say
+    // app.aeo.how" — this passed against a server with no proxy at all: the SPA
+    // fallback answered /blog with index.html, whose canonical is the homepage's
+    // and mentions no aeo.how. Requiring /blog in the path is what separates the
+    // blog answering from this site answering in its place.
+    const servedByBlog = blogCanonical.includes('/blog');
+    const ownsItsUrl = Boolean(blogCanonical) && !blogCanonical.includes('app.aeo.how');
+
+    check(
+      servedByBlog,
+      `canonical của /blog là "${blogCanonical || 'không có'}", không trỏ vào /blog — ` +
+        'đây là trang chủ của site này trả lời thay, không phải blog. Proxy chưa chạy, ' +
+        'hoặc đứng sau catch-all trong server.ts. (`npm run dev` luôn trả 200 cho mọi URL, ' +
+        'nên đừng tin status code ở đó.)'
+    );
+    check(
+      ownsItsUrl,
+      `canonical của /blog trỏ về "${blogCanonical || 'không có'}" — brand chưa khai custom domain ` +
+        'trong AEO (Settings → Connections → Blog Domain), nên mọi bài viết đang nhường ' +
+        'toàn bộ giá trị SEO cho app.aeo.how. Proxy chạy đúng cũng không cứu được chỗ này.'
+    );
+    console.log(`  /blog 200 · canonical ${blogCanonical || 'không có'}`);
+
+    // Every link the blog index offers, followed. This is the check that would
+    // have caught the state this site shipped in before the redirect existed:
+    // /blog answered 200, the canonical named a real page, and all seventeen
+    // links out of it were 404 — a crawler arrives, finds the index, and cannot
+    // reach a single article. Nothing that looks only at /blog can see that.
+    const outbound = [...new Set(
+      [...blogHtml.matchAll(/<a [^>]*href="(\/[^"]*\/blog\/[^"#?]+)"/g)].map((m) => m[1])
+    )].slice(0, 20);
+
+    if (outbound.length) {
+      const results = await inBatches(outbound, 6, async (href) => {
+        try {
+          const r = await fetch(BASE + href, { redirect: 'follow' });
+          return { href, status: r.status };
+        } catch {
+          return { href, status: 0 };
+        }
+      });
+      const dead = results.filter((r) => r.status !== 200);
+
+      // How many fail says where to look, so the message says which it is
+      // rather than making the reader guess. All of them means the path is
+      // wrong at this end — the prefix redirect is gone, or the proxy moved
+      // below the catch-all — and no article is reachable at all. A few means
+      // the path works and AEO is publishing links to pages it has not got;
+      // one such topic link was 404 upstream when this check was written, on
+      // app.aeo.how directly, with nothing of this site's in the way.
+      const allDead = dead.length === results.length;
+      check(
+        dead.length === 0,
+        `${dead.length}/${results.length} link bài viết trên /blog không tới nơi: ` +
+          `${dead.slice(0, 3).map((d) => `${d.href} (${d.status})`).join(', ')}. ` +
+          (allDead
+            ? 'Không bài nào đọc được — hỏng ở phía này: kiểm redirect tiền tố và ' +
+              'vị trí proxy trong server.ts.'
+            : 'Phần lớn link vẫn tới nơi, nên đường đi đúng — mấy cái này hầu như ' +
+              'chắc chắn 404 sẵn trên app.aeo.how. Thử curl thẳng lên đó để xác nhận ' +
+              'rồi báo bên AEO, không sửa được từ repo này.')
+      );
+      console.log(`  ${results.length - dead.length}/${results.length} link bài viết đi tới nơi`);
+    }
+  }
+
+  // ---- the redirect that keeps the old link shape alive -----------------
+  //
+  // Independent of what the index currently emits: once AEO knows the custom
+  // domain it writes /blog/... and the prefixed shape stops appearing, so the
+  // loop above would go quiet and stop proving anything. This asserts the net is
+  // still there for the day the upstream reverts.
+  const legacy = await fetch(`${BASE}${AEO_LEGACY_BLOG_PREFIX}/bai-viet-thu`, {
+    redirect: 'manual',
+  }).catch(() => null);
+  check(
+    legacy?.status === 301 && legacy.headers.get('location') === '/blog/bai-viet-thu',
+    `${AEO_LEGACY_BLOG_PREFIX}/… trả ${legacy?.status ?? 'lỗi mạng'} tới ` +
+      `"${legacy?.headers.get('location') ?? 'không có Location'}", chờ 301 tới /blog/bai-viet-thu`
+  );
 
   // ---- the structured data matches src/company.ts ---------------------
   const home = await (await fetch(`${BASE}/`)).text();

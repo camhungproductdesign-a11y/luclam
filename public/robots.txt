@@ -2,3 +2,10 @@ User-agent: *
 Allow: /
 
 Sitemap: https://gift.luclam.vn/sitemap.xml
+
+# The blog is proxied from AEO and writes its own sitemap, which this build
+# never sees and cannot merge. Named separately because in a rewrite setup the
+# crawler reads this file and only this file — AEO's own robots.txt sits on a
+# hostname no visitor to gift.luclam.vn ever requests, so anything not listed
+# here is not listed anywhere.
+Sitemap: https://gift.luclam.vn/blog/sitemap.xml

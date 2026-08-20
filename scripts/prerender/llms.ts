@@ -116,6 +116,10 @@ ${sections}
 
 - [Sitemap](${ORIGIN}/sitemap.xml): every URL with its hreflang alternates and images.
 - [robots.txt](${ORIGIN}/robots.txt): crawl rules. All assistant crawlers are allowed.
+- [Blog](${ORIGIN}/blog): articles, served from this domain but generated
+  separately, so none of the pages above describe them and they change without
+  this file changing. [Its own sitemap](${ORIGIN}/blog/sitemap.xml) is the
+  current list.
 `;
 }
 
