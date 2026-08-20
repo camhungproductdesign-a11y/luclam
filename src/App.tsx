@@ -966,6 +966,20 @@ export default function App() {
 
         {/* Sidebar Footer */}
         <div className="mt-auto pt-6 border-t border-zinc-800/50 space-y-1 text-center shrink-0">
+          {/* A real anchor, not navigateToPage: /blog is served by another
+              machine through the proxy in server.ts, so it needs a page load
+              rather than a state change. It sits here rather than in the page
+              list above because that list is indexed — every entry carries a
+              "Pg n" badge and drives currentPage — and the blog is not page 11.
+
+              zinc-300 rather than the zinc-400 beside it: this one is a control,
+              and the copyright is not. */}
+          <a
+            href="/blog"
+            className="inline-block text-[11px] text-zinc-300 hover:text-[#d98a6e] transition-colors mb-1"
+          >
+            {t.blog}
+          </a>
           <p className="text-[11px] text-zinc-400">&copy; 2026 Lục Lam. All rights reserved.</p>
           <p className="text-[9px] text-zinc-400">Designed for Saigon Travelers with Premium UI</p>
         </div>
@@ -982,6 +996,28 @@ export default function App() {
           {t.brand}
         </span>
         <div className="flex items-center gap-2">
+          {/* The only way to the blog on a phone.
+
+              The sidebar carrying the other one is `hidden lg:flex`, and the tab
+              strip at the bottom is driven by pagesList against a fixed array of
+              ten icons — an eleventh entry there would need an icon it does not
+              have and a page index that does not exist. So the blog reached
+              every crawler, through the prerendered nav, while being unreachable
+              by hand on the layout most visitors to a travel guide are using.
+
+              Shaped like the select beside it so the two read as one pair of
+              controls, and coloured rather than bordered so it still reads as a
+              link. #d98a6e on #0f1f1b measures 6.34:1, against the 4.5:1 text
+              this size needs. Padding matches the select's, so the sticky header
+              does not grow — the vertical budget here is the whole reason the
+              page fits one screen. */}
+          <a
+            href="/blog"
+            className="text-xs py-1.5 px-2.5 rounded-lg font-medium text-[#d98a6e] hover:text-white hover:bg-zinc-800/90 transition-colors"
+          >
+            {t.blog}
+          </a>
+
           {/* Quick select language */}
           {/* A select whose options are language names still needs to say what
               it is for: a screen reader announces "combo box, Tiếng Việt" and

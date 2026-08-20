@@ -122,3 +122,7 @@ driver or enter them into a map):
 
 - [Sitemap](https://gift.luclam.vn/sitemap.xml): every URL with its hreflang alternates and images.
 - [robots.txt](https://gift.luclam.vn/robots.txt): crawl rules. All assistant crawlers are allowed.
+- [Blog](https://gift.luclam.vn/blog): articles, served from this domain but generated
+  separately, so none of the pages above describe them and they change without
+  this file changing. [Its own sitemap](https://gift.luclam.vn/blog/sitemap.xml) is the
+  current list.
