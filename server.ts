@@ -701,6 +701,39 @@ async function startServer() {
   } else {
     const distPath = path.join(process.cwd(), "dist");
 
+    /**
+     * The two directories whose filenames change whenever their bytes do.
+     *
+     * serve-static sends `max-age=0` unless told otherwise, so every return
+     * visit re-requested 575KB of JavaScript and 93KB of CSS and got 304s for
+     * its trouble — a round trip per file before the page could paint, on a
+     * site whose visitors are on Saigon mobile data.
+     *
+     * A year is only safe because the URL changes with the content. Vite writes
+     * a content hash into every name it emits (index-BMl1HaUo.js), so a rebuild
+     * that changes a byte publishes a different path and the HTML — which is
+     * NOT cached this way — points at it on the next load. The font files are
+     * the same bargain from Google's side: their names are derived from the
+     * subset they contain, and scripts/fetch-fonts.ts vendors them under those
+     * names rather than renaming them.
+     *
+     * `immutable` is the part that matters for a reload. Without it a browser
+     * revalidates on refresh even inside max-age, which is exactly when someone
+     * checking whether a fix went live pays for every file again.
+     *
+     * Deliberately not applied to the rest of dist. The sixty HTML pages are
+     * rewritten in place by `npm run build` whenever Creator Studio changes the
+     * content, at the same URLs — caching those for a year would mean an editor
+     * publishes a correction and returning readers keep the old page until 2027.
+     * Same for sitemap.xml, robots.txt and llms.txt. And uploads keep whatever
+     * name they were given (cover-benthanh-1200.avif), so their bytes can change
+     * under a stable URL; they are served by their own handler far above, which
+     * this does not touch.
+     */
+    const HASHED = { immutable: true, maxAge: "365d" };
+    app.use("/assets", express.static(path.join(distPath, "assets"), HASHED));
+    app.use("/fonts", express.static(path.join(distPath, "fonts"), HASHED));
+
     // extensions: ["html"] so /en/food/ resolves dist/en/food/index.html.
     // Without it the catch-all below would answer every generated URL with
     // the Vietnamese homepage.
