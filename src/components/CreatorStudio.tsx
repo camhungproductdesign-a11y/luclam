@@ -32,7 +32,7 @@ import { defaultMedia, imagePresets, videoPresets } from '../defaultMedia';
 import { Language, translations } from '../translations';
 import { LANGUAGES } from '../routes';
 import { checkPrice } from '../parsePrice';
-import { getAdminToken, setAdminToken } from '../adminToken';
+import { getAdminToken, setAdminToken, authHeaders, UNAUTHORIZED_MESSAGE } from '../adminToken';
 
 interface CreatorStudioProps {
   lang: Language;
@@ -122,6 +122,11 @@ export function CreatorStudio({
 
   // Copy State
   const [copiedText, setCopiedText] = useState<string | null>(null);
+  const [serverFiles, setServerFiles] = useState<
+    Array<{ name: string; url: string; bytes: number; modified: number }>
+  >([]);
+  const [serverFilesError, setServerFilesError] = useState<string | null>(null);
+  const [loadingServerFiles, setLoadingServerFiles] = useState(false);
 
   // Form State
   const [selectedSection, setSelectedSection] = useState<string>('intro');
@@ -336,6 +341,79 @@ export function CreatorStudio({
     } finally {
       setUploadProgress(null);
     }
+  };
+
+  /**
+   * What is on the server, which is not what is in this browser.
+   *
+   * localMediaList comes from IndexedDB — the files this browser uploaded. A
+   * second machine sees an empty library while the disk still holds everything,
+   * so the two lists answer different questions and both are shown.
+   */
+  const refreshServerFiles = async () => {
+    setLoadingServerFiles(true);
+    setServerFilesError(null);
+    try {
+      const res = await fetch('/api/uploads', { headers: authHeaders() });
+      if (res.status === 401) {
+        setServerFilesError(UNAUTHORIZED_MESSAGE);
+        setServerFiles([]);
+        return;
+      }
+      if (!res.ok) {
+        // 404 on a static host is the normal answer, not a fault: GitHub Pages
+        // runs no server at all, so say that rather than showing an error.
+        setServerFilesError(
+          res.status === 404 || res.status === 405
+            ? 'Máy chủ không chạy API — bản này là trang tĩnh, không quản lý được tệp ở đây.'
+            : `Máy chủ trả về HTTP ${res.status}.`
+        );
+        setServerFiles([]);
+        return;
+      }
+      const data = await res.json();
+      setServerFiles(data.files ?? []);
+    } catch {
+      setServerFilesError('Không gọi được máy chủ.');
+      setServerFiles([]);
+    } finally {
+      setLoadingServerFiles(false);
+    }
+  };
+
+  /** Every place whose image or video points at this file. */
+  const placesUsing = (url: string): string[] =>
+    Object.entries(customMedia ?? {})
+      .filter(([, m]) => m?.img === url || m?.video === url)
+      .map(([placeId]) => placeId);
+
+  useEffect(() => {
+    if (activeStudioTab === 'media') refreshServerFiles();
+    // adminToken: a save that failed for want of a token should recover as soon
+    // as one is pasted, without making the operator switch tabs to trigger it.
+  }, [activeStudioTab, adminToken]);
+
+  const handleDeleteServerFile = async (name: string, url: string) => {
+    const used = placesUsing(url);
+    const warning = used.length
+      ? `\n\nTệp này đang được ${used.length} địa điểm dùng (${used.join(', ')}). ` +
+        'Xoá đi thì những chỗ đó sẽ mất ảnh.'
+      : '';
+    if (!window.confirm(`Xoá vĩnh viễn "${name}" khỏi máy chủ?${warning}`)) return;
+
+    const res = await fetch(`/api/uploads/${encodeURIComponent(name)}`, {
+      method: 'DELETE',
+      headers: authHeaders(),
+    });
+    if (res.status === 401) {
+      window.alert(UNAUTHORIZED_MESSAGE);
+      return;
+    }
+    if (!res.ok && res.status !== 404) {
+      window.alert(`Không xoá được: máy chủ trả về HTTP ${res.status}.`);
+      return;
+    }
+    await refreshServerFiles();
   };
 
   const handleDeleteLocalMedia = async (id: string) => {
@@ -1069,7 +1147,86 @@ export function CreatorStudio({
               </div>
             </div>
 
+            {/* What the disk holds, which is not what this browser remembers.
+
+                The library above lists IndexedDB — files uploaded from here. The
+                server keeps everything ever sent from anywhere, and nothing in this
+                interface could see that, so a second machine showed an empty library
+                beside a disk that only ever grew. */}
+            <div className="bg-zinc-900/40 rounded-2xl border border-zinc-800 p-4 space-y-3">
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <h3 className="text-[11px] font-bold text-zinc-200 uppercase tracking-wider">
+                  Tệp trên máy chủ
+                </h3>
+                <button
+                  type="button"
+                  onClick={refreshServerFiles}
+                  disabled={loadingServerFiles}
+                  className="text-[10px] font-semibold text-zinc-300 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 px-3 py-1.5 rounded-lg border border-zinc-700 cursor-pointer"
+                >
+                  {loadingServerFiles ? 'Đang tải…' : 'Làm mới'}
+                </button>
+              </div>
+
+              {serverFilesError ? (
+                <p className="text-[10px] text-amber-300/90 m-0 leading-relaxed">{serverFilesError}</p>
+              ) : serverFiles.length === 0 ? (
+                <p className="text-[10px] text-zinc-500 m-0">Chưa có tệp nào trên máy chủ.</p>
+              ) : (
+                <>
+                  <p className="text-[10px] text-zinc-500 m-0">
+                    {serverFiles.length} tệp ·{' '}
+                    {(serverFiles.reduce((sum, f) => sum + f.bytes, 0) / 1048576).toFixed(1)} MB
+                  </p>
+                  <div className="space-y-1.5 max-h-64 overflow-y-auto">
+                    {serverFiles.map((file) => {
+                      const used = placesUsing(file.url);
+                      return (
+                        <div
+                          key={file.name}
+                          className="flex items-center gap-2.5 bg-zinc-950/60 rounded-xl p-2 border border-zinc-800"
+                        >
+                          <span className="flex-1 min-w-0">
+                            <span className="block text-[10px] text-zinc-300 font-mono truncate">
+                              {file.name}
+                            </span>
+                            <span className="block text-[9px] text-zinc-500 tabular-nums">
+                              {(file.bytes / 1024).toFixed(0)} KB
+                              {used.length > 0 && (
+                                <span className="text-emerald-400"> · đang dùng ở {used.length} nơi</span>
+                              )}
+                            </span>
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => copyToClipboard(file.url)}
+                            className="bg-zinc-800 hover:bg-zinc-700 p-1.5 rounded-lg cursor-pointer shrink-0"
+                            title="Chép đường dẫn"
+                          >
+                            <Copy className="w-3 h-3 text-zinc-400" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteServerFile(file.name, file.url)}
+                            className="bg-rose-950/60 hover:bg-rose-900/60 p-1.5 rounded-lg cursor-pointer shrink-0 border border-rose-900/50"
+                            title={
+                              used.length > 0
+                                ? `Đang được ${used.length} địa điểm dùng — xoá sẽ mất ảnh ở đó`
+                                : 'Xoá khỏi máy chủ'
+                            }
+                          >
+                            <Trash2 className="w-3 h-3 text-rose-300" />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+            </div>
+
           </div>
+
         )}
 
         {/* ==========================================================================

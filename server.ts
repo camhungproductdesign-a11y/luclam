@@ -414,6 +414,74 @@ async function startServer() {
   });
 
   // Health check API
+  /**
+   * What is actually on the server, and a way to remove it.
+   *
+   * Creator Studio's media library lists IndexedDB — what this browser has
+   * uploaded — so a second machine, or the same one after clearing storage,
+   * showed nothing while the disk kept every file ever sent. Nothing could
+   * delete one either: `app.delete` did not exist, so the only way to reclaim
+   * space was ssh. On a small VPS that is a disk that fills and never empties.
+   *
+   * Both are guarded. The files themselves are public — they are served from
+   * /uploads — but a list of everything an operator has ever uploaded is not the
+   * same as the files being individually reachable, and deletion obviously is
+   * not public.
+   */
+  app.get("/api/uploads", requireAdmin, async (req, res) => {
+    try {
+      const names = await fs.promises.readdir(uploadsDir);
+      const files = await Promise.all(
+        names.map(async (name) => {
+          const stat = await fs.promises.stat(path.join(uploadsDir, name));
+          return { name, url: `/uploads/${name}`, bytes: stat.size, modified: stat.mtimeMs };
+        })
+      );
+      // Newest first: the file someone wants to remove is usually one just sent.
+      files.sort((a, b) => b.modified - a.modified);
+      res.json({ files });
+    } catch (e: any) {
+      console.error("Error listing uploads:", e);
+      res.status(500).json({ error: "Không đọc được thư mục uploads" });
+    }
+  });
+
+  app.delete("/api/uploads/:name", requireAdmin, async (req, res) => {
+    const { name } = req.params;
+
+    /**
+     * The name is matched against what upload() generates, not merely cleaned.
+     *
+     * A blocklist of "../" is the wrong shape for this: the parameter arrives
+     * URL-decoded, so %2e%2e%2f has already become ../ by the time it is read,
+     * and there are more encodings than anyone enumerates correctly. Accepting
+     * only `<digits>-<word>.<ext>` makes traversal unrepresentable rather than
+     * filtered.
+     */
+    if (!/^\d+-[A-Za-z0-9_]+\.[A-Za-z0-9]{2,5}$/.test(name)) {
+      return res.status(400).json({ error: "Tên tệp không hợp lệ" });
+    }
+
+    const target = path.join(uploadsDir, name);
+    // Belt to the pattern's braces: whatever the name did, the file being
+    // removed has to sit directly inside the uploads directory.
+    if (path.dirname(path.resolve(target)) !== path.resolve(uploadsDir)) {
+      return res.status(400).json({ error: "Tên tệp không hợp lệ" });
+    }
+
+    try {
+      await fs.promises.unlink(target);
+      console.log(`Đã xoá ${target}`);
+      res.json({ status: "success" });
+    } catch (e: any) {
+      if (e.code === "ENOENT") {
+        return res.status(404).json({ error: "Không có tệp này" });
+      }
+      console.error("Error deleting upload:", e);
+      res.status(500).json({ error: "Không xoá được tệp" });
+    }
+  });
+
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
   });
