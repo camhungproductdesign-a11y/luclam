@@ -1,0 +1,56 @@
+services:
+  app:
+    build: .
+    image: luclam
+    restart: unless-stopped
+
+    # 127.0.0.1 on the left is the whole security boundary here.
+    #
+    # "3000:3000" would bind every interface on the VM, so the write API would
+    # answer directly on http://<vm-ip>:3000 — around nginx and around TLS, with
+    # the admin token travelling in a header in clear text. Bound to loopback,
+    # only the host itself can reach it, which is all nginx needs.
+    ports:
+      - "127.0.0.1:3000:3000"
+
+    # ADMIN_TOKEN lives here and never in the image.
+    #
+    # Generate one with:
+    #   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+    # The server refuses to start below 32 characters.
+    env_file:
+      - .env
+
+    # After env_file, and deliberately: compose lets `environment` win, and these
+    # two must not be overridable from a file people copy from .env.example.
+    #
+    # That template ships `HOST=` empty, meaning "use the default", and the
+    # default is 127.0.0.1 — correct on a VM, fatal in a container, where it
+    # means the container's own loopback and nothing outside can connect. An
+    # empty value in .env would silently beat the Dockerfile's ENV and produce a
+    # container that starts, reports healthy from inside, and refuses every
+    # connection from nginx.
+    environment:
+      HOST: "0.0.0.0"
+      PORT: "3000"
+
+    volumes:
+      # The two paths Creator Studio writes, kept outside the container so an
+      # image rebuild does not take the photographs with it.
+      #
+      # config.json is a bind mount of a single file rather than a directory:
+      # the prerenderer reads it during `npm run build`, so it has to be the
+      # live one at the moment the build runs, not a copy baked into the image.
+      - ./public/uploads:/app/public/uploads
+      - ./public/config.json:/app/public/config.json
+
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3000/api/health').then(r=>r.json()).then(j=>process.exit(j.status==='ok'?0:1)).catch(()=>process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3

@@ -1,0 +1,23 @@
+# node_modules is reinstalled inside the image for the right platform — sharp
+# ships a native binary per OS and libc, and copying a Windows or macOS build
+# into a Debian container produces a runtime error rather than an install one.
+node_modules
+dist
+
+# Secrets. ADMIN_TOKEN reaches the container through env_file at run time, so it
+# never needs to exist in a layer — and a layer is readable by anyone who can
+# pull the image.
+.env
+.env.*
+!.env.example
+
+.git
+.github
+*.log
+.DS_Store
+
+# Written beside config.json at run time; the volume supplies the real one.
+public/config.json.bak
+public/config.json.*.tmp
+
+docs
