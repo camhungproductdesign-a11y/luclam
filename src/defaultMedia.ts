@@ -62,6 +62,13 @@ export const defaultMedia: Record<string, PlaceMedia> = {
     img: "/uploads/external/banh-mi-nhu-lan.jpg",
     video: ""
   },
+  // REPRESENTATIVE: a bánh mì, not this shop, and not the pan-fried version
+  // it is famous for — Commons has no free photograph of bánh mì chảo. Same
+  // trade-off as the phở bowls above.
+  "food-1-4": {
+    img: "/uploads/external/c0da12ca8c8e.jpg",
+    video: ""
+  },
   // Cafe — nhom 2 la Saigon Coffee, khong phai com tam
   "food-2-0": {
     img: "/uploads/external/cong-ca-phe.jpg",
@@ -77,6 +84,12 @@ export const defaultMedia: Record<string, PlaceMedia> = {
   },
   "food-2-3": {
     img: "/uploads/external/cheo-leo-cafe.jpg",
+    video: ""
+  },
+  // REPRESENTATIVE: a phin dripping. Chosen over a sharper frame that carried
+  // a rival chain’s logo.
+  "food-2-4": {
+    img: "/uploads/external/5f28da8e0271.jpg",
     video: ""
   },
   // Com Tam — nhom 3, khong phai cafe
@@ -176,6 +189,108 @@ export const defaultMedia: Record<string, PlaceMedia> = {
     video: ""
   },
 
+  // Eighteen entries added at once, every one looked at before it was kept.
+  // Wikimedia Commons, free licences only; run npm run media:fetch to vendor
+  // them and npm run media:credits to fill in attribution.
+  //
+  // Four searches came back with nothing usable and were thrown away rather
+  // than settled for: the History Museum returned the Reichstag in Berlin, the
+  // metro returned flyovers, and Củ Chi returned a souvenir stall of spent
+  // cartridges twice over. Củ Chi is therefore still without an image — a
+  // landmark card carrying the wrong photograph is worse than one carrying
+  // none, which is the standing this file already takes.
+  // A Cham Lokesvara from Trà Vinh, which is a signature holding of this
+  // museum rather than its facade. Commons has the building only in
+  // colonial-era black and white.
+  "culture-5": {
+    img: "/uploads/external/eaee2700adda.jpg",
+    video: ""
+  },
+  "culture-6": {
+    img: "/uploads/external/aed5796d0db4.jpg",
+    video: ""
+  },
+  // Chosen over three others that show restoration scaffolding and cranes.
+  "culture-7": {
+    img: "/uploads/external/6ae4cab5b5ae.jpg",
+    video: ""
+  },
+  "culture-8": {
+    img: "/uploads/external/af99d39636cf.jpg",
+    video: ""
+  },
+  "culture-9": {
+    img: "/uploads/external/db6c1644a693.jpg",
+    video: ""
+  },
+  "culture-10": {
+    img: "/uploads/external/448a88a219d3.jpg",
+    video: ""
+  },
+  // The temple gate rather than the roof ceramics, which are beautiful and
+  // unreadable at card size.
+  "culture-11": {
+    img: "/uploads/external/47c29d13e5d9.jpg",
+    video: ""
+  },
+  // Daylight from across the river: the night shots lose the tower against
+  // black.
+  "culture-12": {
+    img: "/uploads/external/b7fdcd910ad2.jpg",
+    video: ""
+  },
+  // Line 1 rolling stock at Bến Thành, February 2025.
+  "culture-13": {
+    img: "/uploads/external/d63f01b011e1.jpg",
+    video: ""
+  },
+  // The People's Committee building seen from the boulevard at night, which
+  // is the view the entry is about.
+  "culture-14": {
+    img: "/uploads/external/7ca5b32a2420.jpg",
+    video: ""
+  },
+  "culture-16": {
+    img: "/uploads/external/deac69088bb8.jpg",
+    video: ""
+  },
+  // REPRESENTATIVE, not the venue: this is the Thăng Long theatre in Hà Nội.
+  // Commons has no free photograph of the Rồng Vàng stage, and a water puppet
+  // stage is what the entry is selling.
+  "culture-18": {
+    img: "/uploads/external/c64f75bdc5d0.jpg",
+    video: ""
+  },
+  // The wall of motorbikes, which is the thing being described.
+  "culture-19": {
+    img: "/uploads/external/f397366d2e6b.jpg",
+    video: ""
+  },
+  "culture-20": {
+    img: "/uploads/external/1164e233e181.jpg",
+    video: ""
+  },
+  // REPRESENTATIVE: mangrove and a river channel, filed on Commons under a
+  // river name rather than Cần Giờ, so it stands for the landscape rather
+  // than proving the location.
+  "culture-22": {
+    img: "/uploads/external/21b318a7d02e.jpg",
+    video: ""
+  },
+  "culture-23": {
+    img: "/uploads/external/f523cfc35a40.jpg",
+    video: ""
+  },
+  // The lily pond and the Hùng King temple gate, which is what makes this
+  // park recognisable.
+  "culture-24": {
+    img: "/uploads/external/009f67e1c0ab.jpg",
+    video: ""
+  },
+  "culture-25": {
+    img: "/uploads/external/40f9c8e6e590.jpg",
+    video: ""
+  },
   // --- SHOPPING ---
   "shopping-0": {
     img: "/uploads/external/ben-thanh-market.jpg",
