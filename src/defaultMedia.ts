@@ -7,6 +7,23 @@ export interface PlaceMedia {
   video: string;
 }
 
+/**
+ * The cover photograph the guide falls back to, in one place.
+ *
+ * It was written out at six call sites in App.tsx and, in Creator Studio, not
+ * written out at all: the cover URL field fell back to an Unsplash photo that
+ * answers 404. So the one screen offering to change the cover was the one
+ * screen showing a value that does not exist, and an operator who pressed save
+ * without editing it would have stored the dead link as the cover.
+ *
+ * The cover renderer already defends against exactly that — it ignores any
+ * customMedia value containing unsplash.com and uses this file instead. That
+ * guard was treating the symptom; this is the cause. The guard stays, because
+ * browsers that saved the old value still have it in their own storage and the
+ * page should keep rendering for them.
+ */
+export const DEFAULT_COVER_IMAGE = '/uploads/cover-benthanh.jpg';
+
 export const defaultMedia: Record<string, PlaceMedia> = {
   // --- FOOD ---
   // Pho

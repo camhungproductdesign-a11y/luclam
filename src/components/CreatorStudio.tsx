@@ -26,7 +26,7 @@ import {
 } from 'lucide-react';
 import { googleSignIn, logout, getAccessToken } from '../firebaseAuth';
 import { saveMedia, listMedia, deleteMedia, UploadedMedia, uploadMediaToServer } from '../indexedDBStore';
-import { defaultMedia, imagePresets, videoPresets } from '../defaultMedia';
+import { defaultMedia, imagePresets, videoPresets, DEFAULT_COVER_IMAGE } from '../defaultMedia';
 import { Language, translations } from '../translations';
 import { LANGUAGES } from '../routes';
 import { checkPrice } from '../parsePrice';
@@ -879,7 +879,7 @@ export function CreatorStudio({
                   <div className="flex gap-2">
                     <input 
                       type="text"
-                      value={customMedia.cover?.img || "https://images.unsplash.com/photo-1509060464153-4466739f78ad?auto=format&fit=crop&w=1200&q=80"}
+                      value={customMedia.cover?.img || DEFAULT_COVER_IMAGE}
                       onChange={(e) => {
                         const nextMedia = {
                           ...customMedia,

@@ -50,7 +50,7 @@ import { PlaceDetailModal } from './components/PlaceDetailModal';
 const CreatorStudio = React.lazy(() =>
   import('./components/CreatorStudio').then((module) => ({ default: module.CreatorStudio }))
 );
-import { defaultMedia } from './defaultMedia';
+import { defaultMedia, DEFAULT_COVER_IMAGE } from './defaultMedia';
 import { authHeaders, saveFailedMessage, UNAUTHORIZED_MESSAGE } from './adminToken';
 import { resolveContent } from './resolveContent';
 import { pathFor, parsePath, TOPICS, type Topic } from './routes';
@@ -312,13 +312,13 @@ export default function App() {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (!parsed.cover?.img || parsed.cover.img.includes('unsplash.com')) {
-          parsed.cover = { img: '/uploads/cover-benthanh.jpg', video: '' };
+          parsed.cover = { img: DEFAULT_COVER_IMAGE, video: '' };
         }
         return parsed;
       }
-      return { cover: { img: '/uploads/cover-benthanh.jpg', video: '' } };
+      return { cover: { img: DEFAULT_COVER_IMAGE, video: '' } };
     } catch (e) {
-      return { cover: { img: '/uploads/cover-benthanh.jpg', video: '' } };
+      return { cover: { img: DEFAULT_COVER_IMAGE, video: '' } };
     }
   });
 
@@ -406,7 +406,7 @@ export default function App() {
             const loadedOverrides = data.overrides || {};
             const loadedMedia = data.customMedia || {};
             if (!loadedMedia.cover?.img || loadedMedia.cover.img.includes('unsplash.com')) {
-              loadedMedia.cover = { img: '/uploads/cover-benthanh.jpg', video: '' };
+              loadedMedia.cover = { img: DEFAULT_COVER_IMAGE, video: '' };
             }
             setOverrides(loadedOverrides);
             setCustomMedia(loadedMedia);
@@ -430,7 +430,7 @@ export default function App() {
               const loadedOverrides = data.overrides || {};
               const loadedMedia = data.customMedia || {};
               if (!loadedMedia.cover?.img || loadedMedia.cover.img.includes('unsplash.com')) {
-                loadedMedia.cover = { img: '/uploads/cover-benthanh.jpg', video: '' };
+                loadedMedia.cover = { img: DEFAULT_COVER_IMAGE, video: '' };
               }
               setOverrides(loadedOverrides);
               setCustomMedia(loadedMedia);
@@ -1274,7 +1274,7 @@ export default function App() {
                 {/* Full-bleed high-contrast premium Ben Thanh aerial photograph background */}
                 <div className="absolute inset-0 transition-all duration-700">
                   <Picture
-                    src={(customMedia.cover?.img && !customMedia.cover.img.includes('unsplash.com')) ? customMedia.cover.img : "/uploads/cover-benthanh.jpg"}
+                    src={(customMedia.cover?.img && !customMedia.cover.img.includes('unsplash.com')) ? customMedia.cover.img : DEFAULT_COVER_IMAGE}
                     alt="Chợ Bến Thành Sài Gòn Aerial Cover" 
                     width={1200}
                     height={1600}
