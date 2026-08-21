@@ -50,6 +50,16 @@ interface PlaceDetailModalProps {
   onClose: () => void;
   lang: string;
   onUpdateMedia?: (placeId: string, type: 'img' | 'video', url: string) => void;
+  /**
+   * The video this place carries as an override, if it has one — not the one
+   * on screen, which may be the default.
+   *
+   * The modal is handed `media` already merged, so it cannot tell the two
+   * apart, and a remove button shown against a default would set the override
+   * to empty, fall straight back to that same default, and appear to do
+   * nothing at all.
+   */
+  customVideo?: string;
   onOpenEditor?: (placeId: string) => void;
   isCreator?: boolean;
 }
@@ -163,7 +173,8 @@ export function PlaceDetailModal({
   lang,
   onUpdateMedia,
   onOpenEditor,
-  isCreator = false
+  isCreator = false,
+  customVideo,
 }: PlaceDetailModalProps) {
   const [isMuted, setIsMuted] = useState(true);
   const [isPlaying, setIsPlaying] = useState(true);
@@ -811,6 +822,29 @@ export function PlaceDetailModal({
                         Import
                       </button>
                     </div>
+
+                    {/* Undo, where the thing was done. Removing a video meant
+                        leaving the place you were looking at, opening Creator
+                        Studio, finding the same place in a list and clicking a
+                        red link — and that link drops the place's image with the
+                        video, because it deletes the whole entry rather than one
+                        field.
+
+                        Writing '' to the override is the surgical version: the
+                        merge at handleOpenDetail reads `custom.video ||
+                        fallback.video`, so an empty override is not "no video",
+                        it is "whatever this place had before I touched it". When
+                        that was nothing, nothing is what comes back. The image
+                        override is untouched either way. */}
+                    {customVideo && onUpdateMedia && (
+                      <button
+                        type="button"
+                        onClick={() => { onUpdateMedia(place.id, 'video', ''); setImportUrl(''); setImportError(''); }}
+                        className="text-[10px] font-medium text-red-700 hover:underline"
+                      >
+                        {lang === 'vi' ? 'Gỡ video đã nhúng' : 'Remove embedded video'}
+                      </button>
+                    )}
 
                     {/* What it read out of the link, before anything is saved.
                         Being told only "invalid" leaves you guessing; being told

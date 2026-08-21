@@ -3174,6 +3174,7 @@ export default function App() {
               media={selectedPlace.media}
               lang={lang}
               isCreator={isCreator}
+              customVideo={customMedia[selectedPlace.id]?.video}
               onUpdateMedia={(placeId, type, url) => {
                 const nextMedia = {
                   ...customMedia,
