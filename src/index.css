@@ -36,6 +36,33 @@
 @import "tailwindcss";
 
 @theme {
+  /* The width at which the editor can dock beside the guide instead of sitting
+     over it. Both numbers here were measured, not chosen.
+
+     Docking costs 604px before the guide gets anything: 460 of panel, 64 of
+     collapsed nav rail, 64 of frame padding, 16 of frame border. The guide is
+     drawn for a ~430px phone frame or a desktop spread of 1000px and up, and
+     everything that broke in between — the map card torn across a column, gate
+     labels at three letters a line, 113px fare inputs, food rows with 140px of
+     name — was it being asked to lay out at 560-700.
+
+     1440 was the first guess and it was wrong. It leaves the guide 836, and at
+     836 the food rows still clip: every restaurant name came back ellipsed
+     ("Phở Hòa Pasteur…") and so did every opening time. 1536 leaves 932, and
+     there nothing clips — 0 of 5 names and 0 of 5 times, against 5 of 5 at
+     1440. Below this the editor is a sheet over the guide instead, which costs
+     the guide no width at all, so 1366 and 1440 also come back clean.
+
+     96rem rather than 1536px, and the unit is load-bearing. Tailwind orders its
+     breakpoints to decide which media block wins, and it cannot compare a px
+     value against the rem ones the default scale uses. Declared in px this
+     block was emitted BEFORE xl (80rem), so xl:w-[340px] on the sidebar beat
+     dock:w-16 and the rail silently never collapsed — measured, the sidebar
+     stayed 340 and the guide got 560. In rem it sorts where it belongs.
+
+     Named rather than spelled min-[1536px] at each call site, so the number
+     lives in one place and the variant says what it is for. */
+  --breakpoint-dock: 96rem;
   /* Body text is Be Vietnam Pro, not Outfit. Outfit ships only the latin and
      latin-ext subsets, and latin-ext stops short of U+1EA0-U+1EF1 — which is
      where most Vietnamese tone-marked vowels live (ạ ấ ầ ậ ắ ế ệ ố ộ ớ ợ ụ ứ ự).
