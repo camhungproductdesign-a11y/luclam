@@ -18,7 +18,6 @@
 type Tab<Id extends string> = {
   id: Id;
   label: string;
-  emoji: string;
 };
 
 type Props<Id extends string> = {
@@ -89,13 +88,10 @@ export function SectionTabs<Id extends string>({
             type="button"
             aria-pressed={selected}
             onClick={() => onChange(tab.id)}
-            className={`flex items-center gap-1 px-2.5 py-1.5 rounded-full text-[9px] font-medium transition-all duration-300 shrink-0 border focus-visible:outline-none focus-visible:ring-2 ${palette.ring} ${
+            className={`flex items-center px-2.5 py-1.5 rounded-full text-[9px] font-medium transition-all duration-300 shrink-0 border focus-visible:outline-none focus-visible:ring-2 ${palette.ring} ${
               selected ? palette.on : palette.off
             }`}
           >
-            <span className="text-[11px] leading-none shrink-0" aria-hidden="true">
-              {tab.emoji}
-            </span>
             <span className="leading-none whitespace-nowrap">{tab.label}</span>
           </button>
         );

@@ -245,6 +245,23 @@ function ThumbnailPreview({ url }: { url: string | undefined }) {
   );
 }
 
+/**
+ * One icon per page, and one list of them.
+ *
+ * This lived inside the phone tab bar's map callback, rebuilt on every render
+ * and reachable from nowhere else. The collapsed desktop rail needs the same
+ * ten, and a page should not be a book on a phone and a bare number on a
+ * desktop — it is the same page, so it gets the same mark in both places.
+ *
+ * Components rather than elements, so each caller sizes its own.
+ */
+const NAV_ICONS = [BookOpen, Heart, Map, Navigation, Star, Utensils, Compass, Grid, Coffee, Info] as const;
+
+function NavIcon({ index, className }: { index: number; className?: string }) {
+  const Icon = NAV_ICONS[index] ?? Info;
+  return <Icon className={className} />;
+}
+
 export default function App() {
   const [initialState] = useState(getInitialState);
   const [lang, setLang] = useState<Language>(initialState.lang);
@@ -331,6 +348,26 @@ export default function App() {
   // handler does not rewrite state and URL for every page it passes through.
   const programmaticScrollRef = useRef(false);
   const scrollSettleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /**
+   * True from the first scroll event the carousel reports until 120ms after
+   * the last one — in other words, while a finger or a fling still owns the
+   * scroll position.
+   *
+   * It exists because the resync effect below was correcting the carousel
+   * mid-swipe. Crossing into a page fires setCurrentPage from the scroll
+   * handler, which runs that effect, which sets scrollLeft back to that
+   * page's offset — while the scroll is still travelling. Traced: a scroll
+   * asked to go to page 4 accelerated to 876px, hit the page 2 boundary at
+   * 952px 488ms in, and stopped there for the remaining 1.5 seconds. A fling
+   * measured at two and a half pages landed on page one. That truncation, and
+   * the yank that causes it, is the stutter.
+   *
+   * A flag rather than a one-shot: StrictMode invokes effects twice in
+   * development, and anything consumed on the first pass would be gone by the
+   * second, so the correction would come back only in dev and only sometimes.
+   * Reading it without clearing it is idempotent.
+   */
+  const userScrollRef = useRef(false);
   const pagesList = ['cover', 'welcome', 'atmosphere', 'transport', 'stay', 'food', 'culture', 'shopping', 'luclam', 'info'] as const;
 
   const [brandClicks, setBrandClicks] = useState<number>(0);
@@ -689,13 +726,84 @@ export default function App() {
     }
   };
 
+  /**
+   * Slide the bottom tab strip with the carousel, continuously.
+   *
+   * The strip used to be driven by currentPage, and currentPage is a whole
+   * number: it changes only once a page has been crossed. So the strip sat
+   * still through the entire swipe and then caught up afterwards, which does
+   * not read as a strip that is behind — it reads as an app that is slow.
+   *
+   * scrollLeft is the continuous version of the same information. Divided by
+   * the frame width it gives a fractional position — 3.4 means most of the way
+   * from page four to page five — and the strip is placed between where it
+   * would sit for page four and where it would sit for page five, by that same
+   * fraction. The strip moves with the finger and arrives exactly as the page
+   * does, because both are reading the same number.
+   *
+   * Interpolating between two centred positions rather than mapping progress
+   * straight onto the scroll range: it keeps the behaviour the strip already
+   * had — the active tab ends up centred — and only makes the journey there
+   * continuous.
+   *
+   * Rects rather than offsetLeft, which is measured from the offset parent and
+   * the strip is not one. Three reads per scroll frame, against layout that
+   * scrolling does not dirty.
+   */
+  const followStripToScroll = () => {
+    const el = phoneScreenRef.current;
+    if (!el) return;
+    const per = el.clientWidth;
+    if (per <= 0) return;
+
+    const strip = document.getElementById(`mobile-tab-btn-0`)?.parentElement;
+    if (!strip) return;
+
+    const stripBox = strip.getBoundingClientRect();
+    const stripMid = stripBox.left + stripBox.width / 2;
+    // The scrollLeft that would centre tab `i`, measured from where the strip
+    // is right now, so both ends of the interpolation share one baseline.
+    const centreFor = (i: number): number | null => {
+      const btn = document.getElementById(`mobile-tab-btn-${i}`);
+      if (!btn) return null;
+      const box = btn.getBoundingClientRect();
+      return strip.scrollLeft + (box.left + box.width / 2) - stripMid;
+    };
+
+    const fraction = el.scrollLeft / per;
+    const lower = Math.max(0, Math.min(pagesList.length - 1, Math.floor(fraction)));
+    const upper = Math.max(0, Math.min(pagesList.length - 1, lower + 1));
+    const from = centreFor(lower);
+    const to = centreFor(upper);
+    if (from === null || to === null) return;
+
+    const between = from + (to - from) * (fraction - lower);
+    const furthest = strip.scrollWidth - strip.clientWidth;
+    const target = Math.max(0, Math.min(furthest, between));
+    // A hair rather than half a pixel: the strip travels about 92px for every
+    // 390px the carousel does, so at 60fps a frame often moves it less than
+    // half a pixel, and a half-pixel gate threw those frames away and made a
+    // continuous slide look like a series of small steps. Fractional scroll
+    // offsets are honoured; there is nothing to round to here.
+    if (Math.abs(strip.scrollLeft - target) < 0.05) return;
+    strip.scrollLeft = target;
+  };
+
   // Sync state if user swipes inside the mockup (scroll listener)
   const handlePhoneScroll = () => {
     if (!phoneScreenRef.current) return;
     if (!spreadMetrics()) return;
 
+    // Before anything that depends on a page number, because this is the part
+    // that has to keep up with a finger.
+    followStripToScroll();
+
     const index = pageAtScroll(phoneScreenRef.current.scrollLeft, currentPage);
     if (index < 0 || index >= pagesList.length) return;
+
+    // The carousel is moving, so its position is the source of truth until it
+    // settles. See userScrollRef.
+    userScrollRef.current = true;
 
     // Writing the URL on every frame of a scroll rewrites it once per page
     // crossed, and browsers throttle the History API for exactly that. Wait
@@ -718,6 +826,11 @@ export default function App() {
       if (window.location.pathname !== nextPath) {
         window.history.replaceState({ topic: TOPICS[settled] }, '', nextPath);
       }
+
+      // Scrolling is over; the effect may correct the carousel again. By now
+      // scrollLeft already equals the offset for `settled`, so its own
+      // early-out is what actually runs.
+      userScrollRef.current = false;
     }, 120);
 
     // The page indicator should track a finger in real time, but must not fight
@@ -736,6 +849,13 @@ export default function App() {
     // Skipped while navigateToPage's own smooth scroll is running, or this
     // would jump straight to the destination and cut the animation short.
     if (programmaticScrollRef.current) return;
+
+    // And skipped while the carousel itself is moving. A page change that came
+    // out of the scroll handler needs no correction — the scroll is already
+    // where it says it is, and pushing it back is what cut multi-page swipes
+    // short. Only changes from outside the carousel — a deep link, the back
+    // button — have a position to fix.
+    if (userScrollRef.current) return;
 
     const el = phoneScreenRef.current;
     if (!el) return;
@@ -760,17 +880,62 @@ export default function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, [currentPage]);
 
-  // Scroll active mobile tab button into view
+  /**
+   * Centre the active tab in the bottom strip.
+   *
+   * scrollIntoView did this, and it was replaced for two reasons.
+   *
+   * The first is that it scrolls every scrollable ancestor, not the one you
+   * meant. Measured here it only ever moved the strip, so it was not doing any
+   * harm today — but it is a standing invitation to, the moment anything above
+   * the strip becomes scrollable. Moving the strip by hand can only move the
+   * strip.
+   *
+   * The second is the animation. This effect runs on every page the carousel
+   * crosses, and 'smooth' starts a fresh animation each time, on top of one
+   * already in flight. A finger crossing three pages launches three overlapping
+   * animations at three different targets. So: instant while the carousel is
+   * being scrolled, where the strip should simply track what the finger is
+   * doing, and animated only when the page changed from somewhere else — a nav
+   * click, a deep link, the back button — where there is no competing motion
+   * and the travel is worth seeing.
+   *
+   * Rects rather than offsetLeft, which is measured against the offset parent
+   * and would be wrong the day the strip stops being it.
+   */
   useEffect(() => {
+    // While the carousel is moving, followStripToScroll owns the strip and is
+    // already ahead of this. Two writers would fight, and the animated one
+    // would win the argument and lose the feel.
+    if (userScrollRef.current) return;
+
     const activeBtn = document.getElementById(`mobile-tab-btn-${currentPage}`);
-    if (activeBtn) {
-      activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-    }
+    const strip = activeBtn?.parentElement;
+    if (!activeBtn || !strip) return;
+
+    const stripBox = strip.getBoundingClientRect();
+    const btnBox = activeBtn.getBoundingClientRect();
+    const offCentre = (btnBox.left + btnBox.width / 2) - (stripBox.left + stripBox.width / 2);
+    if (Math.abs(offCentre) < 1) return;
+
+    strip.scrollTo({
+      left: strip.scrollLeft + offCentre,
+      behavior: 'smooth',
+    });
   }, [currentPage]);
 
   // Shared with scripts/prerender so the generated HTML and the running app
   // resolve content the same way. See src/resolveContent.ts.
   const t = resolveContent(lang, overrides);
+
+  /* While the editor is docked, the guide needs the width more than the nav
+     does — you are not browsing the contents with an edit half-typed. So the
+     sidebar drops to a rail of page numbers and hands back 276px of the 340 it
+     holds, which is what lets the panel dock beside the guide instead of over
+     it. Everything else in there is reachable from the panel anyway: the panel
+     carries its own language picker, and the Creator Studio entry is moot when
+     Creator Studio is already open. */
+  const navRail = isCreator && showEditor;
 
 
   // lg, not md: the row direction exists to put the sidebar beside the pages,
@@ -792,10 +957,10 @@ export default function App() {
           the viewport has nowhere else to go. justify-start plus mt-auto on the
           footer rather than justify-between, which can push content above the
           scroll origin once it overflows. */}
-      <aside className="hidden lg:flex flex-col w-[264px] xl:w-[340px] border-r border-zinc-800/50 p-8 shrink-0 bg-[#0f1f1b] relative z-10 justify-start overflow-y-auto">
+      <aside className={`hidden lg:flex flex-col border-r border-zinc-800/50 shrink-0 bg-[#0f1f1b] relative z-10 justify-start overflow-y-auto transition-[width] duration-300 ${navRail ? 'w-[264px] xl:w-[340px] p-8 dock:w-16 dock:px-2 dock:py-6 dock:items-center' : 'w-[264px] xl:w-[340px] p-8'}`}>
         <div className="space-y-8 shrink-0">
           {/* Brand header */}
-          <div className="space-y-1">
+          <div className={`space-y-1 ${navRail ? 'dock:hidden' : ''}`}>
             {/* Brand mark, not the page heading — the cover heading is the h1. */}
             <div
               onClick={handleBrandClick}
@@ -807,7 +972,7 @@ export default function App() {
           </div>
 
           {/* Language Selector */}
-          <div className="space-y-3">
+          <div className={`space-y-3 ${navRail ? 'dock:hidden' : ''}`}>
             <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider flex items-center gap-2">
               <Globe className="w-4 h-4 text-[#d16b4c]" />
               <span>Language / 言語 / ngôn ngữ</span>
@@ -887,7 +1052,7 @@ export default function App() {
               too, so a reader saw the heading with the editor button hidden
               beneath it; with the toggle gone that left a heading over nothing. */}
           {isCreator && (
-            <div className="space-y-3">
+            <div className={`space-y-3 ${navRail ? 'dock:hidden' : ''}`}>
               <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-[#d16b4c]" />
                 <span>Editor / 編集</span>
@@ -914,7 +1079,7 @@ export default function App() {
 
           {/* Navigation Menu Links */}
           <nav className="space-y-2">
-            <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block mb-4">
+            <label className={`text-xs font-semibold text-zinc-400 uppercase tracking-wider block mb-4 ${navRail ? 'dock:hidden' : ''}`}>
               Guide Contents
             </label>
             <ul className="space-y-1" id="desktop-nav-menu">
@@ -929,13 +1094,40 @@ export default function App() {
                   <button
                     id={`desktop-nav-item-${idx}`}
                     onClick={() => navigateToPage(idx)}
-                    className={`w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl transition-all duration-300 text-left border-l-4 ${
+                    title={`${String(idx + 1).padStart(2, '0')} · ${t.pages[pageName]}`}
+                    className={`group w-full flex items-center rounded-xl transition-all duration-300 text-left border-l-4 ${navRail ? 'justify-between gap-2 px-4 py-3 dock:block dock:border-l-0 dock:px-0 dock:py-1 dock:bg-transparent' : 'justify-between gap-2 px-4 py-3'} ${
                       currentPage === idx
                         ? 'bg-[#b85233]/15 text-[#d98a6e] font-semibold border-[#b85233]'
                         : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5 border-transparent'
                     }`}
                   >
-                    <div className="flex items-center gap-3 min-w-0">
+                    {/* Rail form. Hidden outright unless the editor is docked, so
+                        the expanded sidebar is untouched by any of this. The tile
+                        carries the selected state by itself — the translucent pill
+                        and the border-l-4 stub, which together read as a rendering
+                        fault once the sidebar narrowed to 64px, are both switched
+                        off on the button above. */}
+                    <span className={`hidden ${navRail ? 'dock:flex' : ''} flex-col items-center gap-1.5`}>
+                      <span
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 ${
+                          currentPage === idx
+                            ? 'bg-[#b85233] text-white shadow-lg shadow-[#b85233]/30'
+                            : 'text-zinc-500 group-hover:text-zinc-100 group-hover:bg-white/10'
+                        }`}
+                      >
+                        <NavIcon index={idx} className="w-[18px] h-[18px]" />
+                      </span>
+                      {/* The ordinal stays: this is a ten page guide and the pages
+                          are called by number everywhere else in it. tabular-nums
+                          so the column of numerals does not shift width at 09/10. */}
+                      <span className={`font-serif text-[10px] leading-none tabular-nums ${
+                        currentPage === idx ? 'text-[#d98a6e]' : 'text-zinc-600 group-hover:text-zinc-400'
+                      }`}>
+                        {String(idx + 1).padStart(2, '0')}
+                      </span>
+                    </span>
+
+                    <div className={`flex items-center gap-3 min-w-0 ${navRail ? 'dock:hidden' : ''}`}>
                       {/* opacity-90, not 75: at 75 the numeral resolved to
                           #7b7f86 against the sidebar and measured 4.23:1, just
                           under the 4.5:1 this size needs. 90 keeps it quieter
@@ -945,14 +1137,14 @@ export default function App() {
                       <span className="font-serif text-xs opacity-90 shrink-0">
                         {String(idx + 1).padStart(2, '0')}
                       </span>
-                      <span className="text-sm">{unbreakableHyphens(t.pages[pageName])}</span>
+                      <span className={`text-sm ${navRail ? 'dock:hidden' : ''}`}>{unbreakableHyphens(t.pages[pageName])}</span>
                     </div>
                     {/* zinc-400 on zinc-800 is 5.81:1; zinc-500 was 3.08:1. */}
                     {/* shrink-0 + whitespace-nowrap: justify-between de ca hai con deu co
                         duoc, nen "Pg 7" bi bop thanh hai dong khi nhan ben canh
                         dai — dung cai loi da sua o PageHeading. Nua ngan phai
                         duoc ghim de nua dai xuong dong. */}
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded uppercase shrink-0 whitespace-nowrap ${
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded uppercase shrink-0 whitespace-nowrap ${navRail ? 'dock:hidden ' : ''}${
                       currentPage === idx ? 'bg-[#b85233] text-white' : 'bg-zinc-800 text-zinc-400'
                     }`}>
                       Pg {idx + 1}
@@ -965,7 +1157,7 @@ export default function App() {
         </div>
 
         {/* Sidebar Footer */}
-        <div className="mt-auto pt-6 border-t border-zinc-800/50 space-y-1 text-center shrink-0">
+        <div className={`mt-auto pt-6 border-t border-zinc-800/50 space-y-1 text-center shrink-0 ${navRail ? 'dock:hidden' : ''}`}>
           {/* A real anchor, not navigateToPage: /blog is served by another
               machine through the proxy in server.ts, so it needs a page load
               rather than a state change. It sits here rather than in the page
@@ -1375,10 +1567,9 @@ export default function App() {
                     active={activeAtmosphereTab}
                     onChange={setActiveAtmosphereTab}
                     tabs={[
-                      { id: 'districts', emoji: '🏙️', label: t.pages.atmosphere },
+                      { id: 'districts', label: t.pages.atmosphere },
                       {
                         id: 'map',
-                        emoji: '🗺️',
                         // The same string the map's own <h3> uses, so the tab
                         // and the heading it reveals cannot say different
                         // things.
@@ -1389,8 +1580,32 @@ export default function App() {
 
 
 
-                  {/* Bến Thành Market Stylized Map Guide */}
-                  <div className={`bg-[#fcfbf9] border border-zinc-300/80 rounded-2xl p-4 shadow-sm space-y-3 text-zinc-800 ${activeAtmosphereTab === 'map' ? '' : 'hidden'}`}>
+                  {/* Bến Thành Market Stylized Map Guide.
+
+                      lg:break-inside-avoid is not decoration — without it this
+                      card is the one card in a multicolumn section that does not
+                      have it, and it fragments. Measured at 1556x841: two client
+                      rects, 344px at the bottom of column one and 590px at the
+                      top of column two. The card paints its own background down
+                      to the bottom of the first column, so the half holding just
+                      a heading and a segmented control rendered as roughly 600px
+                      of empty cream box, and the map and its tips appeared
+                      separately in the next column. It read as a broken render
+                      rather than a column break, which is why it was reported as
+                      one.
+
+                      Every other card inside a min-[1100px]:columns-2 section
+                      already carries this — the district cards directly below,
+                      the food and culture rows, the tea list, the store cards.
+                      This one was simply missed.
+
+                      Whole, the card is 617-727px depending on width, which fits
+                      one column at every size that has columns at all, so the
+                      avoid is honoured rather than ignored. It costs about 128px
+                      of extra section scroll at 1280-1556, because column one no
+                      longer absorbs the card's first half. A page that scrolls a
+                      little is worth more than a card torn in two. */}
+                  <div className={`bg-[#fcfbf9] border border-zinc-300/80 rounded-2xl lg:break-inside-avoid p-4 shadow-sm space-y-3 text-zinc-800 ${activeAtmosphereTab === 'map' ? '' : 'hidden'}`}>
                     {/* Stacked, not two columns on one row.
                         A heading, a subtitle and two labelled tabs will not fit
                         across 430px, and the frame is 430px on a desktop screen
@@ -2374,9 +2589,9 @@ export default function App() {
                     active={activeLuclamTab}
                     onChange={setActiveLuclamTab}
                     tabs={[
-                      { id: 'teas', emoji: '🍵', label: t.luclam.menuHeading },
-                      { id: 'stores', emoji: '📍', label: lang === 'vi' ? 'Hệ thống cửa hàng' : lang === 'ko' ? '매장 안내' : lang === 'ja' ? '店舗ネットワーク' : 'Branch locator' },
-                      { id: 'offers', emoji: '🎁', label: lang === 'vi' ? 'Ưu đãi & Đánh giá' : lang === 'ko' ? '혜택 & 리뷰' : lang === 'ja' ? '特典＆口コミ' : 'Offers & reviews' },
+                      { id: 'teas', label: t.luclam.menuHeading },
+                      { id: 'stores', label: lang === 'vi' ? 'Hệ thống cửa hàng' : lang === 'ko' ? '매장 안내' : lang === 'ja' ? '店舗ネットワーク' : 'Branch locator' },
+                      { id: 'offers', label: lang === 'vi' ? 'Ưu đãi & Đánh giá' : lang === 'ko' ? '혜택 & 리뷰' : lang === 'ja' ? '特典＆口コミ' : 'Offers & reviews' },
                     ] as const}
                   />
 
@@ -2774,9 +2989,9 @@ export default function App() {
                     active={activeInfoTab}
                     onChange={setActiveInfoTab}
                     tabs={[
-                      { id: 'info', emoji: '🚨', label: t.pages.info },
-                      { id: 'contact', emoji: '🍵', label: t.contact.heading },
-                      { id: 'faq', emoji: '❓', label: t.faqHeading },
+                      { id: 'info', label: t.pages.info },
+                      { id: 'contact', label: t.contact.heading },
+                      { id: 'faq', label: t.faqHeading },
                     ] as const}
                   />
 
@@ -2927,18 +3142,6 @@ export default function App() {
                 ========================================================================== */}
             <nav className="lg:hidden border-t border-zinc-200/80 bg-white/95 backdrop-blur-sm flex overflow-x-auto shrink-0 select-none max-w-full pb-1 pt-1.5 px-3 gap-1 z-30 scrollbar-none">
               {pagesList.map((pageName, idx) => {
-                const navIcons = [
-                  <BookOpen className="w-3.5 h-3.5 shrink-0" />,
-                  <Heart className="w-3.5 h-3.5 shrink-0" />,
-                  <Map className="w-3.5 h-3.5 shrink-0" />,
-                  <Navigation className="w-3.5 h-3.5 shrink-0" />,
-                  <Star className="w-3.5 h-3.5 shrink-0" />,
-                  <Utensils className="w-3.5 h-3.5 shrink-0" />,
-                  <Compass className="w-3.5 h-3.5 shrink-0" />,
-                  <Grid className="w-3.5 h-3.5 shrink-0" />,
-                  <Coffee className="w-3.5 h-3.5 shrink-0" />,
-                  <Info className="w-3.5 h-3.5 shrink-0" />
-                ];
                 return (
                   <button
                     key={pageName}
@@ -2950,7 +3153,7 @@ export default function App() {
                         : 'text-zinc-500 hover:text-zinc-800 hover:bg-zinc-100/50'
                     }`}
                   >
-                    {navIcons[idx]}
+                    <NavIcon index={idx} className="w-3.5 h-3.5 shrink-0" />
                     <span className="text-[8px] tracking-tight leading-normal mt-1 uppercase font-semibold">
                       {t.pages[pageName]}
                     </span>
@@ -3003,47 +3206,61 @@ export default function App() {
 
         </div>
 
-        {/* Creator Studio panel on desktop (side-by-side) */}
-        {isCreator && showEditor && (
-          <div className="hidden lg:block w-[460px] h-[840px] bg-zinc-950 rounded-[32px] overflow-hidden border border-zinc-800 shadow-2xl shrink-0">
-            <React.Suspense fallback={
-              <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-950 text-zinc-400 font-mono text-sm p-8 space-y-4">
-                <div className="w-8 h-8 rounded-full border-2 border-t-amber-500 border-zinc-800 animate-spin" />
-                <span>Loading Creator Studio...</span>
-              </div>
-            }>
-              <CreatorStudio
-                lang={lang}
-                onLangChange={handleLangChange}
-                overrides={overrides}
-                onUpdateOverrides={handleUpdateOverrides}
-                customMedia={customMedia}
-                onUpdateCustomMedia={handleUpdateCustomMedia}
-                onForceRefresh={() => setRefreshKey(prev => prev + 1)}
-                activeEditPlaceId={activeEditPlaceId}
-                onSetActiveEditPlaceId={setActiveEditPlaceId}
-                onDeactivateCreator={handleDeactivateCreator}
-              />
-            </React.Suspense>
-          </div>
-        )}
-
       </main>
 
-      {/* Creator Studio sliding drawer overlay for Mobile / Small Screens */}
+      {/* The editor, at every width, over the guide rather than beside it.
+
+          There used to be a second copy of this docked into the layout above,
+          and it was the cause rather than a victim of the breakages chased
+          through this file: a docked 460px panel takes its width from the
+          guide permanently, which left the guide laying out at 560-700px. The
+          guide is drawn for two states — a ~430px phone frame, or a desktop
+          spread of 1000px and up — and 560-700 is neither. Everything that
+          went wrong there was one bug wearing different clothes: the map card
+          torn across a column, "CỔNG TÂY" broken three letters to a line, fare
+          inputs at 113px, food cards leaving 140px for a name. Floating the
+          editor gives the guide its full width back at every size, so those
+          stop being possible rather than being fixed one at a time.
+
+          Two shapes from one element, so there is still only one CreatorStudio
+          mounted and it keeps its scroll and its open tab across the change:
+
+          Below lg it is `fixed`, which takes it out of the shell's flow
+          entirely — the modal sheet it always was, dimmed backdrop, rises from
+          the bottom, tap outside to dismiss.
+
+          From lg it goes `static` and becomes an ordinary 460px flex child of
+          the shell, docked to the right of the guide. It covers nothing. The
+          width it takes is the width the sidebar just gave up by dropping to a
+          rail, which is the whole trick: docking used to cost the guide 460px
+          and leave it laying out at 560-700, the band that broke the map card,
+          the gate labels, the fare grid and the food rows. Taking it from the
+          nav instead leaves the guide at 836-1316 depending on screen.
+
+          role="dialog" survives both shapes. Docked it is a non-modal dialog,
+          which is a fair description of a panel you open and dismiss; and it is
+          what keeps the sheet announced properly on a phone, where it really is
+          one. No aria-modal, because for most of its life it is not. */}
       {isCreator && showEditor && (
         <div
-          className="lg:hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex flex-col justify-end"
+          className="fixed inset-0 z-50 flex flex-col justify-end bg-black/70 backdrop-blur-sm dock:static dock:z-auto dock:w-[460px] dock:shrink-0 dock:bg-transparent dock:backdrop-blur-none"
           onClick={() => setShowEditor(false)}
         >
+          {/* Capped, because this sheet now opens on desktops too. It was built
+              for widths at or under 1023px, where w-full is the right answer;
+              from 1024 to 1439 it was stretching a phone-shaped form across the
+              screen, with the admin-token input alone running past 1000px. The
+              cap is above every phone and tablet width, so nothing below 820
+              changes — mx-auto only has room to do anything above it. */}
           <div
-            className="w-full h-[85%] bg-zinc-950 rounded-t-[28px] overflow-hidden shadow-2xl flex flex-col border-t border-zinc-800"
+            className="w-full max-w-[820px] mx-auto h-[85%] bg-zinc-950 rounded-t-[28px] overflow-hidden shadow-2xl flex flex-col border-t border-zinc-800 dock:w-full dock:max-w-none dock:mx-0 dock:h-full dock:rounded-none dock:border-t-0 dock:border-l dock:shadow-none"
             role="dialog"
-            aria-modal="true"
             aria-label="Creator Studio"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="h-1.5 w-12 bg-zinc-700 rounded-full mx-auto my-3 shrink-0"></div>
+            {/* Grab handle: a bottom-sheet affordance, and nothing to grab once
+                the sheet is a side panel. */}
+            <div className="h-1.5 w-12 bg-zinc-700 rounded-full mx-auto my-3 shrink-0 dock:hidden"></div>
             <div className="flex-1 overflow-hidden">
               <React.Suspense fallback={
                 <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-950 text-zinc-400 font-mono text-sm p-8 space-y-4">
@@ -3070,11 +3287,17 @@ export default function App() {
         </div>
       )}
 
-      {/* Mobile Floating Toggle Editor Button */}
+      {/* The way in and out, now at every width — with the panel undocked there
+          is no longer a version of this screen that shows the editor by itself.
+
+          bottom-20 is clearance for the bottom tab bar, which is lg:hidden, so
+          from lg up the button drops back into the corner. And from lg up it
+          steps left by the panel's width while the panel is open, or it would
+          be sitting underneath it. */}
       {isCreator && (
         <button
           onClick={() => setShowEditor(!showEditor)}
-          className="lg:hidden fixed bottom-20 right-4 z-40 bg-[#b85233] text-white p-3.5 rounded-full shadow-2xl active:scale-95 transition-transform flex items-center justify-center cursor-pointer"
+          className={`fixed bottom-20 lg:bottom-6 right-4 z-40 bg-[#b85233] text-white p-3.5 rounded-full shadow-2xl active:scale-95 transition-all flex items-center justify-center cursor-pointer ${showEditor ? 'dock:right-[484px]' : ''}`}
           title="Open Creator Studio"
         >
           <Settings className={`w-5 h-5 ${showEditor ? 'animate-spin-slow text-amber-200' : ''}`} />

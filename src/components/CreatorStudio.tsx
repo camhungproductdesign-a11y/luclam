@@ -4,14 +4,12 @@ import {
   Check, 
   Copy, 
   Trash2, 
-  FolderOpen, 
   FileImage, 
   FileVideo, 
   UserCheck, 
   LogOut, 
   RefreshCw, 
   FileCode, 
-  Settings, 
   Globe, 
   MapPin, 
   Clock, 
@@ -33,6 +31,7 @@ import { Language, translations } from '../translations';
 import { LANGUAGES } from '../routes';
 import { checkPrice } from '../parsePrice';
 import { getAdminToken, setAdminToken, authHeaders, UNAUTHORIZED_MESSAGE } from '../adminToken';
+import { useMediaUrl } from '../hooks/useMediaUrl';
 
 interface CreatorStudioProps {
   lang: Language;
@@ -76,6 +75,70 @@ function LockedCopy({ label, text, path }: { label: string; text: string; path: 
         khách hỏi về Lục Lam, nên nó đi qua review thay vì sửa trực tiếp.
       </p>
     </div>
+  );
+}
+
+/**
+ * The deploy reminder, held in one place because it is rendered twice.
+ *
+ * A save reaches the app immediately and the sixty static pages not at all, and
+ * nothing on screen would otherwise show the difference: /api/config serves this
+ * editor's changes live, but the prerendered HTML — the copy Google and the
+ * assistant crawlers actually read — is written at build time. An operator who
+ * edits and stops here has changed what visitors see and left what search
+ * engines see alone, which is the exact failure the SEO work on this site was
+ * about. So it cannot simply be dropped on small screens.
+ *
+ * It cannot simply be kept, either. In the phone drawer the sheet is 717px and
+ * this banner took 150 of them, on top of a header, a token row and a tab strip
+ * — 366px of fixed furniture leaving 351px to actually edit in. So below 600px
+ * of panel it collapses to its one actionable line and opens on demand, and at
+ * 600px and up it stays exactly the banner it has always been.
+ */
+const DEPLOY_NOTE = (
+  <>
+    Lưu xong là khách vào web thấy ngay, nhưng <strong>60 trang tĩnh</strong> mà Google và trợ lý
+    AI đọc thì chưa đổi — chúng được sinh lúc build. Sửa nội dung xong nhớ{' '}
+    <strong>chạy lại deploy</strong> trên máy chủ, nếu không công cụ tìm kiếm vẫn thấy bản cũ.
+  </>
+);
+
+/**
+ * A library thumbnail, resolved rather than handed the raw scheme.
+ *
+ * The img here used to be given `indexeddb-media://<id>` straight, and no
+ * browser can fetch that: every item in the library logged
+ * ERR_UNKNOWN_URL_SCHEME and fell through an onError handler onto
+ * /uploads/cover-benthanh.jpg. So the grid showed the same cover photograph
+ * over and over and none of it was the file you had uploaded — you could not
+ * tell two uploads apart. The fault was known rather than hidden: the
+ * handler's own comment called it a "fallback if the raw protocol is not
+ * parsed here''. It papered over the symptom and left the cause.
+ *
+ * useMediaUrl is the piece that turns the scheme into a blob URL, and it also
+ * covers the serverUrl case, so the two branches collapse into one call. It is
+ * a hook, and hooks cannot run inside the map that renders this list, which is
+ * why this is a component of its own — the same shape and the same reason as
+ * ThumbnailPreview in App.tsx.
+ */
+function LocalMediaThumb({ item }: { item: UploadedMedia }) {
+  const resolved = useMediaUrl(item.serverUrl || `indexeddb-media://${item.id}`);
+
+  // Empty while the blob is being read, and empty for good if the record has
+  // lost its blob. A plain panel says "nothing here" honestly; the cover
+  // photograph said "here is your upload" and was wrong.
+  if (!resolved) return <div className="w-full h-full bg-zinc-900" aria-hidden="true" />;
+
+  return (
+    <img
+      src={resolved}
+      alt={item.name}
+      width={64}
+      height={64}
+      loading="lazy"
+      decoding="async"
+      className="w-full h-full object-cover"
+    />
   );
 }
 
@@ -654,8 +717,22 @@ export function CreatorStudio({
       ?? '';
   };
 
+  /* The root is the query container for everything below, and it has to be a
+     container rather than the viewport, because this panel's width and the
+     window's width are not related. The same component renders at three sizes:
+     390px inside the phone drawer, 460px as the desktop side panel, and up to
+     820px as the drawer on a tablet or a sub-1440 desktop. So a viewport at
+     1440 means a NARROW studio and a viewport at 1024 means a wide one — an
+     `sm:` or `md:` breakpoint here would get it exactly backwards.
+
+     Container units are already the idiom on page 02 (`[container-type:size]`
+     in App.tsx); this extends them from units to queries. inline-size rather
+     than size, because only the width should be queried — size containment on
+     the block axis would flatten a column whose height comes from its content.
+     Nothing inside this tree is position:fixed, which is the one thing a
+     containment context would silently reparent. */
   return (
-    <div className="w-full h-full flex flex-col bg-zinc-950 border-l border-zinc-800 text-zinc-100 font-sans relative">
+    <div className="@container w-full h-full flex flex-col bg-zinc-950 border-l border-zinc-800 text-zinc-100 font-sans relative">
       
       {/* Studio Header */}
       <header className="p-4 bg-zinc-900 border-b border-zinc-800 flex items-center justify-between gap-4 shrink-0">
@@ -683,7 +760,11 @@ export function CreatorStudio({
       </header>
 
       {/* Admin token. Without it the server rejects every save with 401. */}
-      <div className="px-4 py-2.5 bg-zinc-900/40 border-b border-zinc-800 shrink-0 flex items-center gap-3 flex-wrap">
+      {/* Stacks below 480px of panel. flex-wrap alone was not enough: the label
+          and the status text are both shrink-0, so the input took what was left
+          — 184px in the phone drawer, about eleven characters of a token that is
+          all one unbroken string. */}
+      <div className="px-4 py-2.5 bg-zinc-900/40 border-b border-zinc-800 shrink-0 flex flex-col items-stretch gap-1.5 @[480px]:flex-row @[480px]:items-center @[480px]:gap-3 @[480px]:flex-wrap">
         <label htmlFor="admin-token" className="text-[10px] uppercase tracking-wider font-bold text-zinc-400 shrink-0">
           Token quản trị
         </label>
@@ -694,29 +775,36 @@ export function CreatorStudio({
           onChange={(e) => handleAdminTokenChange(e.target.value)}
           placeholder="Dán ADMIN_TOKEN của máy chủ"
           autoComplete="off"
-          className="flex-1 min-w-[180px] bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs text-zinc-200 font-mono focus:outline-none focus:border-[#b85233]"
+          className="w-full min-w-0 @[480px]:flex-1 @[480px]:w-auto @[480px]:min-w-[180px] bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs text-zinc-200 font-mono focus:outline-none focus:border-[#b85233]"
         />
         <span className={`text-[10px] font-mono shrink-0 ${adminToken ? 'text-emerald-400' : 'text-amber-400'}`}>
           {adminToken ? 'Đã có token' : 'Chưa nhập — mọi thao tác lưu sẽ bị từ chối'}
         </span>
       </div>
 
-      {/* A save reaches the app immediately and the sixty static pages not at all.
-          Worth saying out loud, because nothing on screen would otherwise show
-          the difference: /api/config serves this editor's changes live, but the
-          prerendered HTML — the copy Google and the assistant crawlers actually
-          read — is written at build time. An operator who edits and stops here
-          has changed what visitors see and left what search engines see alone,
-          which is the exact failure the SEO work on this site was about. */}
-      <div className="px-4 py-2 bg-amber-950/30 border-b border-amber-500/25 shrink-0 flex items-start gap-2">
+      {/* Narrow panel: the action stays on screen, the reasoning is one tap away.
+          See DEPLOY_NOTE above for why it may neither be dropped nor kept whole. */}
+      <details className="@[600px]:hidden px-4 py-2 bg-amber-950/30 border-b border-amber-500/25 shrink-0 group">
+        <summary className="text-[10.5px] leading-5 text-amber-200/90 cursor-pointer list-none flex items-start gap-2 marker:hidden">
+          <span aria-hidden="true" className="text-amber-400 text-xs leading-5 shrink-0">
+            ⚠
+          </span>
+          <span className="flex-1">
+            Sửa xong nhớ <strong>chạy lại deploy</strong> trên máy chủ
+          </span>
+          <span aria-hidden="true" className="text-amber-400/70 text-[10px] shrink-0 group-open:rotate-90 transition-transform">
+            ▸
+          </span>
+        </summary>
+        <p className="text-[10.5px] leading-5 text-amber-200/90 m-0 mt-1.5 pl-6">{DEPLOY_NOTE}</p>
+      </details>
+
+      {/* Wide panel: unchanged from before container queries were introduced. */}
+      <div className="hidden @[600px]:flex px-4 py-2 bg-amber-950/30 border-b border-amber-500/25 shrink-0 items-start gap-2">
         <span aria-hidden="true" className="text-amber-400 text-xs leading-5 shrink-0">
           ⚠
         </span>
-        <p className="text-[10.5px] leading-5 text-amber-200/90 m-0">
-          Lưu xong là khách vào web thấy ngay, nhưng <strong>60 trang tĩnh</strong> mà Google và
-          trợ lý AI đọc thì chưa đổi — chúng được sinh lúc build. Sửa nội dung xong nhớ{' '}
-          <strong>chạy lại deploy</strong> trên máy chủ, nếu không công cụ tìm kiếm vẫn thấy bản cũ.
-        </p>
+        <p className="text-[10.5px] leading-5 text-amber-200/90 m-0">{DEPLOY_NOTE}</p>
       </div>
 
       {/* Primary Tab Navigation */}
@@ -729,8 +817,15 @@ export function CreatorStudio({
               : 'text-zinc-400 border-transparent hover:text-zinc-200'
           }`}
         >
-          <FolderOpen className="w-3.5 h-3.5" />
-          <span>📸 Thư Viện Media & Drive</span>
+          {/* Text alone. Both marks each tab used to carry are gone — a lucide
+              glyph and an emoji saying the same thing twice — and nothing was
+              lost with them: the selected tab is already named by its colour,
+              its underline and its background, three signals for one bit.
+
+              The full label still wraps to two lines under about 420px of panel,
+              which is why the short form exists. */}
+          <span className="@[420px]:hidden">Media</span>
+          <span className="hidden @[420px]:inline">Thư Viện Media & Drive</span>
         </button>
         <button
           onClick={() => setActiveStudioTab('content')}
@@ -740,8 +835,8 @@ export function CreatorStudio({
               : 'text-zinc-400 border-transparent hover:text-zinc-200'
           }`}
         >
-          <Settings className="w-3.5 h-3.5" />
-          <span>✍️ Chỉnh Sửa Nội Dung & Dịch</span>
+          <span className="@[420px]:hidden">Nội dung</span>
+          <span className="hidden @[420px]:inline">Chỉnh Sửa Nội Dung & Dịch</span>
         </button>
       </div>
 
@@ -1022,27 +1117,7 @@ export function CreatorStudio({
                               <span className="absolute bottom-1 right-1 text-[8px] bg-black/80 px-1 py-0.5 rounded uppercase">Video</span>
                             </div>
                           ) : (
-                            <img
-                              src={item.serverUrl || `indexeddb-media://${item.id}`}
-                              alt={item.name}
-                              width={64}
-                              height={64}
-                              loading="lazy"
-                              decoding="async"
-                              className="w-full h-full object-cover"
-                              onError={(e) => {
-                                // Fallback if the raw protocol is not parsed here.
-                                // The flag stops the handler from reassigning a src
-                                // that is itself broken, which loops forever.
-                                const image = e.currentTarget;
-                                if (image.dataset.fallbackApplied === 'true') {
-                                  image.style.display = 'none';
-                                  return;
-                                }
-                                image.dataset.fallbackApplied = 'true';
-                                image.src = '/uploads/cover-benthanh.jpg';
-                              }}
-                            />
+                            <LocalMediaThumb item={item} />
                           )}
                         </div>
                         <div className="min-w-0">
@@ -1402,7 +1477,7 @@ export function CreatorStudio({
                             className="p-2.5 bg-zinc-950 rounded-xl border border-zinc-800 space-y-2"
                           >
                             <span className="text-[10px] font-bold text-amber-500">{mode.name}</span>
-                            <div className="grid grid-cols-3 gap-2">
+                            <div className="grid grid-cols-1 @[420px]:grid-cols-3 gap-2">
                               {[0, 1, 2].map((fareIdx) => (
                                 <div key={fareIdx} className="space-y-1">
                                   <label className="text-zinc-500 text-[9px] block">
@@ -1538,7 +1613,7 @@ export function CreatorStudio({
                             <div key={restIdx} id={`edit-place-${placeId}`} className="p-3 bg-zinc-950 rounded-xl border border-zinc-800 space-y-3 transition-all duration-300">
                               <span className="text-[10px] font-bold text-[#b85233] font-mono">Quán Ăn #{restIdx + 1} ({rest.name})</span>
                               
-                              <div className="grid grid-cols-2 gap-2">
+                              <div className="grid grid-cols-1 @[600px]:grid-cols-2 gap-2">
                                 <div className="space-y-1">
                                   <label className="text-zinc-500 font-semibold">Tên Quán:</label>
                                   <input 
@@ -1571,7 +1646,7 @@ export function CreatorStudio({
                                 />
                               </div>
 
-                              <div className="grid grid-cols-2 gap-2">
+                              <div className="grid grid-cols-1 @[600px]:grid-cols-2 gap-2">
                                 <div className="space-y-1">
                                   <label className="text-zinc-500 font-semibold">Địa chỉ:</label>
                                   <input 
@@ -1609,7 +1684,7 @@ export function CreatorStudio({
                               <div className="pt-2 border-t border-zinc-900 space-y-2">
                                 <span className="text-[9px] uppercase tracking-wide font-bold text-zinc-500">Gán Media Cho Quán:</span>
                                 
-                                <div className="grid grid-cols-2 gap-2 text-[10px]">
+                                <div className="grid grid-cols-1 @[600px]:grid-cols-2 gap-2 text-[10px]">
                                   <div className="space-y-1">
                                     <label className="text-zinc-400">Hình ảnh URL:</label>
                                     <input 
@@ -1675,7 +1750,7 @@ export function CreatorStudio({
                       <div key={itemIdx} id={`edit-place-${placeId}`} className="p-3 bg-zinc-950 rounded-xl border border-zinc-800 space-y-3 transition-all duration-300">
                         <span className="text-[10px] font-bold text-amber-500 font-mono">Địa Điểm #{itemIdx + 1} ({item.name || `Địa điểm ${itemIdx + 1}`})</span>
                         
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-1 @[600px]:grid-cols-2 gap-2">
                           <div className="space-y-1">
                             <label className="text-zinc-500 font-semibold">Tên địa điểm:</label>
                             <input 
@@ -1708,7 +1783,7 @@ export function CreatorStudio({
                           />
                         </div>
 
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-1 @[600px]:grid-cols-2 gap-2">
                           <div className="space-y-1">
                             <label className="text-zinc-500 font-semibold">Địa chỉ:</label>
                             <input 
@@ -1746,7 +1821,7 @@ export function CreatorStudio({
                         <div className="pt-2 border-t border-zinc-900 space-y-2">
                           <span className="text-[9px] uppercase tracking-wide font-bold text-zinc-500">Gán Media Cho Địa Điểm:</span>
                           
-                          <div className="grid grid-cols-2 gap-2 text-[10px]">
+                          <div className="grid grid-cols-1 @[600px]:grid-cols-2 gap-2 text-[10px]">
                             <div className="space-y-1">
                               <label className="text-zinc-400">Hình ảnh URL:</label>
                               <input 
@@ -1809,7 +1884,7 @@ export function CreatorStudio({
                       <div key={itemIdx} id={`edit-place-${placeId}`} className="p-3 bg-zinc-950 rounded-xl border border-zinc-800 space-y-3 transition-all duration-300">
                         <span className="text-[10px] font-bold text-amber-500 font-mono">Điểm mua sắm #{itemIdx + 1} ({item.name || `Địa điểm ${itemIdx + 1}`})</span>
                         
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-1 @[600px]:grid-cols-2 gap-2">
                           <div className="space-y-1">
                             <label className="text-zinc-500 font-semibold">Tên chợ:</label>
                             <input 
@@ -1842,7 +1917,7 @@ export function CreatorStudio({
                           />
                         </div>
 
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-1 @[600px]:grid-cols-2 gap-2">
                           <div className="space-y-1">
                             <label className="text-zinc-500 font-semibold">Địa chỉ:</label>
                             <input 
@@ -1869,7 +1944,7 @@ export function CreatorStudio({
                         <div className="pt-2 border-t border-zinc-900 space-y-2">
                           <span className="text-[9px] uppercase tracking-wide font-bold text-zinc-500">Gán Media Cho Chợ:</span>
                           
-                          <div className="grid grid-cols-2 gap-2 text-[10px]">
+                          <div className="grid grid-cols-1 @[600px]:grid-cols-2 gap-2 text-[10px]">
                             <div className="space-y-1">
                               <label className="text-zinc-400">Hình ảnh URL:</label>
                               <input 
@@ -2014,7 +2089,7 @@ export function CreatorStudio({
                             })()}
                           </div>
 
-                          <div className="grid grid-cols-2 gap-2 border-t border-zinc-800/70 pt-2.5">
+                          <div className="grid grid-cols-1 @[600px]:grid-cols-2 gap-2 border-t border-zinc-800/70 pt-2.5">
                             <div className="space-y-1">
                               <label className="text-zinc-400 text-[10px]">Link mua tại Lục Lam:</label>
                               <input
@@ -2041,7 +2116,7 @@ export function CreatorStudio({
                             </div>
                           </div>
 
-                          <div className="grid grid-cols-2 gap-2 border-t border-zinc-800/70 pt-2.5">
+                          <div className="grid grid-cols-1 @[600px]:grid-cols-2 gap-2 border-t border-zinc-800/70 pt-2.5">
                             <div className="space-y-1">
                               <label className="text-zinc-400 text-[10px]">Ảnh sản phẩm:</label>
                               <input

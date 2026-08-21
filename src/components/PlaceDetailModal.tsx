@@ -68,6 +68,46 @@ const NO_PHOTO_LABEL = {
   zht: '暫無照片',
 } as const;
 
+/**
+ * What the import field accepts, worked out from what getEmbedDetails below
+ * can actually render — one rule rather than two.
+ *
+ * There used to be two, and they disagreed. The field validated against a
+ * TikTok-only pattern while the player already handled YouTube and plain
+ * video files, so a YouTube link was refused at the door by the very
+ * component that would have played it happily. The same link pasted into
+ * Creator Studio's Video URL box worked, because that route has no gate at
+ * all. Three ways in, three different answers to one question.
+ *
+ * 'direct' needs the extension test that getEmbedDetails does not do. That
+ * branch is a catch-all returning the URL untouched, which is right for
+ * rendering — a <video src> either plays or it does not — and wrong as an
+ * acceptance test, since it would wave through any string at all.
+ */
+const VIDEO_FILE = /\.(mp4|webm|ogv|ogg|mov|m4v)(?:[?#].*)?$/i;
+
+type Detected = { ok: boolean; kind: 'tiktok' | 'youtube' | 'direct' | 'none'; handle: string };
+
+const detectEmbed = (raw: string): Detected => {
+  const url = raw.trim();
+  const none: Detected = { ok: false, kind: 'none', handle: '' };
+  if (!url) return none;
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return none;
+  }
+  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return none;
+
+  const details = getEmbedDetails(url);
+  if (details.type === 'tiktok') return { ok: true, kind: 'tiktok', handle: details.handle };
+  if (details.type === 'youtube') return { ok: true, kind: 'youtube', handle: '' };
+  if (details.type === 'direct' && VIDEO_FILE.test(parsed.pathname)) {
+    return { ok: true, kind: 'direct', handle: '' };
+  }
+  return none;
+};
 /** The @handle out of a TikTok URL, so the credit can be rendered as our own text. */
 const tiktokHandle = (url: string): string => (url.match(/tiktok\.com\/(@[\w.-]+)/i)?.[1] ?? '');
 
@@ -130,8 +170,8 @@ export function PlaceDetailModal({
   const [activeTab, setActiveTab] = useState<'about' | 'info' | 'secret'>('about');
   const [copied, setCopied] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
-  const [tiktokUrl, setTiktokUrl] = useState('');
-  const [tiktokError, setTiktokError] = useState('');
+  const [importUrl, setImportUrl] = useState('');
+  const [importError, setImportError] = useState('');
 
   const resolvedImg = useMediaUrl(media.img);
 
@@ -148,6 +188,7 @@ export function PlaceDetailModal({
   }
   const resolvedVideo = useMediaUrl(media.video);
   const embedDetails = getEmbedDetails(resolvedVideo);
+  const detected = detectEmbed(importUrl);
 
   React.useEffect(() => {
     if (!isOpen) return;
@@ -159,8 +200,8 @@ export function PlaceDetailModal({
   }, [isOpen, onClose]);
 
   React.useEffect(() => {
-    setTiktokUrl('');
-    setTiktokError('');
+    setImportUrl('');
+    setImportError('');
     setTiktokHeight(null);
   }, [place.id]);
 
@@ -187,17 +228,19 @@ export function PlaceDetailModal({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleTikTokImport = () => {
-    const trimmedUrl = tiktokUrl.trim();
-    const match = trimmedUrl.match(/^https?:\/\/(?:www\.)?tiktok\.com\/.+\/video\/(\d+)(?:[/?#].*)?$/i);
-    if (!match) {
-      setTiktokError(lang === 'vi'
-        ? 'Link không hợp lệ. Hãy dùng URL TikTok có dạng /video/{id}.'
-        : 'Invalid link. Use a TikTok URL containing /video/{id}.');
+  const handleEmbedImport = () => {
+    const trimmedUrl = importUrl.trim();
+    if (!detectEmbed(trimmedUrl).ok) {
+      // Naming the accepted forms rather than only the rejected one. The old
+      // message described the TikTok pattern and nothing else, which is how
+      // an author ends up believing TikTok is all there is.
+      setImportError(lang === 'vi'
+        ? 'Chưa nhận ra link này. Nhận link TikTok, YouTube, hoặc link video trực tiếp (.mp4, .webm, .mov).'
+        : 'Link not recognised. Accepts TikTok, YouTube, or a direct video link (.mp4, .webm, .mov).');
       return;
     }
     onUpdateMedia?.(place.id, 'video', trimmedUrl);
-    setTiktokError('');
+    setImportError('');
   };
 
   // Curate mock secret tips based on the place type
@@ -336,7 +379,24 @@ export function PlaceDetailModal({
             w-[340px] is TikTok's own embed width plus the padding. */}
         {embedDetails.type === 'tiktok' && (
           <aside className="hidden lg:block w-[340px] shrink-0 bg-black overflow-y-auto p-2.5">
+            {/* Keyed on the URL, which is what makes replacing a video feel
+                instant rather than broken.
+            
+                Without a key React keeps the same iframe element and only
+                rewrites src, and rewriting src on an iframe is a navigation:
+                the browser has to tear down a YouTube player that is mid-
+                playback, still decoding and still holding connections, before
+                it will show anything else. For seconds after the click the old
+                video is what is on screen, so Import reads as a button that
+                did nothing. It also pushes an entry onto session history, so
+                Back starts walking through past embeds instead of leaving.
+            
+                A changed key makes React drop the old element and mount a
+                fresh one. Nothing has to be torn down first. Verified on the
+                DOM node itself: before this, the node survived an import
+                unchanged; now a new URL produces a new node. */}
             <iframe
+              key={embedDetails.embedUrl}
               src={embedDetails.embedUrl}
               className="w-full border-0 rounded-2xl block"
               style={{ height: tiktokHeight ?? 760 }}
@@ -634,6 +694,7 @@ export function PlaceDetailModal({
                     <div className="w-full max-w-[325px] mx-auto space-y-1.5">
                       <div className="relative w-full aspect-[9/16] rounded-2xl overflow-hidden shadow-lg border border-zinc-200/50 bg-black">
                         <iframe
+                          key={embedDetails.embedUrl}
                           src={embedDetails.embedUrl}
                           className="absolute inset-x-0 top-0 w-full border-0"
                           style={{ height: tiktokHeight ?? 1000 }}
@@ -664,6 +725,7 @@ export function PlaceDetailModal({
                   ) : embedDetails.type === 'youtube' ? (
                     <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-lg border border-zinc-200/50 bg-black">
                       <iframe
+                        key={embedDetails.embedUrl}
                         src={embedDetails.embedUrl}
                         className="absolute inset-0 w-full h-full border-0"
                         allow="autoplay; encrypted-media; picture-in-picture"
@@ -674,6 +736,7 @@ export function PlaceDetailModal({
                   ) : (
                     <div className="relative w-full rounded-2xl overflow-hidden shadow-lg border border-zinc-200/50 bg-black">
                       <video
+                        key={resolvedVideo}
                         src={resolvedVideo}
                         controls
                         loop
@@ -688,37 +751,82 @@ export function PlaceDetailModal({
               )}
               </div>
 
+              {/* Open on arrival, by request — an author who has switched creator
+                  mode on is usually here to change something, so the field is
+                  ready rather than one click away. Still a <details>, so it can
+                  be folded shut when it is in the way of reading.
+
+                  defaultOpen rather than a bare `open` prop. `open` is a prop
+                  React reconciles: it holds the value at true, so the moment
+                  anything re-rendered this modal — typing in the field is enough,
+                  since it drives importUrl state — a panel the author had just
+                  folded shut would spring open again. Setting the attribute once
+                  on mount and never touching it after leaves the element
+                  uncontrolled, which is what a disclosure wants to be. */}
               {isCreator && (
-                <div className="mt-4 space-y-2 rounded-xl border border-amber-200 bg-amber-50 p-3">
-                  <label htmlFor="place-tiktok-url" className="block text-[10px] font-bold uppercase tracking-wider text-amber-900">
-                    {lang === 'vi' ? 'Import / Thay video TikTok' : 'Import / Replace TikTok video'}
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      id="place-tiktok-url"
-                      type="url"
-                      value={tiktokUrl}
-                      onChange={(event) => {
-                        setTiktokUrl(event.target.value);
-                        if (tiktokError) setTiktokError('');
-                      }}
-                      onKeyDown={(event) => {
-                        if (event.key === 'Enter') {
-                          event.preventDefault();
-                          handleTikTokImport();
-                        }
-                      }}
-                      placeholder="https://www.tiktok.com/@creator/video/1234567890"
-                      aria-invalid={Boolean(tiktokError)}
-                      aria-describedby={tiktokError ? 'place-tiktok-error' : undefined}
-                      className="min-w-0 flex-1 rounded-lg border border-amber-200 bg-white px-3 py-2 text-[10px] text-zinc-800 outline-none focus:border-amber-500"
-                    />
-                    <button type="button" onClick={handleTikTokImport} className="rounded-lg bg-amber-700 px-3 py-2 text-[10px] font-bold text-white hover:bg-amber-800">
-                      Import
-                    </button>
+                <details
+                  ref={(node) => {
+                    if (node && !node.dataset.defaulted) {
+                      node.dataset.defaulted = 'yes';
+                      node.open = true;
+                    }
+                  }}
+                  className="group/embed mt-4 rounded-xl border border-amber-200 bg-amber-50"
+                >
+                  <summary className="flex cursor-pointer list-none items-center gap-2 px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-amber-900 marker:hidden">
+                    <span className="flex-1">{lang === 'vi' ? 'Nhúng video' : 'Embed video'}</span>
+                    <span aria-hidden="true" className="text-amber-700 transition-transform group-open/embed:rotate-90">▸</span>
+                  </summary>
+
+                  <div className="space-y-2 px-3 pb-3">
+                    {/* Says what it takes before you can guess wrong, which is
+                        the whole reason a field named after one platform was a
+                        problem rather than a shorthand. */}
+                    <p className="text-[10px] leading-relaxed text-amber-900/80">
+                      {lang === 'vi'
+                        ? 'Dán link TikTok, YouTube, hoặc link video trực tiếp (.mp4, .webm, .mov).'
+                        : 'Paste a TikTok, YouTube, or direct video link (.mp4, .webm, .mov).'}
+                    </p>
+                    <div className="flex gap-2">
+                      <input
+                        id="place-embed-url"
+                        type="url"
+                        value={importUrl}
+                        onChange={(event) => {
+                          setImportUrl(event.target.value);
+                          if (importError) setImportError('');
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key === 'Enter') {
+                            event.preventDefault();
+                            handleEmbedImport();
+                          }
+                        }}
+                        placeholder="https://…"
+                        aria-invalid={Boolean(importError)}
+                        aria-describedby={importError ? 'place-embed-error' : undefined}
+                        className="min-w-0 flex-1 rounded-lg border border-amber-200 bg-white px-3 py-2 text-[10px] text-zinc-800 outline-none focus:border-amber-500"
+                      />
+                      <button type="button" onClick={handleEmbedImport} className="rounded-lg bg-amber-700 px-3 py-2 text-[10px] font-bold text-white hover:bg-amber-800">
+                        Import
+                      </button>
+                    </div>
+
+                    {/* What it read out of the link, before anything is saved.
+                        Being told only "invalid" leaves you guessing; being told
+                        "YouTube" tells you it landed. */}
+                    {detected.ok && (
+                      <p className="text-[10px] font-medium text-emerald-800">
+                        {detected.kind === 'tiktok'
+                          ? `TikTok${detected.handle ? ` · ${detected.handle}` : ''}`
+                          : detected.kind === 'youtube'
+                            ? 'YouTube'
+                            : lang === 'vi' ? 'Video trực tiếp' : 'Direct video'}
+                      </p>
+                    )}
+                    {importError && <p id="place-embed-error" role="alert" className="text-[10px] text-red-700">{importError}</p>}
                   </div>
-                  {tiktokError && <p id="place-tiktok-error" role="alert" className="text-[10px] text-red-700">{tiktokError}</p>}
-                </div>
+                </details>
               )}
 
               {/* Elegant decorative line */}
