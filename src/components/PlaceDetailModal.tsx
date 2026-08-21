@@ -96,7 +96,18 @@ const NO_PHOTO_LABEL = {
  */
 const VIDEO_FILE = /\.(mp4|webm|ogv|ogg|mov|m4v)(?:[?#].*)?$/i;
 
-type Detected = { ok: boolean; kind: 'tiktok' | 'youtube' | 'direct' | 'none'; handle: string };
+type Detected = { ok: boolean; kind: 'tiktok' | 'youtube' | 'direct' | 'none' | 'tiktok-short'; handle: string };
+
+/**
+ * vt.tiktok.com and vm.tiktok.com are the links TikTok's own share sheet
+ * produces, and they are redirects: the video id only exists on the other side
+ * of a request this page cannot make, because TikTok sends no CORS header that
+ * would let it. So the field cannot accept them, but it can stop pretending it
+ * does not recognise them — the difference between "no idea what this is" and
+ * "I know what this is, open it and copy the address bar" is the difference
+ * between a dead end and an instruction.
+ */
+const TIKTOK_SHORT = /^https?:\/\/(?:vt|vm)\.tiktok\.com\//i;
 
 const detectEmbed = (raw: string): Detected => {
   const url = raw.trim();
@@ -109,6 +120,7 @@ const detectEmbed = (raw: string): Detected => {
     return none;
   }
   if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return none;
+  if (TIKTOK_SHORT.test(url)) return { ok: false, kind: 'tiktok-short', handle: '' };
 
   const details = getEmbedDetails(url);
   if (details.type === 'tiktok') return { ok: true, kind: 'tiktok', handle: details.handle };
@@ -136,7 +148,12 @@ const getEmbedDetails = (url: string | undefined) => {
   }
 
   // YouTube match
-  const ytMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i);
+  // shorts and live sit in the path exactly as embed does, and both were
+  // falling through to the catch-all and being refused. They matter more than
+  // their share of the URL space suggests: /shorts/ is what YouTube's mobile
+  // app puts on the clipboard, so the commonest way to hand this field a link
+  // was also the one it would not take.
+  const ytMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|shorts|live)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i);
   if (ytMatch && ytMatch[1]) {
     return {
       type: 'youtube' as const,
@@ -241,7 +258,14 @@ export function PlaceDetailModal({
 
   const handleEmbedImport = () => {
     const trimmedUrl = importUrl.trim();
-    if (!detectEmbed(trimmedUrl).ok) {
+    const read = detectEmbed(trimmedUrl);
+    if (read.kind === 'tiktok-short') {
+      setImportError(lang === 'vi'
+        ? 'Link rút gọn của TikTok không đọc được id video. Mở link đó trong trình duyệt rồi sao chép địa chỉ đầy đủ (dạng .../video/123...).'
+        : 'A shortened TikTok link hides the video id. Open it in a browser and copy the full address (the one containing /video/123...).');
+      return;
+    }
+    if (!read.ok) {
       // Naming the accepted forms rather than only the rejected one. The old
       // message described the TikTok pattern and nothing else, which is how
       // an author ends up believing TikTok is all there is.
@@ -795,8 +819,8 @@ export function PlaceDetailModal({
                         problem rather than a shorthand. */}
                     <p className="text-[10px] leading-relaxed text-amber-900/80">
                       {lang === 'vi'
-                        ? 'Dán link TikTok, YouTube, hoặc link video trực tiếp (.mp4, .webm, .mov).'
-                        : 'Paste a TikTok, YouTube, or direct video link (.mp4, .webm, .mov).'}
+                        ? 'Dán link TikTok, YouTube (kể cả Shorts), hoặc link video trực tiếp (.mp4, .webm, .mov).'
+                        : 'Paste a TikTok, YouTube (Shorts included), or direct video link (.mp4, .webm, .mov).'}
                     </p>
                     <div className="flex gap-2">
                       <input
