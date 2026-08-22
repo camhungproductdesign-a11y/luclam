@@ -62,6 +62,8 @@ import {
 } from './adminToken';
 import { resolveContent } from './resolveContent';
 import { pathFor, parsePath, TOPICS, type Topic } from './routes';
+import { DEFAULT_BUY_LINKS, FALLBACK_BUY_LINKS } from './buyLinks';
+import { SOCIAL } from './company';
 
 /**
  * Keep a hyphenated word whole when a navigation label has to wrap.
@@ -148,34 +150,6 @@ async function unlockCreatorMode(): Promise<boolean> {
   return false;
 }
 
-/**
- * Where each tea can be bought, used when nothing has been set in the editor.
- * These sat inline in the render as an array indexed by position, so a sixth
- * product silently fell through to a generic search page. Editable per product
- * as menuItems[i].buyLuclam / buyTaka; these are only the starting values.
- */
-const DEFAULT_BUY_LINKS: Array<{ luclam: string; taka: string }> = [
-  {
-    luclam: 'https://luclam.vn/collections/hop-50-g',
-    taka: 'https://online.takashimaya-vn.com/chai-tra-red-lava-luc-lam-50g--s230800289',
-  },
-  {
-    luclam: 'https://luclam.vn/collections/hop-50-g',
-    taka: 'https://online.takashimaya-vn.com/chai-tra-velvet-rose-luc-lam-50g--s230800295',
-  },
-  {
-    luclam: 'https://luclam.vn/collections/hop-50-g',
-    taka: 'https://online.takashimaya-vn.com/c/luc-lam-tet',
-  },
-  {
-    luclam: 'https://luclam.vn/collections/hop-50-g',
-    taka: 'https://online.takashimaya-vn.com/c/luc-lam-tet',
-  },
-  {
-    luclam: 'https://luclam.vn/collections/hop-50-g',
-    taka: 'https://online.takashimaya-vn.com/c/luc-lam-tet',
-  },
-];
 
 /**
  * The fare table used to live here, as a module constant holding names, prices
@@ -195,10 +169,6 @@ const DEFAULT_BUY_LINKS: Array<{ luclam: string; taka: string }> = [
  * likely to change were the only ones that needed a developer.
  */
 
-const FALLBACK_BUY_LINKS = {
-  luclam: 'https://luclam.vn/collections/all',
-  taka: 'https://www.takashimaya-vietnam.com/vn/search?q=luc+lam',
-};
 
 function useFallbackImage(event: React.SyntheticEvent<HTMLImageElement>) {
   const image = event.currentTarget;
@@ -2928,7 +2898,7 @@ export default function App() {
 
                     <div className="grid grid-cols-3 gap-2">
                       <a 
-                        href="https://www.instagram.com/luclam_vietnam.review_japan/" 
+                        href={SOCIAL.instagram[0]} 
                         target="_blank" 
                         rel="noreferrer"
                         className="bg-zinc-950 border border-zinc-800 hover:border-amber-500/40 rounded-xl p-2.5 text-center flex flex-col items-center justify-between gap-2 shadow-md transition-all hover:-translate-y-0.5"
@@ -2945,7 +2915,7 @@ export default function App() {
                       </a>
 
                       <a 
-                        href="https://www.instagram.com/luclam_vietnam.review_korea/" 
+                        href={SOCIAL.instagram[1]} 
                         target="_blank" 
                         rel="noreferrer"
                         className="bg-zinc-950 border border-zinc-800 hover:border-amber-500/40 rounded-xl p-2.5 text-center flex flex-col items-center justify-between gap-2 shadow-md transition-all hover:-translate-y-0.5"
@@ -2962,7 +2932,7 @@ export default function App() {
                       </a>
 
                       <a 
-                        href="https://www.instagram.com/luclam_vietnam.review_china/" 
+                        href={SOCIAL.instagram[2]} 
                         target="_blank" 
                         rel="noreferrer"
                         className="bg-zinc-950 border border-zinc-800 hover:border-amber-500/40 rounded-xl p-2.5 text-center flex flex-col items-center justify-between gap-2 shadow-md transition-all hover:-translate-y-0.5"
