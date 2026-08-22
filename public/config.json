@@ -28,7 +28,7 @@
     },
     "culture-2": {
       "img": "/uploads/external/ho-chi-minh-city-hall.jpg",
-      "video": "https://www.tiktok.com/@hoamoclan2212/video/7641101449178483989"
+      "video": ""
     },
     "culture-5": {
       "img": "/uploads/external/hcmc-museum-of-history.jpg",
@@ -117,14 +117,6 @@
     "cover": {
       "img": "/uploads/cover-benthanh.jpg",
       "video": ""
-    },
-    "culture-0": {
-      "img": "",
-      "video": "https://www.tiktok.com/@hoamoclan2212/video/7641101449178483989"
-    },
-    "food-0-0": {
-      "img": "",
-      "video": "https://www.youtube.com/watch?v=fsIAB_dDe1k"
     }
   }
 }
