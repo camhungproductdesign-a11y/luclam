@@ -6,6 +6,7 @@ import { escapeHtml } from './render-content';
 import { parsePrice } from '../../src/parsePrice';
 import { describe } from './describe';
 import { faqFor } from '../../src/faq';
+import { videosFor } from './place-videos';
 import { COMPANY, STORES, storeName, type Store } from '../../src/company';
 
 import { ORIGIN } from '../../src/origin';
@@ -340,6 +341,47 @@ function organization(lang: Language, resolved: ResolvedContent): string {
   });
 }
 
+/**
+ * The videos this page shows, described.
+ *
+ * Emitted only for videos videos.json holds a complete record for. VideoObject
+ * requires name, thumbnailUrl and uploadDate, and a block missing one of them
+ * is not a partial description — it is a block Google discards, so there is
+ * nothing to be gained by guessing at the missing field and something to lose
+ * by claiming it.
+ *
+ * This is paired with the markup render-content emits. Describing a video that
+ * is not on the page is the thing structured-data policy exists to stop, and
+ * until the figure below existed there was no honest way to write this at all.
+ */
+function videoObjects(lang: Language, topic: Topic, resolved: ResolvedContent): string {
+  const videos = videosFor(topic, resolved[lang]).filter((video) => video.describable);
+  if (!videos.length) return '';
+
+  const items = videos.map((video, index) => ({
+    '@type': 'ListItem',
+    position: index + 1,
+    item: {
+      '@type': 'VideoObject',
+      name: video.name,
+      description: video.description,
+      thumbnailUrl: video.thumbnailUrl,
+      uploadDate: video.uploadDate,
+      embedUrl: video.embedUrl,
+      contentUrl: video.sourceUrl,
+      // The page the frame sits on, so the video is tied to somewhere rather
+      // than floating free of the site that claims it.
+      mainEntityOfPage: { '@type': 'WebPage', '@id': absolute(pathFor(lang, topic)) },
+    },
+  }));
+
+  return JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: items,
+  });
+}
+
 export function renderHead(
   lang: Language,
   topic: Topic,
@@ -365,6 +407,7 @@ export function renderHead(
     faqPage(lang, topic, resolved),
     infoItemList(lang, topic, resolved),
     products(lang, topic, resolved),
+    videoObjects(lang, topic, resolved),
   ]
     .filter(Boolean)
     .map((json) => `<script type="application/ld+json">${json}</script>`)
