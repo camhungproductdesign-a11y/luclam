@@ -38,6 +38,7 @@ import { faqFor } from './faq';
 import { PageHeading } from './components/PageHeading';
 import { SectionTabs } from './components/SectionTabs';
 import { DeferredFrame } from './components/DeferredFrame';
+import { PlaceVideos, type PlaceVideo } from './components/PlaceVideos';
 
 // ==========================================================================
 // Translation Data for Saigon Pocket Guide
@@ -50,7 +51,7 @@ import { PlaceDetailModal } from './components/PlaceDetailModal';
 const CreatorStudio = React.lazy(() =>
   import('./components/CreatorStudio').then((module) => ({ default: module.CreatorStudio }))
 );
-import { defaultMedia } from './defaultMedia';
+import { defaultMedia, DEFAULT_COVER_IMAGE } from './defaultMedia';
 import { authHeaders, saveFailedMessage, UNAUTHORIZED_MESSAGE } from './adminToken';
 import { resolveContent } from './resolveContent';
 import { pathFor, parsePath, TOPICS, type Topic } from './routes';
@@ -312,13 +313,13 @@ export default function App() {
       if (saved) {
         const parsed = JSON.parse(saved);
         if (!parsed.cover?.img || parsed.cover.img.includes('unsplash.com')) {
-          parsed.cover = { img: '/uploads/cover-benthanh.jpg', video: '' };
+          parsed.cover = { img: DEFAULT_COVER_IMAGE, video: '' };
         }
         return parsed;
       }
-      return { cover: { img: '/uploads/cover-benthanh.jpg', video: '' } };
+      return { cover: { img: DEFAULT_COVER_IMAGE, video: '' } };
     } catch (e) {
-      return { cover: { img: '/uploads/cover-benthanh.jpg', video: '' } };
+      return { cover: { img: DEFAULT_COVER_IMAGE, video: '' } };
     }
   });
 
@@ -406,7 +407,7 @@ export default function App() {
             const loadedOverrides = data.overrides || {};
             const loadedMedia = data.customMedia || {};
             if (!loadedMedia.cover?.img || loadedMedia.cover.img.includes('unsplash.com')) {
-              loadedMedia.cover = { img: '/uploads/cover-benthanh.jpg', video: '' };
+              loadedMedia.cover = { img: DEFAULT_COVER_IMAGE, video: '' };
             }
             setOverrides(loadedOverrides);
             setCustomMedia(loadedMedia);
@@ -430,7 +431,7 @@ export default function App() {
               const loadedOverrides = data.overrides || {};
               const loadedMedia = data.customMedia || {};
               if (!loadedMedia.cover?.img || loadedMedia.cover.img.includes('unsplash.com')) {
-                loadedMedia.cover = { img: '/uploads/cover-benthanh.jpg', video: '' };
+                loadedMedia.cover = { img: DEFAULT_COVER_IMAGE, video: '' };
               }
               setOverrides(loadedOverrides);
               setCustomMedia(loadedMedia);
@@ -613,6 +614,37 @@ export default function App() {
    * cost this project real content twice — nineteen places were shadowed the
    * same way once before.
    */
+  /**
+   * The videos an editor has attached to places on one topic page, each with
+   * the name of the place it belongs to.
+   *
+   * customMedia rather than defaultMedia, because a video is something someone
+   * adds; nothing ships with one. The name is looked up per family, since the
+   * ids are shaped differently — food carries a category and an index, the
+   * others carry one index — and a video on the page has to say which place it
+   * is of, or it is just a clip sitting there.
+   */
+  const videosForTopic = (family: 'food' | 'culture' | 'shopping'): PlaceVideo[] => {
+    const out: PlaceVideo[] = [];
+    const entries = Object.entries(customMedia) as Array<[string, { img?: string; video?: string } | undefined]>;
+    for (const [id, entry] of entries) {
+      if (!entry || !entry.video) continue;
+      if (!id.startsWith(family + "-")) continue;
+
+      let name = "";
+      if (family === "food") {
+        const parts = id.split("-");
+        name = (t as any).food?.categories?.[Number(parts[1])]?.restaurants?.[Number(parts[2])]?.name ?? "";
+      } else {
+        const idx = Number(id.split("-")[1]);
+        name = (t as any)[family]?.items?.[idx]?.name ?? "";
+      }
+      if (!name) continue;
+      out.push({ id, name, video: entry.video });
+    }
+    return out;
+  };
+
   const getPlaceMedia = (placeId: string) => {
     const fallback = defaultMedia[placeId] || { img: '', video: '' };
     const custom = customMedia[placeId];
@@ -1274,7 +1306,7 @@ export default function App() {
                 {/* Full-bleed high-contrast premium Ben Thanh aerial photograph background */}
                 <div className="absolute inset-0 transition-all duration-700">
                   <Picture
-                    src={(customMedia.cover?.img && !customMedia.cover.img.includes('unsplash.com')) ? customMedia.cover.img : "/uploads/cover-benthanh.jpg"}
+                    src={(customMedia.cover?.img && !customMedia.cover.img.includes('unsplash.com')) ? customMedia.cover.img : DEFAULT_COVER_IMAGE}
                     alt="Chợ Bến Thành Sài Gòn Aerial Cover" 
                     width={1200}
                     height={1600}
@@ -2365,6 +2397,13 @@ export default function App() {
                   </div>
                 </div>
 
+                {/* The videos attached to places on this page, on the page. See
+                    PlaceVideos: they were only in the detail modal, which a crawler
+                    never opens, so nothing in the prerendered HTML said a video
+                    existed. Withheld until approached, so they cost nothing to a
+                    reader who does not scroll this far. */}
+                <PlaceVideos items={videosForTopic('food')} lang={lang} />
+
                 <div className="mt-4 lg:mt-0 pt-3 border-t border-zinc-200/40 text-center">
                   <span className="text-[8px] tracking-widest text-zinc-400 uppercase">Lục Lam Pocket Companion</span>
                 </div>
@@ -2472,6 +2511,13 @@ export default function App() {
                   </div>
                 </div>
 
+                {/* The videos attached to places on this page, on the page. See
+                    PlaceVideos: they were only in the detail modal, which a crawler
+                    never opens, so nothing in the prerendered HTML said a video
+                    existed. Withheld until approached, so they cost nothing to a
+                    reader who does not scroll this far. */}
+                <PlaceVideos items={videosForTopic('culture')} lang={lang} />
+
                 <div className="mt-4 lg:mt-0 pt-3 border-t border-zinc-200/40 text-center">
                   <span className="text-[8px] tracking-widest text-zinc-400 uppercase">Lục Lam Heritage Route</span>
                 </div>
@@ -2531,6 +2577,13 @@ export default function App() {
                     })}
                   </div>
                 </div>
+
+                {/* The videos attached to places on this page, on the page. See
+                    PlaceVideos: they were only in the detail modal, which a crawler
+                    never opens, so nothing in the prerendered HTML said a video
+                    existed. Withheld until approached, so they cost nothing to a
+                    reader who does not scroll this far. */}
+                <PlaceVideos items={videosForTopic('shopping')} lang={lang} />
 
                 <div className="mt-4 lg:mt-0 pt-3 border-t border-zinc-200/40 text-center">
                   <span className="text-[8px] tracking-widest text-zinc-400 uppercase">Lục Lam Shopping Companion</span>
@@ -3174,6 +3227,7 @@ export default function App() {
               media={selectedPlace.media}
               lang={lang}
               isCreator={isCreator}
+              customVideo={customMedia[selectedPlace.id]?.video}
               onUpdateMedia={(placeId, type, url) => {
                 const nextMedia = {
                   ...customMedia,

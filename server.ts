@@ -582,7 +582,12 @@ async function startServer() {
         overrides: overrides ?? {},
         customMedia: customMedia ?? {},
       };
-      const serialised = JSON.stringify(dataToSave, null, 2);
+      // Trailing newline, because every other generated file in this repo has
+      // one — CREDITS.json is written the same way a few files over. Without
+      // it the first save after a checkout rewrites the last line of
+      // config.json for no reason, and every save after that shows up in a
+      // diff as a change to a line nobody touched.
+      const serialised = `${JSON.stringify(dataToSave, null, 2)}\n`;
 
       // Parsed back before it is allowed near the real file: a value that cannot
       // survive the round trip is one the prerenderer would choke on later.

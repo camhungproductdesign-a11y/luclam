@@ -14,6 +14,7 @@
     "media:fetch": "tsx scripts/fetch-external-media.ts",
     "media:credits": "tsx scripts/fetch-wikimedia-credits.ts",
     "media:rewrite": "tsx scripts/rewrite-media-urls.ts",
+    "video:meta": "tsx scripts/fetch-video-meta.ts",
     "credits": "tsx scripts/generate-credits-module.ts",
     "verify": "tsx scripts/verify-output.ts",
     "smoke": "tsx scripts/smoke.ts"

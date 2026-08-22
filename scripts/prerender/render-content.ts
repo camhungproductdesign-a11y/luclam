@@ -2,6 +2,7 @@ import { type Language } from '../../src/translations';
 import { pathFor, TOPICS, type Topic } from '../../src/routes';
 import { type ResolvedContent } from '../../src/resolveContent';
 import { type PlaceImage } from './place-images';
+import { videosFor, type PlaceVideoMeta } from './place-videos';
 import { COMPANY, STORES, storeName } from '../../src/company';
 import { faqFor } from '../../src/faq';
 
@@ -194,6 +195,34 @@ function renderContact(topic: Topic, t: any): string {
   );
 }
 
+/**
+ * The videos this page carries, as markup rather than only as a promise.
+ *
+ * The app mounts these frames on the client, and behind an IntersectionObserver
+ * at that, so nothing about them survived into the generated HTML — the same
+ * hole the photographs had, from the same cause: this file walks
+ * translations.ts and a video lives in config.json, where SKIP_KEYS drops it
+ * as machinery.
+ *
+ * A link rather than an iframe. The iframe is the app’s job and putting a
+ * third-party player in the static HTML would hand someone else a say in
+ * whether this page renders — the reason the images here are only ever served
+ * from /uploads. A link names the video, points at it, and is the thing a
+ * reader with JavaScript off can actually use.
+ */
+function renderVideos(videos: PlaceVideoMeta[]): string {
+  if (videos.length === 0) return '';
+
+  return videos
+    .map(
+      (video) =>
+        `<figure><a href="${escapeHtml(video.sourceUrl)}" rel="noopener nofollow">` +
+        `${escapeHtml(video.name)}</a>` +
+        `<figcaption>${escapeHtml(video.placeName)}</figcaption></figure>`
+    )
+    .join('');
+}
+
 export function renderContent(
   lang: Language,
   topic: Topic,
@@ -258,6 +287,7 @@ export function renderContent(
     renderFaq(lang, topic, t),
     renderContact(topic, t),
     renderImages(images),
+    renderVideos(videosFor(topic, t)),
     '</article>',
     `<nav aria-label="${escapeHtml(t.pages.info)}"><ul>${topicNav}${blogNav}</ul></nav>`,
     `<nav aria-label="Languages"><ul>${languageNav}</ul></nav>`,

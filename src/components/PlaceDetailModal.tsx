@@ -23,6 +23,7 @@ import {
   Settings
 } from 'lucide-react';
 import { useMediaUrl } from '../hooks/useMediaUrl';
+import { detectEmbed, getEmbedDetails } from '../videoEmbed';
 import { Picture } from './Picture';
 import { saveMedia } from '../indexedDBStore';
 import { creditFor } from '../mediaCredits';
@@ -50,6 +51,16 @@ interface PlaceDetailModalProps {
   onClose: () => void;
   lang: string;
   onUpdateMedia?: (placeId: string, type: 'img' | 'video', url: string) => void;
+  /**
+   * The video this place carries as an override, if it has one — not the one
+   * on screen, which may be the default.
+   *
+   * The modal is handed `media` already merged, so it cannot tell the two
+   * apart, and a remove button shown against a default would set the override
+   * to empty, fall straight back to that same default, and appear to do
+   * nothing at all.
+   */
+  customVideo?: string;
   onOpenEditor?: (placeId: string) => void;
   isCreator?: boolean;
 }
@@ -68,92 +79,6 @@ const NO_PHOTO_LABEL = {
   zht: '暫無照片',
 } as const;
 
-/**
- * What the import field accepts, worked out from what getEmbedDetails below
- * can actually render — one rule rather than two.
- *
- * There used to be two, and they disagreed. The field validated against a
- * TikTok-only pattern while the player already handled YouTube and plain
- * video files, so a YouTube link was refused at the door by the very
- * component that would have played it happily. The same link pasted into
- * Creator Studio's Video URL box worked, because that route has no gate at
- * all. Three ways in, three different answers to one question.
- *
- * 'direct' needs the extension test that getEmbedDetails does not do. That
- * branch is a catch-all returning the URL untouched, which is right for
- * rendering — a <video src> either plays or it does not — and wrong as an
- * acceptance test, since it would wave through any string at all.
- */
-const VIDEO_FILE = /\.(mp4|webm|ogv|ogg|mov|m4v)(?:[?#].*)?$/i;
-
-type Detected = { ok: boolean; kind: 'tiktok' | 'youtube' | 'direct' | 'none'; handle: string };
-
-const detectEmbed = (raw: string): Detected => {
-  const url = raw.trim();
-  const none: Detected = { ok: false, kind: 'none', handle: '' };
-  if (!url) return none;
-  let parsed: URL;
-  try {
-    parsed = new URL(url);
-  } catch {
-    return none;
-  }
-  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return none;
-
-  const details = getEmbedDetails(url);
-  if (details.type === 'tiktok') return { ok: true, kind: 'tiktok', handle: details.handle };
-  if (details.type === 'youtube') return { ok: true, kind: 'youtube', handle: '' };
-  if (details.type === 'direct' && VIDEO_FILE.test(parsed.pathname)) {
-    return { ok: true, kind: 'direct', handle: '' };
-  }
-  return none;
-};
-/** The @handle out of a TikTok URL, so the credit can be rendered as our own text. */
-const tiktokHandle = (url: string): string => (url.match(/tiktok\.com\/(@[\w.-]+)/i)?.[1] ?? '');
-
-const getEmbedDetails = (url: string | undefined) => {
-  if (!url) return { type: 'none' as const, embedUrl: '', handle: '', sourceUrl: '' };
-
-  // TikTok Video Match
-  const tiktokMatch = url.match(/tiktok\.com\/.*\/video\/(\d+)/i);
-  if (tiktokMatch && tiktokMatch[1]) {
-    return {
-      type: 'tiktok' as const,
-      embedUrl: `https://www.tiktok.com/embed/v2/${tiktokMatch[1]}`,
-      handle: tiktokHandle(url),
-      sourceUrl: url,
-    };
-  }
-
-  // YouTube match
-  const ytMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i);
-  if (ytMatch && ytMatch[1]) {
-    return {
-      type: 'youtube' as const,
-      embedUrl: `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1&mute=1&loop=1&playlist=${ytMatch[1]}`,
-      handle: '',
-      sourceUrl: url,
-    };
-  }
-
-  // General fallback if it contains tiktok.com but different format
-  if (url.includes('tiktok.com')) {
-    const parts = url.split('/video/');
-    if (parts.length > 1) {
-      const id = parts[1].split('?')[0];
-      if (/^\d+$/.test(id)) {
-        return {
-          type: 'tiktok' as const,
-          embedUrl: `https://www.tiktok.com/embed/v2/${id}`,
-          handle: tiktokHandle(url),
-          sourceUrl: url,
-        };
-      }
-    }
-  }
-
-  return { type: 'direct' as const, embedUrl: url, handle: '', sourceUrl: url };
-};
 
 export function PlaceDetailModal({ 
   place, 
@@ -163,7 +88,8 @@ export function PlaceDetailModal({
   lang,
   onUpdateMedia,
   onOpenEditor,
-  isCreator = false
+  isCreator = false,
+  customVideo,
 }: PlaceDetailModalProps) {
   const [isMuted, setIsMuted] = useState(true);
   const [isPlaying, setIsPlaying] = useState(true);
@@ -230,7 +156,14 @@ export function PlaceDetailModal({
 
   const handleEmbedImport = () => {
     const trimmedUrl = importUrl.trim();
-    if (!detectEmbed(trimmedUrl).ok) {
+    const read = detectEmbed(trimmedUrl);
+    if (read.kind === 'tiktok-short') {
+      setImportError(lang === 'vi'
+        ? 'Link rút gọn của TikTok không đọc được id video. Mở link đó trong trình duyệt rồi sao chép địa chỉ đầy đủ (dạng .../video/123...).'
+        : 'A shortened TikTok link hides the video id. Open it in a browser and copy the full address (the one containing /video/123...).');
+      return;
+    }
+    if (!read.ok) {
       // Naming the accepted forms rather than only the rejected one. The old
       // message described the TikTok pattern and nothing else, which is how
       // an author ends up believing TikTok is all there is.
@@ -784,8 +717,8 @@ export function PlaceDetailModal({
                         problem rather than a shorthand. */}
                     <p className="text-[10px] leading-relaxed text-amber-900/80">
                       {lang === 'vi'
-                        ? 'Dán link TikTok, YouTube, hoặc link video trực tiếp (.mp4, .webm, .mov).'
-                        : 'Paste a TikTok, YouTube, or direct video link (.mp4, .webm, .mov).'}
+                        ? 'Dán link TikTok, YouTube (kể cả Shorts), hoặc link video trực tiếp (.mp4, .webm, .mov).'
+                        : 'Paste a TikTok, YouTube (Shorts included), or direct video link (.mp4, .webm, .mov).'}
                     </p>
                     <div className="flex gap-2">
                       <input
@@ -811,6 +744,29 @@ export function PlaceDetailModal({
                         Import
                       </button>
                     </div>
+
+                    {/* Undo, where the thing was done. Removing a video meant
+                        leaving the place you were looking at, opening Creator
+                        Studio, finding the same place in a list and clicking a
+                        red link — and that link drops the place's image with the
+                        video, because it deletes the whole entry rather than one
+                        field.
+
+                        Writing '' to the override is the surgical version: the
+                        merge at handleOpenDetail reads `custom.video ||
+                        fallback.video`, so an empty override is not "no video",
+                        it is "whatever this place had before I touched it". When
+                        that was nothing, nothing is what comes back. The image
+                        override is untouched either way. */}
+                    {customVideo && onUpdateMedia && (
+                      <button
+                        type="button"
+                        onClick={() => { onUpdateMedia(place.id, 'video', ''); setImportUrl(''); setImportError(''); }}
+                        className="text-[10px] font-medium text-red-700 hover:underline"
+                      >
+                        {lang === 'vi' ? 'Gỡ video đã nhúng' : 'Remove embedded video'}
+                      </button>
+                    )}
 
                     {/* What it read out of the link, before anything is saved.
                         Being told only "invalid" leaves you guessing; being told

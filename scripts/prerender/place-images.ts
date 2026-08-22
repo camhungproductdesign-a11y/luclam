@@ -60,7 +60,7 @@ async function measure(src: string) {
  * anything — went out with no <img> at all and no sitemap entry, while
  * Product.image pointed at a CDN on another hostname.
  */
-function placesOn(topic: Topic, t: any): Array<{ id: string; name: string; img?: string }> {
+export function placesOn(topic: Topic, t: any): Array<{ id: string; name: string; img?: string }> {
   switch (topic) {
     case 'food':
       return (t.food?.categories ?? []).flatMap((c: any, ci: number) =>
