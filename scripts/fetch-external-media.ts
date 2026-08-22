@@ -25,8 +25,11 @@ const SOURCES = [
  * that is not this site. Google credits the images to the CDN and this site
  * gets nothing for its only commercial pages.
  *
- * assets.mixkit.co still stays hotlinked: those are videos, far too heavy to
- * vendor, and video files earn none of the above.
+ * assets.mixkit.co used to be the exception here — videos, too heavy to vendor,
+ * earning none of the above. It is no longer an exception because it is no
+ * longer anywhere: every one of those URLs is dead, refused by the host and
+ * then by the browser, so they were removed rather than left hotlinked to
+ * nothing. If hosted video loops come back, this is the paragraph to reopen.
  */
 const TARGET_HOSTS =
   /https:\/\/(?:images\.unsplash\.com|upload\.wikimedia\.org|cdn\.hstatic\.net)\/[^"'\s)\\]+/g;

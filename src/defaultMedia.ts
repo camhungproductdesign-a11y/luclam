@@ -112,7 +112,7 @@ export const defaultMedia: Record<string, PlaceMedia> = {
   // Com Tam — nhom 3, khong phai cafe
   "food-3-0": {
     img: "/uploads/external/com-tam-ba-ghien.jpg",
-    video: "https://assets.mixkit.co/videos/preview/mixkit-coffee-dripping-from-a-filter-43093-large.mp4"
+    video: ""
   },
   "food-3-1": {
     img: "/uploads/external/com-tam-thuan-kieu.jpg",
@@ -159,7 +159,7 @@ export const defaultMedia: Record<string, PlaceMedia> = {
   },
   "stay-1": {
     img: "/uploads/external/spa-herbal-wash.jpg",
-    video: "https://assets.mixkit.co/videos/preview/mixkit-dripping-oil-on-massage-stones-in-a-spa-treatment-41666-large.mp4"
+    video: ""
   },
   "stay-2": {
     img: "/uploads/external/hidden-cafes-tea.jpg",
@@ -323,38 +323,21 @@ export const defaultMedia: Record<string, PlaceMedia> = {
   }
 };
 
-// Selection of beautiful premium Saigon stock video loops that users can quickly pick
-export const videoPresets = [
-  {
-    name: "Coffee Dripping (Simmering)",
-    url: "https://assets.mixkit.co/videos/preview/mixkit-coffee-dripping-from-a-filter-43093-large.mp4",
-    category: "Cafe / Sữa Đá"
-  },
-  {
-    name: "Aromatic Hot Stone Therapy",
-    url: "https://assets.mixkit.co/videos/preview/mixkit-dripping-oil-on-massage-stones-in-a-spa-treatment-41666-large.mp4",
-    category: "Spa / Herbal"
-  },
-  {
-    name: "Pouring Hot Tea Cup",
-    url: "https://assets.mixkit.co/videos/preview/mixkit-pouring-hot-tea-into-a-glass-cup-43075-large.mp4",
-    category: "Cafe / Teahouse"
-  },
-  {
-    name: "Fresh Snails / Sizzling Seafood",
-    url: "https://assets.mixkit.co/videos/preview/mixkit-chef-cooking-seafood-in-a-pan-40507-large.mp4",
-    category: "Seafood"
-  },
-  {
-    name: "Splashing Ice Coffee",
-    url: "https://assets.mixkit.co/videos/preview/mixkit-pouring-iced-coffee-into-a-glass-42171-large.mp4",
-    category: "Cafe / Sữa Đá"
-  },
-  {
-    name: "Scenic River Traffic Flow",
-    url: "https://assets.mixkit.co/videos/preview/mixkit-boats-sailing-down-a-wide-river-42938-large.mp4",
-    category: "General"
-  }
+/**
+ * Empty, and deliberately so.
+ *
+ * All six entries pointed at assets.mixkit.co, and all six are gone: 403 to
+ * curl with or without a referer, and in a real browser on the real domain
+ * Chrome refuses them outright — net::ERR_BLOCKED_BY_ORB, with the <video>
+ * element reporting MEDIA_ELEMENT_ERROR: Format error. So the picker was
+ * offering six links that cannot play, and the two places below that carried
+ * one as a default were showing a broken player to readers.
+ *
+ * Kept as an empty export rather than deleted, because the shape is still the
+ * right one: hosted loops belong here the moment there are some worth having.
+ * The panel hides the section while it is empty.
+ */
+export const videoPresets: Array<{ name: string; url: string; category: string }> = [
 ];
 
 export const imagePresets = [
