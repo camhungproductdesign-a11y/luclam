@@ -685,6 +685,23 @@ async function startServer() {
     }
   });
 
+  /**
+   * Answers one question: is this token the one the server was started with?
+   *
+   * The panel used to open to a passcode compiled into the bundle, which
+   * anyone could read and which guarded nothing — writing was checked against
+   * ADMIN_TOKEN here regardless. Two secrets, one of them fake, and the fake
+   * one was the one the operator typed. The door asks for the real token now
+   * and asks this endpoint about it, so there is a single boundary.
+   *
+   * requireAdmin does all of the work, including the per-IP backoff that makes
+   * this a poor thing to guess at. Nothing is returned but the fact of success:
+   * this must not become a way to read the token back.
+   */
+  app.get("/api/session", requireAdmin, (req, res) => {
+    res.json({ ok: true });
+  });
+
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok" });
   });
