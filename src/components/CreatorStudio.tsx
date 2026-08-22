@@ -1162,7 +1162,10 @@ export function CreatorStudio({
               
               <div className="bg-zinc-900 rounded-2xl border border-zinc-800 p-4 space-y-4">
                 
-                {/* Video loops presets */}
+                {/* Video loops presets, when there are any. The list is empty at
+                    the moment — see videoPresets — and a heading over nothing
+                    reads as a section that failed to load. */}
+                {videoPresets.length > 0 && (
                 <div className="space-y-2">
                   <h4 className="text-[10px] uppercase tracking-wider text-[#b85233] font-bold">🎬 Video Loops (Tự Động Phát & Vô Tận)</h4>
                   <div className="space-y-1.5">
@@ -1185,6 +1188,7 @@ export function CreatorStudio({
                     ))}
                   </div>
                 </div>
+                )}
 
                 {/* Image presets */}
                 <div className="space-y-2">
