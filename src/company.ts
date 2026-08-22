@@ -29,6 +29,31 @@ export const COMPANY = {
   },
 } as const;
 
+/**
+ * The accounts this brand is the same entity as.
+ *
+ * Facebook was written out twice in render-head.ts and the three Instagram
+ * feeds three times in App.tsx, so a moved account meant finding five string
+ * literals. They belong with the rest of the company facts.
+ *
+ * `npm run smoke` deliberately does NOT status-check these, and the reason is
+ * worth keeping: both networks answer 200 to any profile URL, real or not.
+ * Measured — facebook.com/chac.chan.khong.ton.tai.9z8y7x and
+ * instagram.com/chac_chan_khong_ton_tai_9z8y7x both return 200. A check over
+ * them could never fail, and a check that can never fail is worse than none:
+ * it reports these links as healthy forever. They have to be opened by eye.
+ */
+export const SOCIAL = {
+  facebook: 'https://www.facebook.com/luclamartoftea',
+  instagram: [
+    'https://www.instagram.com/luclam_vietnam.review_japan/',
+    'https://www.instagram.com/luclam_vietnam.review_korea/',
+    'https://www.instagram.com/luclam_vietnam.review_china/',
+  ],
+} as const;
+
+/** Everything the Organization markup claims is the same entity. */
+export const SAME_AS: string[] = [SOCIAL.facebook, COMPANY.website];
 export type Store = {
   id: string;
   /** What to call this branch in a list — the city, since that is how a visitor picks. */

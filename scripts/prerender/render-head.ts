@@ -7,7 +7,7 @@ import { parsePrice } from '../../src/parsePrice';
 import { describe } from './describe';
 import { faqFor } from '../../src/faq';
 import { videosFor } from './place-videos';
-import { COMPANY, STORES, storeName, type Store } from '../../src/company';
+import { COMPANY, STORES, storeName, type Store, SAME_AS } from '../../src/company';
 
 import { ORIGIN } from '../../src/origin';
 const OG_IMAGE = `${ORIGIN}/uploads/og-cover.jpg`;
@@ -281,7 +281,7 @@ function localBusiness(lang: Language, resolved: ResolvedContent): string {
       : undefined,
     openingHoursSpecification: openingHours(flagship),
     parentOrganization: { '@id': `${ORIGIN}#organization` },
-    sameAs: ['https://www.facebook.com/luclamartoftea', COMPANY.website],
+    sameAs: SAME_AS,
   });
 }
 
@@ -337,7 +337,7 @@ function organization(lang: Language, resolved: ResolvedContent): string {
         : {}),
       ...(store.hours ? { openingHoursSpecification: openingHours(store) } : {}),
     })),
-    sameAs: ['https://www.facebook.com/luclamartoftea', COMPANY.website],
+    sameAs: SAME_AS,
   });
 }
 

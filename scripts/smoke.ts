@@ -18,8 +18,14 @@
  */
 import { ALL_ROUTES } from '../src/routes';
 import { AEO_LEGACY_BLOG_PREFIX } from '../src/aeoBlog';
+import { DEFAULT_BUY_LINKS, FALLBACK_BUY_LINKS } from '../src/buyLinks';
+import { COMPANY, SOCIAL, STORES } from '../src/company';
 
 const BASE = (process.argv[2] ?? 'http://localhost:4177').replace(/\/$/, '');
+
+/** Named honestly. A host that blocks bots should be able to tell what this is. */
+const LINK_UA =
+  'Mozilla/5.0 (compatible; LucLamLinkCheck/1.0; +https://gift.luclam.vn)';
 
 
 
@@ -362,6 +368,112 @@ async function main() {
     );
   }
 
+  // ---- links out of the site still lead somewhere -----------------------
+  /**
+   * Nothing checked these until eight video URLs had been dead for months.
+   *
+   * They are the one class of link this project cannot keep right by being
+   * careful, because they are not its own: Shopify, Takashimaya and Google
+   * retire pages on their own schedule and tell nobody. `npm run verify` reads
+   * files off disk, and every one of them looked perfect the entire time.
+   *
+   * Two sources, because a link reaches a reader by either path: the defaults
+   * compiled into the bundle, and whatever an editor has since typed into
+   * config.json — the half that no code review ever sees.
+   */
+  if (process.env.SMOKE_SKIP_LINKS) {
+    warnings.push(
+      'Bỏ qua phép thử liên kết ra ngoài (SMOKE_SKIP_LINKS). Chỉ dùng khi máy chạy ' +
+        'phép thử không ra được internet — nếu không thì đây là phép thử duy nhất ' +
+        'bắt được link chết.'
+    );
+  } else {
+    const outbound = new Set<string>();
+    for (const pair of DEFAULT_BUY_LINKS) {
+      outbound.add(pair.luclam);
+      outbound.add(pair.taka);
+    }
+    outbound.add(FALLBACK_BUY_LINKS.luclam);
+    outbound.add(FALLBACK_BUY_LINKS.taka);
+    outbound.add(COMPANY.website);
+    for (const store of STORES) if (store.mapUrl) outbound.add(store.mapUrl);
+
+    // Read from the deployment rather than from disk: the point is what is
+    // actually being served, and an editor may have changed it since the build.
+    try {
+      const served = await fetch(`${BASE}/config.json`);
+      if (served.ok) {
+        const text = await served.text();
+        for (const m of text.matchAll(/"(https?:\/\/[^"]+)"/g)) outbound.add(m[1]);
+      }
+    } catch {
+      // The config checks elsewhere already speak to a config that will not load.
+    }
+
+    /**
+     * HEAD first, then GET, then GET once more.
+     *
+     * Some hosts refuse HEAD while serving GET perfectly, so a HEAD failure is
+     * not a verdict on the page. The second GET is there because this gates a
+     * deploy: one dropped packet must not be able to stop a release, and a link
+     * that is genuinely gone will fail twice just as readily as once.
+     */
+    const reach = async (url: string): Promise<number | string> => {
+      const attempt = async (method: 'HEAD' | 'GET'): Promise<number | string> => {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 15_000);
+        try {
+          const r = await fetch(url, {
+            method,
+            redirect: 'follow',
+            signal: controller.signal,
+            headers: { 'User-Agent': LINK_UA },
+          });
+          return r.status;
+        } catch (e) {
+          return (e as Error).name === 'AbortError' ? 'quá hạn' : 'không kết nối được';
+        } finally {
+          clearTimeout(timer);
+        }
+      };
+
+      let status = await attempt('HEAD');
+      if (typeof status !== 'number' || status >= 400) status = await attempt('GET');
+      if (typeof status !== 'number') status = await attempt('GET');
+      return status;
+    };
+
+    const links = await inBatches([...outbound], 4, async (url) => ({
+      url,
+      status: await reach(url),
+    }));
+    const dead = links.filter((r) => typeof r.status !== 'number' || r.status >= 400);
+
+    check(
+      dead.length === 0,
+      `${dead.length}/${links.length} liên kết ra ngoài không tới nơi: ` +
+        dead.map((d) => `${d.url} (${d.status})`).join(', ') +
+        '. Đây là link khách bấm để mua hàng hoặc tìm đường, nên hỏng là mất khách ' +
+        'thật chứ không chỉ là điểm SEO. Sửa trong src/buyLinks.ts, src/company.ts, ' +
+        'hoặc trong Creator Studio nếu link đó do biên tập đặt.'
+    );
+
+    console.log(`  ${links.length - dead.length}/${links.length} liên kết ra ngoài còn sống`);
+    /**
+     * Named rather than quietly skipped.
+     *
+     * Facebook and Instagram answer 200 to any profile URL, existing or not —
+     * measured against deliberately fake handles on both. Including them would
+     * add two lines of permanent green that mean nothing, and the next person
+     * to read this output would reasonably believe those links had been
+     * checked. Saying they cannot be is the only honest option.
+     */
+    const unverifiable = [SOCIAL.facebook, ...SOCIAL.instagram];
+    console.log(
+      `  ${unverifiable.length} liên kết mạng xã hội không kiểm được bằng mã trạng thái ` +
+        '(Facebook và Instagram trả 200 cho cả trang không tồn tại) — mở tay thỉnh thoảng'
+    );
+  }
   // ---- report -----------------------------------------------------------
   console.log('');
   for (const w of warnings) console.log(`  Lưu ý: ${w}`);
