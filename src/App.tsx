@@ -52,7 +52,14 @@ const CreatorStudio = React.lazy(() =>
   import('./components/CreatorStudio').then((module) => ({ default: module.CreatorStudio }))
 );
 import { defaultMedia, DEFAULT_COVER_IMAGE } from './defaultMedia';
-import { authHeaders, saveFailedMessage, UNAUTHORIZED_MESSAGE } from './adminToken';
+import {
+  authHeaders,
+  clearAdminToken,
+  saveFailedMessage,
+  setAdminToken,
+  verifyAdminToken,
+  UNAUTHORIZED_MESSAGE,
+} from './adminToken';
 import { resolveContent } from './resolveContent';
 import { pathFor, parsePath, TOPICS, type Topic } from './routes';
 
@@ -99,29 +106,45 @@ const fallbackImage =
   );
 
 /**
- * Opens the Creator Studio interface, and nothing beyond it.
+ * Opens Creator Studio, by asking for the token that already guards saving.
  *
- * This value ships inside the JavaScript bundle, so anyone who opens devtools
- * can read it. That is a door kept shut against visitors, not a lock — and it
- * is all this needs to be, because it guards no data on its own.
+ * There used to be a second secret here: a short passcode compiled into the
+ * bundle, which anyone who opened devtools could read. It guarded nothing —
+ * every write was checked against ADMIN_TOKEN on the server regardless, and
+ * the panel holds no data of its own. What it did do was worse than nothing,
+ * because a lock that opens to a string sitting in a public file still reads
+ * as a lock, and the real key gets treated more carelessly for it.
  *
- * Writing is a separate gate on the server: every change to config.json is
- * checked against ADMIN_TOKEN with a timing-safe comparison, and the server
- * refuses to start without one. Someone who reads the passcode out of the
- * bundle can open the panel and look; saving still fails without that token.
+ * So the door asks for the same token the server checks, and asks the server
+ * whether it is right. One secret, kept in one place, and the panel opens only
+ * to someone who could have saved from it anyway. It is kept on the way in, so
+ * the token field inside the panel is already filled.
  *
  * There used to be two entrances and only one of them asked. `?creator=true`
  * granted creator mode outright, so the passcode on the brand tap was
  * decorative — typing the parameter walked straight past it. Both go through
  * here now.
  */
-const CREATOR_PASSCODE = '12345';
-
-function askForCreatorPasscode(): boolean {
-  const entered = window.prompt('Nhập mật khẩu quản trị để mở Creator Studio:');
+async function unlockCreatorMode(): Promise<boolean> {
+  const entered = window.prompt('Dán ADMIN_TOKEN của máy chủ để mở Creator Studio:');
   if (entered === null) return false; // cancelled — say nothing
-  if (entered === CREATOR_PASSCODE) return true;
-  window.alert('Mật khẩu không đúng.');
+
+  // Whitespace either side is what a copy out of .env brings with it, and a
+  // token that fails only because of a trailing newline is a miserable hunt.
+  const token = entered.trim();
+  if (!token) return false;
+
+  const verdict = await verifyAdminToken(token);
+  if (verdict === 'ok') {
+    setAdminToken(token);
+    return true;
+  }
+
+  window.alert(
+    verdict === 'unreachable'
+      ? 'Không hỏi được máy chủ để kiểm tra token. Kiểm tra xem máy chủ còn chạy không rồi thử lại.'
+      : 'Máy chủ không chấp nhận token này.'
+  );
   return false;
 }
 
@@ -386,7 +409,7 @@ export default function App() {
           const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
           window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
 
-          if (askForCreatorPasscode()) {
+          if (await unlockCreatorMode()) {
             localStorage.setItem('saigon_guide_is_creator', 'true');
             setIsCreator(true);
             setShowEditor(true);
@@ -569,8 +592,8 @@ export default function App() {
   // The prompt used to live inside the setBrandClicks updater. React may run an
   // updater more than once for the same click — StrictMode does exactly that in
   // development — and each run opened its own dialog, so unlocking meant typing
-  // the passcode twice. Updaters have to stay pure; the dialog belongs out here.
-  const handleBrandClick = () => {
+  // the token twice. Updaters have to stay pure; the dialog belongs out here.
+  const handleBrandClick = async () => {
     const next = brandClicks + 1;
     if (next < 5) {
       setBrandClicks(next);
@@ -578,7 +601,7 @@ export default function App() {
     }
 
     setBrandClicks(0);
-    if (askForCreatorPasscode()) {
+    if (await unlockCreatorMode()) {
       localStorage.setItem('saigon_guide_is_creator', 'true');
       setIsCreator(true);
       setShowEditor(true);
@@ -586,12 +609,28 @@ export default function App() {
     }
   };
 
+  /**
+   * Turns the panel off, and takes the token with it.
+   *
+   * This used to clear the creator flag alone, which hid the panel and left
+   * the token sitting in localStorage — where devtools reads it back and the
+   * door opens again. That is not returning the device to reader mode; it is
+   * the panel out of sight with the key still under the mat. Now that the
+   * token is the only thing standing between someone and editing the live
+   * site, removing both is what the confirmation always implied.
+   */
   const handleDeactivateCreator = () => {
-    if (window.confirm("Bạn có chắc chắn muốn Tắt chế độ Creator trên thiết bị này? Thiết bị sẽ quay lại chế độ Xem (Reader Mode).")) {
+    if (
+      window.confirm(
+        'Tắt chế độ Creator trên thiết bị này? Token quản trị cũng sẽ bị xoá khỏi máy — ' +
+          'muốn sửa lại thì phải nhập token lần nữa.'
+      )
+    ) {
       localStorage.removeItem('saigon_guide_is_creator');
+      clearAdminToken();
       setIsCreator(false);
       setShowEditor(false);
-      alert("Đã tắt chế độ Creator thành công.");
+      alert('Đã tắt chế độ Creator và xoá token khỏi thiết bị này.');
     }
   };
 
