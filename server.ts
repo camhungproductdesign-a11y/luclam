@@ -20,6 +20,7 @@ import {
   AEO_LEGACY_BLOG_PREFIX,
   BLOG_PATH,
 } from "./src/aeoBlog";
+import { ORIGIN } from "./src/origin";
 
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
 
@@ -216,7 +217,13 @@ async function startServer() {
     const rest = req.originalUrl.slice(BLOG_PATH.length);
     const target = `${AEO_UPSTREAM}${AEO_LEGACY_BLOG_PREFIX}${rest}`;
 
-    const headers: Record<string, string> = {};
+    // How AEO tells a rewrite from a stray hit on the legacy path: without this
+    // it answers 410 + noindex; with it, 200 and canonical/links on this domain.
+    // From ORIGIN rather than the visitor's Host, which is forgeable and reads
+    // "localhost" in dev — upstream only accepts the domain declared for the brand.
+    const headers: Record<string, string> = {
+      "x-forwarded-host": new URL(ORIGIN).host,
+    };
     for (const name of BLOG_FORWARD_HEADERS) {
       const value = req.get(name);
       if (value) headers[name] = value;
