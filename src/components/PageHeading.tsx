@@ -30,8 +30,6 @@ type Props = {
   /** The English eyebrow. Decorative — first to yield when space runs out. */
   kicker: string;
   icon?: ReactNode;
-  /** `dark` is the Lục Lam page, which is amber on near-black rather than green on cream. */
-  tone?: 'light' | 'dark';
   /**
    * A prop rather than an appended class: two `pt-*` utilities in one class
    * attribute are resolved by their order in the stylesheet, not the markup, so
@@ -47,21 +45,20 @@ type Props = {
  * mobile floor lifts this to 13.5px, which is still normal text. zinc-600 is
  * 6.97:1 — and this guide is read outdoors, where reflected light flattens
  * every ratio further.
+ *
+ * One palette: page 09 was amber on near-black and had a second one, until it
+ * moved to the cream and green of the shop it sells for.
  */
-const PALETTE = {
-  light: { rule: 'border-[#b85233]', label: 'text-[#0b433f]', kicker: 'text-zinc-600' },
-  dark: { rule: 'border-amber-500/30', label: 'text-amber-400', kicker: 'text-amber-500/90' },
-} as const;
+const PALETTE = { rule: 'border-[#b85233]', label: 'text-[#0b433f]', kicker: 'text-zinc-600' } as const;
 
 export function PageHeading({
   number,
   title,
   kicker,
   icon,
-  tone = 'light',
   padTop = 'pt-4',
 }: Props) {
-  const palette = PALETTE[tone];
+  const palette = PALETTE;
 
   // lm-head makes this cross both columns on desktop, so no list item is ever
   // painted level with — or above — the title of its own page. See the

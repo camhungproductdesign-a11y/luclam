@@ -18,7 +18,7 @@
  */
 import { ALL_ROUTES } from '../src/routes';
 import { AEO_LEGACY_BLOG_PREFIX } from '../src/aeoBlog';
-import { DEFAULT_BUY_LINKS, FALLBACK_BUY_LINKS } from '../src/buyLinks';
+import { DEFAULT_BUY_LINKS, FALLBACK_BUY_LINKS, STOREFRONT_BY_LANG } from '../src/buyLinks';
 import { COMPANY, SOCIAL, STORES } from '../src/company';
 
 const BASE = (process.argv[2] ?? 'http://localhost:4177').replace(/\/$/, '');
@@ -389,12 +389,9 @@ async function main() {
     );
   } else {
     const outbound = new Set<string>();
-    for (const pair of DEFAULT_BUY_LINKS) {
-      outbound.add(pair.luclam);
-      outbound.add(pair.taka);
-    }
-    outbound.add(FALLBACK_BUY_LINKS.luclam);
+    for (const pair of DEFAULT_BUY_LINKS) outbound.add(pair.taka);
     outbound.add(FALLBACK_BUY_LINKS.taka);
+    for (const url of Object.values(STOREFRONT_BY_LANG)) outbound.add(url);
     outbound.add(COMPANY.website);
     for (const store of STORES) if (store.mapUrl) outbound.add(store.mapUrl);
 

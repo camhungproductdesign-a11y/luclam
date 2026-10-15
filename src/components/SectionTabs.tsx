@@ -24,8 +24,6 @@ type Props<Id extends string> = {
   tabs: ReadonlyArray<Tab<Id>>;
   active: Id;
   onChange: (id: Id) => void;
-  /** `dark` is the Lục Lam page — amber on near-black rather than green on cream. */
-  tone?: 'light' | 'dark';
   /** Names the group for a screen reader, since the pills carry no heading. */
   label: string;
 };
@@ -34,30 +32,21 @@ type Props<Id extends string> = {
  * Contrast is the reason the unselected pill is zinc-600 rather than the
  * zinc-500 these controls used elsewhere: on cream that measures 4.36:1 against
  * the 4.5:1 body text needs, and the desktop floor lifts this to 13px, which is
- * normal text. The dark palette borrows page 09's amber so a selected pill
- * reads as the same object on both grounds.
+ * normal text.
  */
 const PALETTE = {
-  light: {
-    on: 'bg-[#0b433f] text-white border-[#0b433f] shadow-sm',
-    off: 'bg-white text-zinc-600 border-zinc-200 hover:border-zinc-300',
-    ring: 'focus-visible:ring-[#0b433f]/50',
-  },
-  dark: {
-    on: 'bg-amber-600 text-white border-amber-600 shadow-sm',
-    off: 'bg-white/5 text-zinc-300 border-zinc-700 hover:border-amber-500/40',
-    ring: 'focus-visible:ring-amber-500/60',
-  },
+  on: 'bg-[#0b433f] text-white border-[#0b433f] shadow-sm',
+  off: 'bg-white text-zinc-600 border-zinc-200 hover:border-zinc-300',
+  ring: 'focus-visible:ring-[#0b433f]/50',
 } as const;
 
 export function SectionTabs<Id extends string>({
   tabs,
   active,
   onChange,
-  tone = 'light',
   label,
 }: Props<Id>) {
-  const palette = PALETTE[tone];
+  const palette = PALETTE;
 
   return (
     /* A group of toggle buttons, not an ARIA tablist.
