@@ -43,7 +43,7 @@ import { PlaceVideos, type PlaceVideo } from './components/PlaceVideos';
 // ==========================================================================
 // Translation Data for Saigon Pocket Guide
 // ==========================================================================
-import { Language, translations } from './translations';
+import { Language, translations, localize } from './translations';
 import { useMediaUrl } from './hooks/useMediaUrl';
 import { withBasePath } from './basePath';
 import { Picture } from './components/Picture';
@@ -62,7 +62,7 @@ import {
 } from './adminToken';
 import { resolveContent } from './resolveContent';
 import { pathFor, parsePath, TOPICS, type Topic } from './routes';
-import { DEFAULT_BUY_LINKS, FALLBACK_BUY_LINKS } from './buyLinks';
+import { DEFAULT_BUY_LINKS, FALLBACK_BUY_LINKS, luclamProductUrl } from './buyLinks';
 import { SOCIAL } from './company';
 
 /**
@@ -189,10 +189,30 @@ function getInitialLanguage(): Language {
   } catch {
     // Storage can be unavailable in private browsing; continue with browser language.
   }
-  const browserLanguage = navigator.language.toLowerCase();
-  if (browserLanguage.startsWith('zh-tw') || browserLanguage.startsWith('zh-hk')) return 'zht';
-  const language = browserLanguage.split('-')[0] as Language;
-  return supportedLanguages.includes(language) ? language : 'vi';
+  // The device's whole preference list, not just its first entry: a reader set
+  // to French-then-Japanese should get Japanese, not the fallback.
+  const preferred = navigator.languages?.length ? navigator.languages : [navigator.language];
+  for (const tag of preferred) {
+    const language = deviceLanguage(tag);
+    if (language) return language;
+  }
+  // English, not Vietnamese: a device set to none of the six belongs to a
+  // visitor, and English is what hreflang="x-default" already promises them.
+  return 'en';
+}
+
+/**
+ * Traditional Chinese is a script, not only a region. zh-TW and zh-HK were
+ * caught, but zh-MO and the script-tagged forms browsers also send (zh-Hant,
+ * zh-Hant-TW) fell through to Simplified.
+ */
+function deviceLanguage(tag: string): Language | null {
+  const lower = tag.toLowerCase();
+  if (lower.startsWith('zh')) {
+    return /^zh-(hant|tw|hk|mo)\b/.test(lower) ? 'zht' : 'zh';
+  }
+  const base = lower.split('-')[0] as Language;
+  return supportedLanguages.includes(base) ? base : null;
 }
 
 /**
@@ -488,6 +508,16 @@ export default function App() {
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
+
+  useEffect(() => {
+    // "/" is the Vietnamese cover. When the device chose another language, put
+    // that language's address in the bar, so what gets shared or bookmarked
+    // opens in the language that was actually on screen.
+    const path = pathFor(initialState.lang, initialState.topic);
+    if (window.location.pathname === '/' && path !== '/') {
+      window.history.replaceState({}, '', path + window.location.search + window.location.hash);
+    }
+  }, [initialState]);
 
   // Update localStorage when preferences change
   const handleLangChange = (selectedLang: Language) => {
@@ -987,7 +1017,7 @@ export default function App() {
   // nothing else. The two switch together now.
   return (
     <div
-      className="app-shell w-full flex flex-col lg:flex-row overflow-hidden bg-[#0b1513] text-zinc-200"
+      className="app-shell w-full flex flex-col lg:flex-row overflow-hidden bg-[#e6e2d8] text-zinc-800"
       id="saigon-guide-root"
     >
       
@@ -998,7 +1028,7 @@ export default function App() {
           the viewport has nowhere else to go. justify-start plus mt-auto on the
           footer rather than justify-between, which can push content above the
           scroll origin once it overflows. */}
-      <aside className={`hidden lg:flex flex-col border-r border-zinc-800/50 shrink-0 bg-[#0f1f1b] relative z-10 justify-start overflow-y-auto transition-[width] duration-300 ${navRail ? 'w-[264px] xl:w-[340px] p-8 dock:w-16 dock:px-2 dock:py-6 dock:items-center' : 'w-[264px] xl:w-[340px] p-8'}`}>
+      <aside className={`hidden lg:flex flex-col border-r border-[#e6e2d8] shrink-0 bg-[#f6f3eb] relative z-10 justify-start overflow-y-auto transition-[width] duration-300 ${navRail ? 'w-[264px] xl:w-[340px] p-8 dock:w-16 dock:px-2 dock:py-6 dock:items-center' : 'w-[264px] xl:w-[340px] p-8'}`}>
         <div className="space-y-8 shrink-0">
           {/* Brand header */}
           <div className={`space-y-1 ${navRail ? 'dock:hidden' : ''}`}>
@@ -1009,23 +1039,23 @@ export default function App() {
             >
               {t.brand}
             </div>
-            <p className="text-xs uppercase tracking-[0.25em] text-zinc-400 font-medium">{t.subtitle}</p>
+            <p className="text-xs uppercase tracking-[0.25em] text-zinc-600 font-medium">{t.subtitle}</p>
           </div>
 
           {/* Language Selector */}
           <div className={`space-y-3 ${navRail ? 'dock:hidden' : ''}`}>
-            <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider flex items-center gap-2">
+            <label className="text-xs font-semibold text-zinc-600 uppercase tracking-wider flex items-center gap-2">
               <Globe className="w-4 h-4 text-[#d16b4c]" />
               <span>Language / 言語 / ngôn ngữ</span>
             </label>
-            <div className="grid grid-cols-2 gap-2 bg-black/30 p-1.5 rounded-xl border border-zinc-800/40">
+            <div className="grid grid-cols-2 gap-2 bg-white/70 p-1.5 rounded-xl border border-[#e6e2d8]">
               <button 
                 id="btn-lang-en"
                 onClick={() => handleLangChange('en')}
                 className={`py-2 px-1 text-[11px] font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                   lang === 'en' 
                     ? 'bg-[#0b433f] text-white shadow-lg shadow-black/20 ring-1 ring-[#d16b4c]/30' 
-                    : 'text-zinc-400 hover:text-white hover:bg-zinc-800/30'
+                    : 'text-zinc-600 hover:text-zinc-900 hover:bg-black/5'
                 }`}
               >
                 <span>🇺🇸</span><span>English</span>
@@ -1036,7 +1066,7 @@ export default function App() {
                 className={`py-2 px-1 text-[11px] font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                   lang === 'zht' 
                     ? 'bg-[#0b433f] text-white shadow-lg shadow-black/20 ring-1 ring-[#d16b4c]/30' 
-                    : 'text-zinc-400 hover:text-white hover:bg-zinc-800/30'
+                    : 'text-zinc-600 hover:text-zinc-900 hover:bg-black/5'
                 }`}
               >
                 <span>🇹🇼</span><span>繁體中文</span>
@@ -1047,7 +1077,7 @@ export default function App() {
                 className={`py-2 px-1 text-[11px] font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                   lang === 'zh' 
                     ? 'bg-[#0b433f] text-white shadow-lg shadow-black/20 ring-1 ring-[#d16b4c]/30' 
-                    : 'text-zinc-400 hover:text-white hover:bg-zinc-800/30'
+                    : 'text-zinc-600 hover:text-zinc-900 hover:bg-black/5'
                 }`}
               >
                 <span>🇨🇳</span><span>简体中文</span>
@@ -1058,7 +1088,7 @@ export default function App() {
                 className={`py-2 px-1 text-[11px] font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                   lang === 'ja' 
                     ? 'bg-[#0b433f] text-white shadow-lg shadow-black/20 ring-1 ring-[#d16b4c]/30' 
-                    : 'text-zinc-400 hover:text-white hover:bg-zinc-800/30'
+                    : 'text-zinc-600 hover:text-zinc-900 hover:bg-black/5'
                 }`}
               >
                 <span>🇯🇵</span><span>日本語</span>
@@ -1069,7 +1099,7 @@ export default function App() {
                 className={`py-2 px-1 text-[11px] font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                   lang === 'ko' 
                     ? 'bg-[#0b433f] text-white shadow-lg shadow-black/20 ring-1 ring-[#d16b4c]/30' 
-                    : 'text-zinc-400 hover:text-white hover:bg-zinc-800/30'
+                    : 'text-zinc-600 hover:text-zinc-900 hover:bg-black/5'
                 }`}
               >
                 <span>🇰🇷</span><span>한국어</span>
@@ -1080,7 +1110,7 @@ export default function App() {
                 className={`py-2 px-1 text-[11px] font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                   lang === 'vi' 
                     ? 'bg-[#0b433f] text-white shadow-lg shadow-black/20 ring-1 ring-[#d16b4c]/30' 
-                    : 'text-zinc-400 hover:text-white hover:bg-zinc-800/30'
+                    : 'text-zinc-600 hover:text-zinc-900 hover:bg-black/5'
                 }`}
               >
                 <span>🇻🇳</span><span>Tiếng Việt</span>
@@ -1094,7 +1124,7 @@ export default function App() {
               beneath it; with the toggle gone that left a heading over nothing. */}
           {isCreator && (
             <div className={`space-y-3 ${navRail ? 'dock:hidden' : ''}`}>
-              <label className="text-xs font-semibold text-zinc-400 uppercase tracking-wider flex items-center gap-2">
+              <label className="text-xs font-semibold text-zinc-600 uppercase tracking-wider flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-[#d16b4c]" />
                 <span>Editor / 編集</span>
               </label>
@@ -1102,25 +1132,25 @@ export default function App() {
                 onClick={() => setShowEditor(!showEditor)}
                 className={`w-full flex items-center justify-between p-3 border rounded-xl transition-all group text-left ${
                   showEditor 
-                    ? 'bg-[#b85233]/20 border-[#b85233]/45 text-[#f0815e] ring-1 ring-[#b85233]/30' 
-                    : 'bg-black/30 hover:bg-black/50 border-zinc-800/40 text-zinc-200'
+                    ? 'bg-[#b85233]/10 border-[#b85233]/45 text-[#963f26] ring-1 ring-[#b85233]/30' 
+                    : 'bg-white/70 hover:bg-white border-[#e6e2d8] text-zinc-800'
                 }`}
               >
                 <div className="flex items-center gap-3">
                   <Settings className={`w-5 h-5 text-[#d16b4c] group-hover:rotate-45 transition-transform duration-500 ${showEditor ? 'animate-spin-slow' : ''}`} />
                   <div>
                     <div className="text-xs font-bold">Creator Studio / 編集</div>
-                    <div className="text-[10px] text-zinc-400">Add photos, video, content overrides</div>
+                    <div className="text-[10px] text-zinc-600">Add photos, video, content overrides</div>
                   </div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-zinc-500 shrink-0" />
+                <ChevronRight className="w-4 h-4 text-zinc-600 shrink-0" />
               </button>
             </div>
           )}
 
           {/* Navigation Menu Links */}
           <nav className="space-y-2">
-            <label className={`text-xs font-semibold text-zinc-400 uppercase tracking-wider block mb-4 ${navRail ? 'dock:hidden' : ''}`}>
+            <label className={`text-xs font-semibold text-zinc-600 uppercase tracking-wider block mb-4 ${navRail ? 'dock:hidden' : ''}`}>
               Guide Contents
             </label>
             <ul className="space-y-1" id="desktop-nav-menu">
@@ -1138,8 +1168,8 @@ export default function App() {
                     title={`${String(idx + 1).padStart(2, '0')} · ${t.pages[pageName]}`}
                     className={`group w-full flex items-center rounded-xl transition-all duration-300 text-left border-l-4 ${navRail ? 'justify-between gap-2 px-4 py-3 dock:block dock:border-l-0 dock:px-0 dock:py-1 dock:bg-transparent' : 'justify-between gap-2 px-4 py-3'} ${
                       currentPage === idx
-                        ? 'bg-[#b85233]/15 text-[#d98a6e] font-semibold border-[#b85233]'
-                        : 'text-zinc-400 hover:text-zinc-200 hover:bg-white/5 border-transparent'
+                        ? 'bg-[#b85233]/10 text-[#963f26] font-semibold border-[#b85233]'
+                        : 'text-zinc-600 hover:text-zinc-900 hover:bg-black/5 border-transparent'
                     }`}
                   >
                     {/* Rail form. Hidden outright unless the editor is docked, so
@@ -1153,7 +1183,7 @@ export default function App() {
                         className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 ${
                           currentPage === idx
                             ? 'bg-[#b85233] text-white shadow-lg shadow-[#b85233]/30'
-                            : 'text-zinc-500 group-hover:text-zinc-100 group-hover:bg-white/10'
+                            : 'text-zinc-600 group-hover:text-zinc-900 group-hover:bg-black/5'
                         }`}
                       >
                         <NavIcon index={idx} className="w-[18px] h-[18px]" />
@@ -1162,17 +1192,16 @@ export default function App() {
                           are called by number everywhere else in it. tabular-nums
                           so the column of numerals does not shift width at 09/10. */}
                       <span className={`font-serif text-[10px] leading-none tabular-nums ${
-                        currentPage === idx ? 'text-[#d98a6e]' : 'text-zinc-600 group-hover:text-zinc-400'
+                        currentPage === idx ? 'text-[#963f26]' : 'text-zinc-600 group-hover:text-zinc-900'
                       }`}>
                         {String(idx + 1).padStart(2, '0')}
                       </span>
                     </span>
 
                     <div className={`flex items-center gap-3 min-w-0 ${navRail ? 'dock:hidden' : ''}`}>
-                      {/* opacity-90, not 75: at 75 the numeral resolved to
-                          #7b7f86 against the sidebar and measured 4.23:1, just
-                          under the 4.5:1 this size needs. 90 keeps it quieter
-                          than the label beside it and measures 5.75:1. */}
+                      {/* opacity-90 keeps the numeral quieter than its label and
+                          still clears 4.5:1 on the beige sidebar: 5.46:1 unselected
+                          (zinc-600), 4.57:1 selected (#963f26 on the rust tint). */}
                       {/* padStart, not a literal "0" in front: the tenth page
                           read "010". */}
                       <span className="font-serif text-xs opacity-90 shrink-0">
@@ -1180,13 +1209,13 @@ export default function App() {
                       </span>
                       <span className={`text-sm ${navRail ? 'dock:hidden' : ''}`}>{unbreakableHyphens(t.pages[pageName])}</span>
                     </div>
-                    {/* zinc-400 on zinc-800 is 5.81:1; zinc-500 was 3.08:1. */}
+                    {/* zinc-600 on #e6e2d8 is 5.98:1. */}
                     {/* shrink-0 + whitespace-nowrap: justify-between de ca hai con deu co
                         duoc, nen "Pg 7" bi bop thanh hai dong khi nhan ben canh
                         dai — dung cai loi da sua o PageHeading. Nua ngan phai
                         duoc ghim de nua dai xuong dong. */}
                     <span className={`text-[10px] px-1.5 py-0.5 rounded uppercase shrink-0 whitespace-nowrap ${navRail ? 'dock:hidden ' : ''}${
-                      currentPage === idx ? 'bg-[#b85233] text-white' : 'bg-zinc-800 text-zinc-400'
+                      currentPage === idx ? 'bg-[#b85233] text-white' : 'bg-[#e6e2d8] text-zinc-600'
                     }`}>
                       Pg {idx + 1}
                     </span>
@@ -1198,33 +1227,33 @@ export default function App() {
         </div>
 
         {/* Sidebar Footer */}
-        <div className={`mt-auto pt-6 border-t border-zinc-800/50 space-y-1 text-center shrink-0 ${navRail ? 'dock:hidden' : ''}`}>
+        <div className={`mt-auto pt-6 border-t border-[#e6e2d8] space-y-1 text-center shrink-0 ${navRail ? 'dock:hidden' : ''}`}>
           {/* A real anchor, not navigateToPage: /blog is served by another
               machine through the proxy in server.ts, so it needs a page load
               rather than a state change. It sits here rather than in the page
               list above because that list is indexed — every entry carries a
               "Pg n" badge and drives currentPage — and the blog is not page 11.
 
-              zinc-300 rather than the zinc-400 beside it: this one is a control,
+              zinc-700 rather than the zinc-600 beside it: this one is a control,
               and the copyright is not. */}
           <a
             href="/blog"
-            className="inline-block text-[11px] text-zinc-300 hover:text-[#d98a6e] transition-colors mb-1"
+            className="inline-block text-[11px] text-zinc-700 hover:text-[#963f26] transition-colors mb-1"
           >
             {t.blog}
           </a>
-          <p className="text-[11px] text-zinc-400">&copy; 2026 Lục Lam. All rights reserved.</p>
-          <p className="text-[9px] text-zinc-400">Designed for Saigon Travelers with Premium UI</p>
+          <p className="text-[11px] text-zinc-600">&copy; 2026 Lục Lam. All rights reserved.</p>
+          <p className="text-[9px] text-zinc-600">Designed for Saigon Travelers with Premium UI</p>
         </div>
       </aside>
 
       {/* ==========================================================================
           MOBILE NAVIGATION TOP STICKY BAR (Visible on mobile/tablet)
           ========================================================================== */}
-      <header className="lg:hidden shrink-0 flex items-center justify-between px-4 py-3 bg-[#0f1f1b] border-b border-zinc-800 sticky top-0 z-50">
+      <header className="lg:hidden shrink-0 flex items-center justify-between px-4 py-3 bg-[#f6f3eb] border-b border-[#e6e2d8] sticky top-0 z-50">
         <span
           onClick={handleBrandClick}
-          className="text-lg font-serif font-bold text-[#d16b4c] select-none cursor-pointer"
+          className="text-lg font-serif font-bold text-[#a2472b] select-none cursor-pointer"
         >
           {t.brand}
         </span>
@@ -1240,13 +1269,13 @@ export default function App() {
 
               Shaped like the select beside it so the two read as one pair of
               controls, and coloured rather than bordered so it still reads as a
-              link. #d98a6e on #0f1f1b measures 6.34:1, against the 4.5:1 text
+              link. #963f26 on #f6f3eb measures 6.24:1, against the 4.5:1 text
               this size needs. Padding matches the select's, so the sticky header
               does not grow — the vertical budget here is the whole reason the
               page fits one screen. */}
           <a
             href="/blog"
-            className="text-xs py-1.5 px-2.5 rounded-lg font-medium text-[#d98a6e] hover:text-white hover:bg-zinc-800/90 transition-colors"
+            className="text-xs py-1.5 px-2.5 rounded-lg font-medium text-[#963f26] hover:text-[#7a3320] hover:bg-black/5 transition-colors"
           >
             {t.blog}
           </a>
@@ -1271,7 +1300,7 @@ export default function App() {
             }
             value={lang}
             onChange={(e) => handleLangChange(e.target.value as Language)}
-            className="bg-zinc-800/90 text-white text-xs py-1.5 px-2.5 rounded-lg border border-zinc-700 font-medium focus:outline-none focus:ring-1 focus:ring-[#d16b4c]"
+            className="bg-white text-zinc-800 text-xs py-1.5 px-2.5 rounded-lg border border-[#e6e2d8] font-medium focus:outline-none focus:ring-1 focus:ring-[#d16b4c]"
           >
             <option value="en">English</option>
             <option value="zht">繁體中文</option>
@@ -1290,7 +1319,7 @@ export default function App() {
       <main className="flex-1 flex items-center justify-center p-0 lg:p-8 relative overflow-y-auto">
         
         {/* Device Container Mockup frame on desktop */}
-        <div className="w-full max-w-full lg:max-w-none h-full bg-zinc-900 border-0 lg:border-8 lg:border-zinc-800 lg:rounded-3xl lg:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] flex flex-col relative overflow-hidden transition-all duration-300">
+        <div className="w-full max-w-full lg:max-w-none h-full bg-zinc-900 border-0 lg:border-8 lg:border-[#d6d0c2] lg:rounded-3xl lg:shadow-[0_25px_60px_-15px_rgba(44,53,49,0.25)] flex flex-col relative overflow-hidden transition-all duration-300">
           
           {/* Nothing here any more. The notch went when the frame stopped
               pretending to be a phone, and the fold went with the spread. */}
@@ -1310,7 +1339,7 @@ export default function App() {
               {/* ==========================================================================
                   PAGE 01: COVER PAGE
                   ========================================================================== */}
-              <section className="w-full h-full shrink-0 snap-start text-[#f6f3eb] flex flex-col justify-between page-section p-6 relative overflow-y-auto overflow-x-hidden bg-zinc-950">
+              <section className="w-full h-full shrink-0 snap-start text-[#2c3531] flex flex-col justify-between page-section p-6 relative overflow-y-auto overflow-x-hidden bg-[#f6f3eb]">
                 
                 {/* Full-bleed high-contrast premium Ben Thanh aerial photograph background */}
                 <div className="absolute inset-0 transition-all duration-700">
@@ -1322,11 +1351,13 @@ export default function App() {
                     decoding="async"
                     referrerPolicy="no-referrer"
                     onError={useFallbackImage}
-                    className="w-full h-full object-cover transition-opacity duration-300 opacity-90"
+                    className="w-full h-full object-cover transition-opacity duration-300"
                   />
-                  {/* Premium vignette gradient overlays for magazine contrast */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-zinc-950/60 to-zinc-950/40"></div>
-                  <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-transparent to-black/85"></div>
+                  {/* A cream wash rather than a black vignette: the photo stays
+                      readable as Bến Thành, the type sits on the page colour
+                      every other page uses. Heaviest at the masthead and the
+                      call-to-action, lightest behind the title. */}
+                  <div className="absolute inset-0 bg-gradient-to-b from-[#f6f3eb]/75 via-[#f6f3eb]/40 to-[#f6f3eb]/85"></div>
                 </div>
                 
                 {/* Masthead strip. The brand leads and the edition is a quiet
@@ -1334,16 +1365,16 @@ export default function App() {
                     made the brand read thin while the tighter edition read
                     heavier. Padding was pt-8/pb-3 alongside py-2, so the box sat
                     32px off the top and 12px off the bottom. */}
-                <div className="relative z-10 flex items-center justify-between gap-3 rounded-xl border border-amber-500/25 bg-black/45 backdrop-blur-md px-4 py-2.5">
+                <div className="relative z-10 flex items-center justify-between gap-3 rounded-xl border border-[#0b433f]/15 bg-white/70 backdrop-blur-md px-4 py-2.5">
                   {/* Larger below lg because the mobile type floor lifts the
                       edition stamp from 8.5px to 11px; without this the two
                       would sit a pixel apart and read as equals again. */}
-                  <span className="font-serif font-bold uppercase text-[12px] max-lg:text-[15px] tracking-[0.3em] text-amber-400 leading-none">
+                  <span className="font-serif font-bold uppercase text-[12px] max-lg:text-[15px] tracking-[0.3em] text-[#0b433f] leading-none">
                     {t.brand}
                   </span>
                   <span className="flex items-center gap-1.5 shrink-0">
-                    <span className="w-1 h-1 rounded-full bg-amber-500/70"></span>
-                    <span className="font-serif uppercase text-[8.5px] font-medium tracking-[0.14em] text-amber-200/70 leading-none tabular-nums">
+                    <span className="w-1 h-1 rounded-full bg-[#b85233]/70"></span>
+                    <span className="font-serif uppercase text-[8.5px] font-medium tracking-[0.14em] text-zinc-600 leading-none tabular-nums">
                       2026 Edition
                     </span>
                   </span>
@@ -1352,55 +1383,55 @@ export default function App() {
                 {/* Elegant Minimal Magazine Typography Heading */}
                 <div className="my-auto space-y-5 text-center relative z-10 px-2 py-6">
                   <div className="space-y-3">
-                    <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-amber-500/40 rounded-full text-[10px] tracking-widest text-amber-300 uppercase font-bold bg-black/60 backdrop-blur-md shadow-lg">
-                      <Sparkles className="w-3 h-3 text-amber-400" />
+                    <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-[#b85233]/30 rounded-full text-[10px] tracking-widest text-[#b85233] uppercase font-bold bg-white/75 backdrop-blur-md shadow-sm">
+                      <Sparkles className="w-3 h-3 text-[#b85233]" />
                       <span>{t.cover.badge}</span>
                     </div>
                     
                     {/* Big Bold Magazine Title */}
                     <div className="space-y-1">
-                      <h1 className="text-5xl md:text-6xl font-serif tracking-tight font-black text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.95)] leading-none uppercase">
+                      <h1 className="text-5xl md:text-6xl font-serif tracking-tight font-black text-[#0b433f] drop-shadow-[0_2px_12px_rgba(246,243,235,0.95)] leading-none uppercase">
                         {t.cover.heading}
                       </h1>
-                      <h2 className="text-xl md:text-2xl font-serif tracking-widest font-semibold text-amber-400 italic drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
+                      <h2 className="text-xl md:text-2xl font-serif tracking-widest font-semibold text-[#b85233] italic drop-shadow-[0_2px_12px_rgba(246,243,235,0.95)]">
                         {t.cover.subheading}
                       </h2>
                     </div>
                   </div>
 
                   <div className="space-y-2 max-w-xs mx-auto pt-4">
-                    <div className="w-16 h-[2px] bg-amber-500 mx-auto"></div>
-                    <p className="text-xs font-semibold tracking-wide text-zinc-100 drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)] leading-relaxed">
+                    <div className="w-16 h-[2px] bg-[#b85233] mx-auto"></div>
+                    <p className="text-xs font-semibold tracking-wide text-[#2c3531] drop-shadow-[0_2px_12px_rgba(246,243,235,0.95)] leading-relaxed">
                       {t.cover.tagline}
                     </p>
-                    <div className="w-16 h-[2px] bg-amber-500 mx-auto"></div>
+                    <div className="w-16 h-[2px] bg-[#b85233] mx-auto"></div>
                   </div>
 
                   {/* Quick highlight chips */}
                   <div className="flex flex-wrap justify-center gap-1.5 pt-2">
-                    <span className="text-[8px] font-bold bg-black/60 text-amber-300 px-2.5 py-1 rounded-full border border-amber-500/30 backdrop-blur-md shadow">
+                    <span className="text-[8px] font-bold bg-white/75 text-[#0b433f] px-2.5 py-1 rounded-full border border-[#0b433f]/20 backdrop-blur-md shadow-sm">
                       📍 Chợ Bến Thành & Takashimaya
                     </span>
-                    <span className="text-[8px] font-bold bg-black/60 text-amber-300 px-2.5 py-1 rounded-full border border-amber-500/30 backdrop-blur-md shadow">
+                    <span className="text-[8px] font-bold bg-white/75 text-[#0b433f] px-2.5 py-1 rounded-full border border-[#0b433f]/20 backdrop-blur-md shadow-sm">
                       🍵 Lục Lam Art of Tea
                     </span>
                   </div>
                 </div>
 
                 {/* Clean cover footer with single elegant call-to-action */}
-                <div className="pt-4 pb-4 flex flex-col items-center gap-3 relative z-10 p-5 rounded-2xl w-full text-center bg-black/60 backdrop-blur-md border border-amber-500/20 shadow-2xl">
+                <div className="pt-4 pb-4 flex flex-col items-center gap-3 relative z-10 w-full text-center">
                   {!customMedia.cover?.img && (
                     <div className="space-y-0.5 text-center">
-                      <span className="text-[9px] uppercase tracking-[0.2em] text-zinc-300 block font-semibold">EXCLUSIVE POCKET GUIDE</span>
-                      <span className="text-[11px] font-bold text-amber-400 block tracking-wide">by Lục Lam & Team</span>
+                      <span className="text-[9px] uppercase tracking-[0.2em] text-zinc-600 block font-semibold">EXCLUSIVE POCKET GUIDE</span>
+                      <span className="text-[11px] font-bold text-[#b85233] block tracking-wide">by Lục Lam & Team</span>
                     </div>
                   )}
                   
                   <button 
                     onClick={() => navigateToPage(1)}
-                    className="w-full max-w-xs inline-flex items-center justify-center gap-2 text-xs text-black bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 px-5 py-3 rounded-xl transition-all font-bold shadow-xl shadow-black/50 active:scale-95 cursor-pointer text-center uppercase tracking-wider"
+                    className="w-full max-w-xs inline-flex items-center justify-center gap-2 text-xs text-white bg-[#0b433f] hover:bg-[#0e544f] px-5 py-3 rounded-xl transition-all font-bold shadow-lg shadow-[#0b433f]/25 active:scale-95 cursor-pointer text-center uppercase tracking-wider"
                   >
-                    <span>{lang === 'vi' ? 'Bắt đầu khám phá' : lang === 'ko' ? '시작하기' : lang === 'ja' ? '探索を始める' : 'Start Exploring'}</span>
+                    <span>{localize(lang, { vi: "Bắt đầu khám phá", en: "Start Exploring", ja: "探索を始める", ko: "시작하기", zh: "开始探索", zht: "開始探索" })}</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
 
@@ -1410,7 +1441,7 @@ export default function App() {
                         setShowEditor(true);
                         setActiveEditPlaceId('cover');
                       }}
-                      className="mt-1 text-[9px] text-amber-400 bg-amber-950/40 hover:bg-amber-950/80 px-2.5 py-1.5 rounded-lg border border-amber-500/20 flex items-center gap-1 transition-all cursor-pointer"
+                      className="mt-1 text-[9px] text-[#0b433f] bg-[#0b433f]/5 hover:bg-[#0b433f]/10 px-2.5 py-1.5 rounded-lg border border-[#0b433f]/20 flex items-center gap-1 transition-all cursor-pointer"
                     >
                       <Settings className="w-3 h-3" />
                       <span>Đổi ảnh bìa (Creator)</span>
@@ -1614,7 +1645,7 @@ export default function App() {
                         // The same string the map's own <h3> uses, so the tab
                         // and the heading it reveals cannot say different
                         // things.
-                        label: lang === 'vi' ? 'Bản Đồ Chợ Bến Thành' : lang === 'ko' ? '벤탄 시장 지도' : lang === 'ja' ? 'ベンタイン市場 地図' : 'Bến Thành Market Map',
+                        label: localize(lang, { vi: "Bản Đồ Chợ Bến Thành", en: "Bến Thành Market Map", ja: "ベンタイン市場 地図", ko: "벤탄 시장 지도", zh: "滨城市场地图", zht: "濱城市場地圖" }),
                       },
                     ] as const}
                   />
@@ -1664,10 +1695,10 @@ export default function App() {
                         <span className="text-xl shrink-0">🗺️</span>
                         <div className="min-w-0">
                           <h3 className="text-xs font-bold text-[#0b433f] uppercase tracking-wider">
-                            {lang === 'vi' ? 'Bản Đồ Chợ Bến Thành' : lang === 'ko' ? '벤탄 시장 지도' : lang === 'ja' ? 'ベンタイン市場 地図' : 'Bến Thành Market Map'}
+                            {localize(lang, { vi: "Bản Đồ Chợ Bến Thành", en: "Bến Thành Market Map", ja: "ベンタイン市場 地図", ko: "벤탄 시장 지도", zh: "滨城市场地图", zht: "濱城市場地圖" })}
                           </h3>
                           <p className="text-[9px] text-zinc-500 font-light">
-                            {lang === 'vi' ? 'Đã đồng bộ trực tiếp với Google Maps' : lang === 'ko' ? '구글 지도와 실시간 동기화됨' : lang === 'ja' ? 'Googleマップと同期済み' : 'Synchronized directly with Google Maps'}
+                            {localize(lang, { vi: "Đã đồng bộ trực tiếp với Google Maps", en: "Synchronized directly with Google Maps", ja: "Googleマップと同期済み", ko: "구글 지도와 실시간 동기화됨", zh: "已与 Google 地图同步", zht: "已與 Google 地圖同步" })}
                           </p>
                         </div>
                       </div>
@@ -1692,7 +1723,7 @@ export default function App() {
                               : 'text-zinc-500 hover:text-zinc-800'
                           }`}
                         >
-                          {lang === 'vi' ? 'Sơ đồ cổng' : lang === 'ko' ? '게이트 안내도' : 'Gate Layout'}
+                          {localize(lang, { vi: "Sơ đồ cổng", en: "Gate Layout", ja: "門の配置図", ko: "게이트 안내도", zh: "市场大门示意图", zht: "市場大門示意圖" })}
                         </button>
                       </div>
                     </div>
@@ -1733,7 +1764,7 @@ export default function App() {
                               rel="noreferrer"
                               className="bg-zinc-900/95 text-white border border-zinc-700 font-bold py-1 px-2 rounded-lg text-[8.5px] shadow-lg flex items-center gap-1 hover:bg-black"
                             >
-                              <span>{lang === 'vi' ? 'Mở Google Maps' : 'Open in Maps'}</span>
+                              <span>{localize(lang, { vi: "Mở Google Maps", en: "Open in Maps", ja: "Googleマップで開く", ko: "구글 지도에서 열기", zh: "在 Google 地图中打开", zht: "在 Google 地圖中開啟" })}</span>
                               <ExternalLink className="w-2.5 h-2.5" />
                             </a>
                           </div>
@@ -1757,9 +1788,9 @@ export default function App() {
                           {/* North Gate (Cổng Bắc) */}
                           <div className="text-center w-full">
                             <span className="bg-[#0b433f] text-white text-[7px] font-bold px-1 py-0.5 rounded shadow">
-                              {lang === 'vi' ? 'CỔNG BẮC' : lang === 'ko' ? '북문 (North)' : 'NORTH GATE'}
+                              {localize(lang, { vi: "CỔNG BẮC", en: "NORTH GATE", ja: "北門", ko: "북문 (North)", zh: "北门", zht: "北門" })}
                             </span>
-                            <span className="block text-[8px] text-zinc-500 mt-0.5">{lang === 'vi' ? 'Hoa tươi & Trái cây' : 'Flowers & Fruits'}</span>
+                            <span className="block text-[8px] text-zinc-500 mt-0.5">{localize(lang, { vi: "Hoa tươi & Trái cây", en: "Flowers & Fruits", ja: "生花・果物", ko: "꽃 & 과일", zh: "鲜花与水果", zht: "鮮花與水果" })}</span>
                           </div>
 
                           {/* Middle Row with East and West Gates + Center Dome */}
@@ -1772,33 +1803,33 @@ export default function App() {
                             {/* West Gate (Cổng Tây) */}
                             <div className="text-center flex-1 min-w-0">
                               <span className="bg-amber-600 text-white text-[7px] font-bold px-1 py-0.5 rounded shadow block">
-                                {lang === 'vi' ? 'CỔNG TÂY' : lang === 'ko' ? '서문' : 'WEST'}
+                                {localize(lang, { vi: "CỔNG TÂY", en: "WEST", ja: "西門", ko: "서문", zh: "西门", zht: "西門" })}
                               </span>
-                              <span className="block text-[6px] text-zinc-500 mt-0.5 leading-tight">{lang === 'vi' ? 'Quà lưu niệm' : 'Souvenirs'}</span>
+                              <span className="block text-[6px] text-zinc-500 mt-0.5 leading-tight">{localize(lang, { vi: "Quà lưu niệm", en: "Souvenirs", ja: "お土産", ko: "기념품", zh: "纪念品", zht: "紀念品" })}</span>
                             </div>
 
                             {/* Center Dome (Gian trung tâm) */}
                             <div className="text-center shrink-0 w-20 h-20 lg:w-28 lg:h-28 flex flex-col items-center justify-center p-1 lg:p-2 bg-[#b85233]/10 border border-[#b85233]/30 rounded-full">
                               <span className="text-[8px] font-bold text-[#b85233] block">
-                                {lang === 'vi' ? 'ẨM THỰC' : lang === 'ko' ? '푸드코트' : 'FOOD'}
+                                {localize(lang, { vi: "ẨM THỰC", en: "FOOD", ja: "フード", ko: "푸드코트", zh: "美食", zht: "美食" })}
                               </span>
-                              <span className="text-[6px] text-zinc-500 block leading-tight font-light">{lang === 'vi' ? 'Chè, Cà phê' : 'Food court'}</span>
+                              <span className="text-[6px] text-zinc-500 block leading-tight font-light">{localize(lang, { vi: "Chè, Cà phê", en: "Food court", ja: "チェー・コーヒー", ko: "쩨 · 커피", zh: "甜汤、咖啡", zht: "甜湯、咖啡" })}</span>
                             </div>
 
                             {/* East Gate (Cổng Đông) */}
                             <div className="text-center flex-1 min-w-0">
                               <span className="bg-amber-600 text-white text-[7px] font-bold px-1 py-0.5 rounded shadow block">
-                                {lang === 'vi' ? 'CỔNG ĐÔNG' : lang === 'ko' ? '동문' : 'EAST'}
+                                {localize(lang, { vi: "CỔNG ĐÔNG", en: "EAST", ja: "東門", ko: "동문", zh: "东门", zht: "東門" })}
                               </span>
-                              <span className="block text-[6px] text-zinc-500 mt-0.5 leading-tight">{lang === 'vi' ? 'Bánh kẹo' : 'Sweets'}</span>
+                              <span className="block text-[6px] text-zinc-500 mt-0.5 leading-tight">{localize(lang, { vi: "Bánh kẹo", en: "Sweets", ja: "お菓子", ko: "과자", zh: "糖果点心", zht: "糖果點心" })}</span>
                             </div>
                           </div>
 
                           {/* South Gate (Cổng Nam - Main clock tower) */}
                           <div className="text-center w-full">
-                            <span className="block text-[8px] text-zinc-500 mb-0.5">{lang === 'vi' ? 'Vải vóc & Tháp đồng hồ' : 'Textiles & Clock'}</span>
+                            <span className="block text-[8px] text-zinc-500 mb-0.5">{localize(lang, { vi: "Vải vóc & Tháp đồng hồ", en: "Textiles & Clock", ja: "布地・時計塔", ko: "원단 & 시계탑", zh: "布料与钟楼", zht: "布料與鐘樓" })}</span>
                             <span className="bg-[#b85233] text-white text-[7px] font-bold px-1 py-0.5 rounded shadow">
-                              {lang === 'vi' ? 'CỔNG NAM' : lang === 'ko' ? '남문 (South)' : 'SOUTH GATE'}
+                              {localize(lang, { vi: "CỔNG NAM", en: "SOUTH GATE", ja: "南門", ko: "남문 (South)", zh: "南门", zht: "南門" })}
                             </span>
                           </div>
 
@@ -1808,11 +1839,11 @@ export default function App() {
                       {/* Info & Tips */}
                       <div className="space-y-2 text-[10px] text-zinc-600">
                         <div className="bg-zinc-100 p-2 rounded-lg border border-zinc-200">
-                          <strong className="block text-[#0b433f] text-[10px] font-bold mb-1">💡 {lang === 'vi' ? 'Mẹo khám phá:' : lang === 'ko' ? '쇼핑 및 네고 팁:' : 'Local Bargaining Pro-Tips:'}</strong>
+                          <strong className="block text-[#0b433f] text-[10px] font-bold mb-1">💡 {localize(lang, { vi: "Mẹo khám phá:", en: "Local Bargaining Pro-Tips:", ja: "散策・値切りのコツ：", ko: "쇼핑 및 네고 팁:", zh: "逛街与砍价小贴士：", zht: "逛街與殺價小撇步：" })}</strong>
                           <ul className="space-y-1 list-disc pl-3 text-[9px] font-light leading-tight">
-                            <li>{lang === 'vi' ? 'Cổng Nam (đối diện quảng trường) là tháp đồng hồ biểu tượng, chụp ảnh cực đẹp.' : lang === 'ko' ? '남문(광장 쪽)은 시그니처 시계탑이 있어 사진 촬영 명소입니다.' : 'South Gate features the iconic clock tower, ideal for photos.'}</li>
-                            <li>{lang === 'vi' ? 'Khu ẩm thực ở trung tâm chợ là thiên đường các món chè, gỏi cuốn, giá cả niêm yết rõ ràng.' : lang === 'ko' ? '중앙 음식 구역은 베트남 빙수(Chè)와 스프링롤의 천국입니다.' : 'The central dome houses food stalls with clear pricing.'}</li>
-                            <li>{lang === 'vi' ? 'Nên mặc cả giảm 30-50% khi mua đồ lưu niệm hoặc quần áo ở các cổng Đông & Tây.' : lang === 'ko' ? '동문, 서문의 옷/기념품 상점에서는 30~50% 내외 네고를 권장합니다.' : 'Negotiate 30-50% off for souvenirs at East & West gates.'}</li>
+                            <li>{localize(lang, { vi: "Cổng Nam (đối diện quảng trường) là tháp đồng hồ biểu tượng, chụp ảnh cực đẹp.", en: "South Gate features the iconic clock tower, ideal for photos.", ja: "南門（広場側）には象徴的な時計塔があり、写真撮影に最適です。", ko: "남문(광장 쪽)은 시그니처 시계탑이 있어 사진 촬영 명소입니다.", zh: "南门（广场对面）有标志性的钟楼，非常适合拍照。", zht: "南門（廣場對面）有標誌性的鐘樓，非常適合拍照。" })}</li>
+                            <li>{localize(lang, { vi: "Khu ẩm thực ở trung tâm chợ là thiên đường các món chè, gỏi cuốn, giá cả niêm yết rõ ràng.", en: "The central dome houses food stalls with clear pricing.", ja: "市場中央のフードエリアはチェーや生春巻きの宝庫で、価格もはっきり表示されています。", ko: "중앙 음식 구역은 베트남 빙수(Chè)와 스프링롤의 천국입니다.", zh: "市场中央的美食区汇集各式甜汤和春卷，价格明码标示。", zht: "市場中央的美食區匯集各式甜湯和春捲，價格明碼標示。" })}</li>
+                            <li>{localize(lang, { vi: "Nên mặc cả giảm 30-50% khi mua đồ lưu niệm hoặc quần áo ở các cổng Đông & Tây.", en: "Negotiate 30-50% off for souvenirs at East & West gates.", ja: "東門・西門でお土産や衣類を買うときは、30〜50%の値引き交渉がおすすめです。", ko: "동문, 서문의 옷/기념품 상점에서는 30~50% 내외 네고를 권장합니다.", zh: "在东门和西门买纪念品或衣服时，建议砍价 30–50%。", zht: "在東門和西門買紀念品或衣服時，建議殺價 30–50%。" })}</li>
                           </ul>
                         </div>
                       </div>
@@ -2602,7 +2633,7 @@ export default function App() {
               {/* ==========================================================================
                   PAGE 09: LỤC LAM TRẠM DỪNG CHÂN (Signature Experience)
                   ========================================================================== */}
-              <section className="w-full h-full shrink-0 snap-start bg-[#0b1513] text-[#f6f3eb] flex flex-col justify-between page-section p-6 overflow-y-auto">
+              <section className="w-full h-full shrink-0 snap-start bg-[#f6f3eb] text-[#2c3531] flex flex-col justify-between page-section p-6 overflow-y-auto">
                 <div className="space-y-5 min-[1100px]:columns-2 min-[1100px]:gap-6 lm-spread">
                   {/* Eyebrow in English by design, like the other eight pages.
                       This one was the only Vietnamese hold-out. */}
@@ -2610,8 +2641,7 @@ export default function App() {
                     number="09"
                     title={t.pages.luclam}
                     kicker="Cultural Rest Stop"
-                    tone="dark"
-                    icon={<Sparkles className="w-3.5 h-3.5 text-amber-400 animate-pulse" />}
+                    icon={<Sparkles className="w-3.5 h-3.5 text-[#b85233] animate-pulse" />}
                   />
 
                   {/* Stunning Shimmering Indochine Intro Card.
@@ -2620,23 +2650,23 @@ export default function App() {
                       pages: without it this card flows into column two and
                       leaves a column-high void beside the title, because there
                       is nothing above it to fill column one. */}
-                  <div className="lm-span bg-gradient-to-br from-[#0c2b27] via-[#081e1b] to-black rounded-2xl p-4.5 border border-amber-500/20 shadow-xl relative overflow-hidden">
+                  <div className="lm-span bg-white rounded-2xl p-4.5 border border-zinc-200/80 shadow-sm relative overflow-hidden">
                     <div className="absolute -right-4 -bottom-4 opacity-5 pointer-events-none">
-                      <Coffee className="w-40 h-40 text-amber-400" />
+                      <Coffee className="w-40 h-40 text-[#0b433f]" />
                     </div>
                     {/* Glowing corner effect */}
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl"></div>
+                    <div className="absolute top-0 right-0 w-24 h-24 bg-[#0b433f]/5 rounded-full blur-2xl"></div>
                     
                     <div className="relative z-10 space-y-2.5">
                       <div className="flex items-center gap-1.5">
-                        <span className="h-[1px] w-6 bg-amber-500/50"></span>
-                        <span className="text-[8px] uppercase tracking-[0.25em] text-amber-400 font-bold block">{t.luclam.subtitle}</span>
-                        <span className="h-[1px] w-6 bg-amber-500/50"></span>
+                        <span className="h-[1px] w-6 bg-[#b85233]/50"></span>
+                        <span className="text-[8px] uppercase tracking-[0.25em] text-[#b85233] font-bold block">{t.luclam.subtitle}</span>
+                        <span className="h-[1px] w-6 bg-[#b85233]/50"></span>
                       </div>
-                      <h3 className="text-base font-serif font-bold text-amber-100 flex items-center gap-1.5">
+                      <h3 className="text-base font-serif font-bold text-[#0b433f] flex items-center gap-1.5">
                         <span>{t.luclam.aboutHeading}</span>
                       </h3>
-                      <p className="text-[10.5px] text-zinc-300 leading-relaxed font-light">
+                      <p className="text-[10.5px] text-zinc-600 leading-relaxed font-light">
                         {t.luclam.aboutText}
                       </p>
                     </div>
@@ -2646,20 +2676,19 @@ export default function App() {
                       1544px of column — 702px of scroll, the worst left on the site.
                       The card above stays on every tab. */}
                   <SectionTabs
-                    tone="dark"
                     label={t.pages.luclam}
                     active={activeLuclamTab}
                     onChange={setActiveLuclamTab}
                     tabs={[
                       { id: 'teas', label: t.luclam.menuHeading },
-                      { id: 'stores', label: lang === 'vi' ? 'Hệ thống cửa hàng' : lang === 'ko' ? '매장 안내' : lang === 'ja' ? '店舗ネットワーク' : 'Branch locator' },
-                      { id: 'offers', label: lang === 'vi' ? 'Ưu đãi & Đánh giá' : lang === 'ko' ? '혜택 & 리뷰' : lang === 'ja' ? '特典＆口コミ' : 'Offers & reviews' },
+                      { id: 'stores', label: localize(lang, { vi: "Hệ thống cửa hàng", en: "Branch locator", ja: "店舗ネットワーク", ko: "매장 안내", zh: "门店分布", zht: "門市據點" }) },
+                      { id: 'offers', label: localize(lang, { vi: "Ưu đãi & Đánh giá", en: "Offers & reviews", ja: "特典＆口コミ", ko: "혜택 & 리뷰", zh: "优惠与评价", zht: "優惠與評價" }) },
                     ] as const}
                   />
 
                   {/* Premium Tea Menu List */}
                   <div className={`space-y-3 ${activeLuclamTab === 'teas' ? '' : 'hidden'}`}>
-                    <h4 className="text-[11px] font-bold text-amber-400 tracking-wider uppercase border-l-2 border-amber-500 pl-2">
+                    <h4 className="text-[11px] font-bold text-[#0b433f] tracking-wider uppercase border-l-2 border-[#b85233] pl-2">
                       {t.luclam.menuHeading}
                     </h4>
 
@@ -2669,7 +2698,7 @@ export default function App() {
                         const productItem = item as any;
                         const defaults = DEFAULT_BUY_LINKS[idx] ?? FALLBACK_BUY_LINKS;
                         const links = {
-                          luclam: productItem.buyLuclam || defaults.luclam,
+                          luclam: productItem.buyLuclam || luclamProductUrl(lang, idx),
                           taka: productItem.buyTaka || defaults.taka,
                         };
                         const productVideo = getPlaceMedia(`luclam-${idx}`).video;
@@ -2699,8 +2728,8 @@ export default function App() {
                               if ((e.target as HTMLElement).closest('button, a')) return;
                               setExpandedTea(isExpanded ? null : idx);
                             }}
-                            className={`bg-zinc-950/65 rounded-xl p-3 border hover:border-amber-500/40 shadow-md transition-all duration-300 cursor-pointer ${
-                              isExpanded ? 'ring-1 ring-amber-500/30 border-amber-500/30 bg-zinc-950/90' : 'border-zinc-800/80'
+                            className={`bg-white rounded-xl p-3 border hover:border-[#0b433f]/40 shadow-sm transition-all duration-300 cursor-pointer ${
+                              isExpanded ? 'ring-1 ring-[#0b433f]/20 border-[#0b433f]/30' : 'border-zinc-200/80'
                             }`}
                           >
                             <div className="flex gap-3.5 items-center">
@@ -2712,7 +2741,7 @@ export default function App() {
                                   height={48}
                                   loading="lazy"
                                   decoding="async"
-                                  className={`w-12 h-12 lg:w-24 lg:h-24 rounded-lg lg:rounded-xl object-cover shrink-0 border border-zinc-800 transition-transform duration-300 ${isExpanded ? 'scale-105 border-amber-500/30' : ''}`}
+                                  className={`w-12 h-12 lg:w-24 lg:h-24 rounded-lg lg:rounded-xl object-cover shrink-0 border border-zinc-200 transition-transform duration-300 ${isExpanded ? 'scale-105 border-[#0b433f]/30' : ''}`}
                                   referrerPolicy="no-referrer"
                                   onError={useFallbackImage}
                                 />
@@ -2721,34 +2750,49 @@ export default function App() {
                               )}
                               <div className="flex-1 min-w-0 space-y-1">
                                 <div className="flex justify-between items-baseline gap-2">
-                                  <h5 className="text-[10.5px] font-bold text-white tracking-wide truncate lg:overflow-visible lg:text-clip lg:whitespace-normal pr-1">{item.name}</h5>
-                                  <span className="text-[10px] font-bold text-amber-400 shrink-0">{item.price}</span>
+                                  <h5 className="text-[10.5px] font-bold text-[#0b433f] tracking-wide truncate lg:overflow-visible lg:text-clip lg:whitespace-normal pr-1">{item.name}</h5>
+                                  <span className="text-[10px] font-bold text-[#b85233] shrink-0">{item.price}</span>
                                 </div>
-                                <p className={`text-[9px] text-zinc-400 leading-normal font-light ${isExpanded ? '' : 'line-clamp-1 lg:line-clamp-2'}`}>
+                                <p className={`text-[9px] text-zinc-600 leading-normal font-light ${isExpanded ? '' : 'line-clamp-1 lg:line-clamp-2'}`}>
                                   {item.desc}
                                 </p>
                               </div>
-                              <ChevronRight className={`w-3.5 h-3.5 text-zinc-500 shrink-0 transition-transform duration-300 ${isExpanded ? 'rotate-90 text-amber-400' : ''}`} />
+                              <ChevronRight className={`w-3.5 h-3.5 text-zinc-400 shrink-0 transition-transform duration-300 ${isExpanded ? 'rotate-90 text-[#0b433f]' : ''}`} />
                             </div>
 
                             {/* Expanded details section */}
                             {isExpanded && (
-                              <div className="mt-3 pt-3 border-t border-zinc-800/60 space-y-3 animate-in fade-in slide-in-from-top-1 duration-200">
+                              <div className="mt-3 pt-3 border-t border-zinc-200 space-y-3 animate-in fade-in slide-in-from-top-1 duration-200">
                                 {/* Extra info */}
-                                <div className="text-[9px] text-zinc-300 leading-relaxed space-y-1.5">
+                                <div className="text-[9px] text-zinc-700 leading-relaxed space-y-1.5">
                                   {lang === 'ko' && (
-                                    <div className="bg-amber-950/10 p-2 rounded border border-amber-500/10 text-amber-200/90">
+                                    <div className="bg-[#f6f3eb] p-2 rounded border border-[#0b433f]/10 text-[#0b433f]">
                                       ✨ <strong>Takashimaya 백화점 B2층</strong> 매장 및 <strong>Lục Lam 공식 온라인 몰</strong>에서 만나보실 수 있습니다.
                                     </div>
                                   )}
                                   {lang === 'vi' && (
-                                    <div className="bg-amber-950/10 p-2 rounded border border-amber-500/10 text-amber-200/90">
+                                    <div className="bg-[#f6f3eb] p-2 rounded border border-[#0b433f]/10 text-[#0b433f]">
                                       ✨ Sản phẩm chính hãng tại <strong>Tầng B2 Takashimaya</strong> và <strong>Lục Lam Store</strong>.
                                     </div>
                                   )}
-                                  {lang !== 'ko' && lang !== 'vi' && (
-                                    <div className="bg-amber-950/10 p-2 rounded border border-amber-500/10 text-amber-200/90">
+                                  {lang === 'en' && (
+                                    <div className="bg-[#f6f3eb] p-2 rounded border border-[#0b433f]/10 text-[#0b433f]">
                                       ✨ Official product available at <strong>Takashimaya B2 Floor</strong> and <strong>Lục Lam Webstore</strong>.
+                                    </div>
+                                  )}
+                                  {lang === 'ja' && (
+                                    <div className="bg-[#f6f3eb] p-2 rounded border border-[#0b433f]/10 text-[#0b433f]">
+                                      ✨ <strong>高島屋 B2階</strong>と<strong>Lục Lam 公式オンラインストア</strong>でお買い求めいただけます。
+                                    </div>
+                                  )}
+                                  {lang === 'zh' && (
+                                    <div className="bg-[#f6f3eb] p-2 rounded border border-[#0b433f]/10 text-[#0b433f]">
+                                      ✨ 正品可在<strong>高岛屋 B2 层</strong>及<strong>Lục Lam 官网</strong>购买。
+                                    </div>
+                                  )}
+                                  {lang === 'zht' && (
+                                    <div className="bg-[#f6f3eb] p-2 rounded border border-[#0b433f]/10 text-[#0b433f]">
+                                      ✨ 正品可於<strong>高島屋 B2 樓</strong>及<strong>Lục Lam 官網</strong>購買。
                                     </div>
                                   )}
                                 </div>
@@ -2769,7 +2813,7 @@ export default function App() {
                                     href={links.luclam}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg text-[9px] font-bold bg-[#0b433f] text-amber-100 hover:bg-[#0e544f] border border-emerald-800 transition-all shadow-md active:scale-95"
+                                    className="flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg text-[9px] font-bold bg-[#0b433f] text-white hover:bg-[#0e544f] border border-[#0b433f] transition-all shadow-md active:scale-95"
                                   >
                                     <span className="text-[10px]">🍃</span>
                                     <span>{ctaLabels.luclam}</span>
@@ -2784,7 +2828,7 @@ export default function App() {
                                 {productVideo && (
                                   <button
                                     onClick={() => handleOpenDetail('product', idx, undefined, item)}
-                                    className="w-full flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg text-[9px] font-bold bg-zinc-800/80 text-amber-200 hover:bg-zinc-700/80 border border-amber-500/25 transition-all shadow-md active:scale-95"
+                                    className="w-full flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg text-[9px] font-bold bg-white text-[#0b433f] hover:bg-[#f6f3eb] border border-[#0b433f]/25 transition-all shadow-sm active:scale-95"
                                   >
                                     <span className="text-[10px]">▶</span>
                                     <span>{videoLabel}</span>
@@ -2803,11 +2847,11 @@ export default function App() {
                     {/* Same shape as the page headers: a localised title beside a
                         short fixed badge. The badge is pinned so the title wraps
                         instead of both being squeezed into broken words. */}
-                    <div className="flex flex-wrap justify-between items-center gap-x-2 gap-y-1 border-l-2 border-amber-500 pl-2">
-                      <h4 className="text-[11px] font-bold text-amber-400 tracking-wider uppercase">
-                        {lang === 'vi' ? 'Hệ Thống Cửa Hàng Lục Lam' : lang === 'ko' ? '룩람 오프라인 매장' : lang === 'ja' ? 'Lục Lam 店舗ネットワーク' : 'Lục Lam Branch Locator'}
+                    <div className="flex flex-wrap justify-between items-center gap-x-2 gap-y-1 border-l-2 border-[#b85233] pl-2">
+                      <h4 className="text-[11px] font-bold text-[#0b433f] tracking-wider uppercase">
+                        {localize(lang, { vi: "Hệ Thống Cửa Hàng Lục Lam", en: "Lục Lam Branch Locator", ja: "Lục Lam 店舗ネットワーク", ko: "룩람 오프라인 매장", zh: "Lục Lam 门店分布", zht: "Lục Lam 門市據點" })}
                       </h4>
-                      <span className="text-[7px] font-mono bg-amber-950 text-amber-300 border border-amber-500/20 px-1.5 py-0.5 rounded font-bold shrink-0 whitespace-nowrap">{STORES.length} BRANCHES</span>
+                      <span className="text-[7px] font-mono bg-[#0b433f]/10 text-[#0b433f] border border-[#0b433f]/20 px-1.5 py-0.5 rounded font-bold shrink-0 whitespace-nowrap">{STORES.length} BRANCHES</span>
                     </div>
                   
                     {/* One panel per city, every one of them read from STORES.
@@ -2827,28 +2871,28 @@ export default function App() {
                         const flagged = group.stores.find((store) => store.flag);
                         const many = group.stores.length > 1;
                         return (
-                          <div key={group.city} className="bg-[#0c2b27]/40 rounded-xl lg:rounded-2xl lg:break-inside-avoid p-3 lg:p-4 border border-amber-500/10 space-y-2 shadow-inner">
+                          <div key={group.city} className="bg-white rounded-xl lg:rounded-2xl lg:break-inside-avoid p-3 lg:p-4 border border-zinc-200/80 space-y-2 shadow-sm">
                             <div className="flex flex-wrap justify-between items-start gap-x-2 gap-y-1">
-                              <span className="text-[8px] bg-[#0b433f] border border-emerald-400/20 text-white font-bold uppercase tracking-wide px-1.5 py-0.5 rounded shrink-0">
+                              <span className="text-[8px] bg-[#0b433f] border border-[#0b433f] text-white font-bold uppercase tracking-wide px-1.5 py-0.5 rounded shrink-0">
                                 {group.cityShort}{many ? ` (${group.stores.length})` : ''}
                               </span>
                               {flagged && (
-                                <span className="text-[8px] text-amber-400 font-bold italic animate-pulse shrink-0 whitespace-nowrap">{flagged.flag}</span>
+                                <span className="text-[8px] text-[#b85233] font-bold italic animate-pulse shrink-0 whitespace-nowrap">{flagged.flag}</span>
                               )}
                             </div>
                   
-                            <div className={many ? 'divide-y divide-zinc-800/60 space-y-2.5' : ''}>
+                            <div className={many ? 'divide-y divide-zinc-200 space-y-2.5' : ''}>
                               {group.stores.map((store, index) => (
                                 <div key={store.id} className={`space-y-1.5 ${index > 0 ? 'pt-2.5' : ''}`}>
                                   <div className="flex flex-wrap justify-between items-center gap-x-2 gap-y-1">
-                                    <h5 className="text-[10.5px] font-bold text-amber-200 tracking-wide">
+                                    <h5 className="text-[10.5px] font-bold text-[#0b433f] tracking-wide">
                                       {many ? `${index + 1}. ` : ''}{storeName(store)}
                                     </h5>
                                     <a
                                       href={storeMapUrl(store)}
                                       target="_blank"
                                       rel="noreferrer"
-                                      className="inline-flex items-center gap-1 text-[8px] text-amber-400 hover:underline font-bold shrink-0 whitespace-nowrap"
+                                      className="inline-flex items-center gap-1 text-[8px] text-[#b85233] hover:underline font-bold shrink-0 whitespace-nowrap"
                                     >
                                       <span>Directions</span>
                                       <ExternalLink className="w-2.5 h-2.5" />
@@ -2863,7 +2907,7 @@ export default function App() {
                                       height={store.photo.height}
                                       loading="lazy"
                                       decoding="async"
-                                      className="w-full h-24 lg:h-44 object-cover rounded-lg lg:rounded-xl border border-zinc-800/80 my-1"
+                                      className="w-full h-24 lg:h-44 object-cover rounded-lg lg:rounded-xl border border-zinc-200 my-1"
                                       referrerPolicy="no-referrer"
                                     />
                                   )}
@@ -2872,10 +2916,10 @@ export default function App() {
                                       of four already cost this section 118px of
                                       height, measured, and it overflows its
                                       screen before the extra line is counted. */}
-                                  <p className="text-[8.5px] text-zinc-400 font-light">
+                                  <p className="text-[8.5px] text-zinc-600 font-light">
                                     {`${store.street}, ${store.locality}`}
                                     {store.hours && (
-                                      <span className="text-emerald-300/90 tabular-nums"> · {store.hours.opens}–{store.hours.closes}</span>
+                                      <span className="text-[#0b433f] tabular-nums"> · {store.hours.opens}–{store.hours.closes}</span>
                                     )}
                                   </p>
                                 </div>
@@ -2889,11 +2933,11 @@ export default function App() {
 
                   {/* International Instagram Portals */}
                   <div className={`space-y-3 pt-2 ${activeLuclamTab === 'offers' ? '' : 'hidden'}`}>
-                    <h4 className="text-[11px] font-bold text-amber-400 tracking-wider uppercase border-l-2 border-amber-500 pl-2">
-                      {lang === 'vi' ? 'Đánh Giá Từ Du Khách Quốc Tế' : lang === 'ko' ? '글로벌 여행자 리뷰 포털' : lang === 'ja' ? 'グローバル旅行者の口コミ' : 'Global Traveler Review Portals'}
+                    <h4 className="text-[11px] font-bold text-[#0b433f] tracking-wider uppercase border-l-2 border-[#b85233] pl-2">
+                      {localize(lang, { vi: "Đánh Giá Từ Du Khách Quốc Tế", en: "Global Traveler Review Portals", ja: "グローバル旅行者の口コミ", ko: "글로벌 여행자 리뷰 포털", zh: "国际旅客评价", zht: "國際旅客評價" })}
                     </h4>
-                    <p className="text-[9px] text-zinc-400 font-light leading-snug">
-                      {lang === 'vi' ? 'Khám phá trải nghiệm thực tế từ các cộng đồng du lịch Nhật Bản, Hàn Quốc, và Trung Quốc trên Instagram.' : lang === 'ko' ? '인스타그램에서 각국(일본, 한국, 중국) 여행자들의 실시간 생생한 룩람 리뷰를 만나보세요.' : 'Discover authentic reviews from Japan, Korea, and China travel communities on Instagram.'}
+                    <p className="text-[9px] text-zinc-600 font-light leading-snug">
+                      {localize(lang, { vi: "Khám phá trải nghiệm thực tế từ các cộng đồng du lịch Nhật Bản, Hàn Quốc, và Trung Quốc trên Instagram.", en: "Discover authentic reviews from Japan, Korea, and China travel communities on Instagram.", ja: "日本・韓国・中国の旅行者によるリアルな口コミをInstagramでご覧いただけます。", ko: "인스타그램에서 각국(일본, 한국, 중국) 여행자들의 실시간 생생한 룩람 리뷰를 만나보세요.", zh: "在 Instagram 上查看来自日本、韩国和中国旅行社群的真实评价。", zht: "在 Instagram 上查看來自日本、韓國和中國旅遊社群的真實評價。" })}
                     </p>
 
                     <div className="grid grid-cols-3 gap-2">
@@ -2901,14 +2945,14 @@ export default function App() {
                         href={SOCIAL.instagram[0]} 
                         target="_blank" 
                         rel="noreferrer"
-                        className="bg-zinc-950 border border-zinc-800 hover:border-amber-500/40 rounded-xl p-2.5 text-center flex flex-col items-center justify-between gap-2 shadow-md transition-all hover:-translate-y-0.5"
+                        className="bg-white border border-zinc-200/80 hover:border-[#0b433f]/40 rounded-xl p-2.5 text-center flex flex-col items-center justify-between gap-2 shadow-sm transition-all hover:-translate-y-0.5"
                       >
                         <span className="text-2xl animate-bounce">🇯🇵</span>
                         <div className="space-y-0.5">
-                          <span className="text-[8.5px] font-bold text-white block leading-tight">Review Japan</span>
+                          <span className="text-[8.5px] font-bold text-[#0b433f] block leading-tight">Review Japan</span>
                           <span className="text-[7.5px] text-zinc-500 block font-mono">@luclam_japan</span>
                         </div>
-                        <span className="text-[8.5px] text-amber-400 font-semibold flex items-center gap-0.5 mt-1 border-t border-zinc-800 pt-1 w-full justify-center">
+                        <span className="text-[8.5px] text-[#b85233] font-semibold flex items-center gap-0.5 mt-1 border-t border-zinc-200 pt-1 w-full justify-center">
                           <span>Feed</span>
                           <ExternalLink className="w-2 h-2" />
                         </span>
@@ -2918,14 +2962,14 @@ export default function App() {
                         href={SOCIAL.instagram[1]} 
                         target="_blank" 
                         rel="noreferrer"
-                        className="bg-zinc-950 border border-zinc-800 hover:border-amber-500/40 rounded-xl p-2.5 text-center flex flex-col items-center justify-between gap-2 shadow-md transition-all hover:-translate-y-0.5"
+                        className="bg-white border border-zinc-200/80 hover:border-[#0b433f]/40 rounded-xl p-2.5 text-center flex flex-col items-center justify-between gap-2 shadow-sm transition-all hover:-translate-y-0.5"
                       >
                         <span className="text-2xl animate-bounce">🇰🇷</span>
                         <div className="space-y-0.5">
-                          <span className="text-[8.5px] font-bold text-white block leading-tight">Review Korea</span>
+                          <span className="text-[8.5px] font-bold text-[#0b433f] block leading-tight">Review Korea</span>
                           <span className="text-[7.5px] text-zinc-500 block font-mono">@luclam_korea</span>
                         </div>
-                        <span className="text-[8.5px] text-amber-400 font-semibold flex items-center gap-0.5 mt-1 border-t border-zinc-800 pt-1 w-full justify-center">
+                        <span className="text-[8.5px] text-[#b85233] font-semibold flex items-center gap-0.5 mt-1 border-t border-zinc-200 pt-1 w-full justify-center">
                           <span>Feed</span>
                           <ExternalLink className="w-2 h-2" />
                         </span>
@@ -2935,14 +2979,14 @@ export default function App() {
                         href={SOCIAL.instagram[2]} 
                         target="_blank" 
                         rel="noreferrer"
-                        className="bg-zinc-950 border border-zinc-800 hover:border-amber-500/40 rounded-xl p-2.5 text-center flex flex-col items-center justify-between gap-2 shadow-md transition-all hover:-translate-y-0.5"
+                        className="bg-white border border-zinc-200/80 hover:border-[#0b433f]/40 rounded-xl p-2.5 text-center flex flex-col items-center justify-between gap-2 shadow-sm transition-all hover:-translate-y-0.5"
                       >
                         <span className="text-2xl animate-bounce">🇨🇳</span>
                         <div className="space-y-0.5">
-                          <span className="text-[8.5px] font-bold text-white block leading-tight">Review China</span>
+                          <span className="text-[8.5px] font-bold text-[#0b433f] block leading-tight">Review China</span>
                           <span className="text-[7.5px] text-zinc-500 block font-mono">@luclam_china</span>
                         </div>
-                        <span className="text-[8.5px] text-amber-400 font-semibold flex items-center gap-0.5 mt-1 border-t border-zinc-800 pt-1 w-full justify-center">
+                        <span className="text-[8.5px] text-[#b85233] font-semibold flex items-center gap-0.5 mt-1 border-t border-zinc-200 pt-1 w-full justify-center">
                           <span>Feed</span>
                           <ExternalLink className="w-2 h-2" />
                         </span>
@@ -2952,44 +2996,44 @@ export default function App() {
 
                   {/* Elegant Golden Coupon / Voucher */}
                   <div className={`space-y-3 pt-2 ${activeLuclamTab === 'offers' ? '' : 'hidden'}`}>
-                    <div className="relative bg-[#0d2b27] rounded-2xl border-2 border-dashed border-amber-500/30 p-4 shadow-xl overflow-hidden flex flex-col justify-between">
+                    <div className="relative bg-white rounded-2xl border-2 border-dashed border-[#b85233]/40 p-4 shadow-sm overflow-hidden flex flex-col justify-between">
                       {/* Left-right notched holes */}
-                      <div className="absolute top-1/2 -left-3 w-6 h-6 rounded-full bg-[#0b1513] -translate-y-1/2 border-r border-amber-500/20 z-10"></div>
-                      <div className="absolute top-1/2 -right-3 w-6 h-6 rounded-full bg-[#0b1513] -translate-y-1/2 border-l border-amber-500/20 z-10"></div>
+                      <div className="absolute top-1/2 -left-3 w-6 h-6 rounded-full bg-[#f6f3eb] -translate-y-1/2 border-r border-[#b85233]/30 z-10"></div>
+                      <div className="absolute top-1/2 -right-3 w-6 h-6 rounded-full bg-[#f6f3eb] -translate-y-1/2 border-l border-[#b85233]/30 z-10"></div>
 
                       <div className="space-y-2">
                         <div className="flex flex-wrap justify-between items-center gap-x-2 gap-y-1">
-                          <span className="text-[8px] bg-amber-500 text-black font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                          <span className="text-[8px] bg-[#b85233] text-white font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
                             {t.luclam.voucherBadge}
                           </span>
-                          <span className="text-[10px] font-serif font-black text-amber-400 tracking-wide shrink-0 whitespace-nowrap ml-auto">LỤC LAM VOUCHER</span>
+                          <span className="text-[10px] font-serif font-black text-[#b85233] tracking-wide shrink-0 whitespace-nowrap ml-auto">LỤC LAM VOUCHER</span>
                         </div>
 
-                        <h4 className="text-xs font-bold text-amber-100">{t.luclam.voucherHeading}</h4>
-                        <p className="text-[9.5px] text-zinc-300 leading-relaxed font-light">
+                        <h4 className="text-xs font-bold text-[#0b433f]">{t.luclam.voucherHeading}</h4>
+                        <p className="text-[9.5px] text-zinc-600 leading-relaxed font-light">
                           {t.luclam.voucherDesc}
                         </p>
                       </div>
 
-                      <div className="my-3 border-t border-dashed border-amber-500/20"></div>
+                      <div className="my-3 border-t border-dashed border-[#b85233]/30"></div>
 
                       <div className="space-y-3 relative z-20">
-                        <div className="bg-black/60 rounded-lg p-2.5 border border-zinc-800 text-center flex justify-between items-center">
+                        <div className="bg-[#f6f3eb] rounded-lg p-2.5 border border-zinc-200 text-center flex justify-between items-center">
                           <div className="text-left">
                             <span className="text-[7px] text-zinc-500 block uppercase font-bold">Voucher Code</span>
-                            <span className="text-xs font-mono font-bold tracking-wider text-amber-400">{t.luclam.voucherCode}</span>
+                            <span className="text-xs font-mono font-bold tracking-wider text-[#0b433f]">{t.luclam.voucherCode}</span>
                           </div>
                           
                           {/* shrink-0: the bars are the decorative barcode, and
                               a squeezed row would thin them to nothing. */}
                           <div className="flex gap-0.5 shrink-0">
-                            <div className="w-0.5 h-6 bg-amber-500/80"></div>
-                            <div className="w-1 h-6 bg-amber-500/80"></div>
-                            <div className="w-0.5 h-6 bg-amber-500/80"></div>
-                            <div className="w-1.5 h-6 bg-amber-500/80"></div>
-                            <div className="w-0.5 h-6 bg-amber-500/80"></div>
-                            <div className="w-1 h-6 bg-amber-500/80"></div>
-                            <div className="w-0.5 h-6 bg-amber-500/80"></div>
+                            <div className="w-0.5 h-6 bg-[#0b433f]/80"></div>
+                            <div className="w-1 h-6 bg-[#0b433f]/80"></div>
+                            <div className="w-0.5 h-6 bg-[#0b433f]/80"></div>
+                            <div className="w-1.5 h-6 bg-[#0b433f]/80"></div>
+                            <div className="w-0.5 h-6 bg-[#0b433f]/80"></div>
+                            <div className="w-1 h-6 bg-[#0b433f]/80"></div>
+                            <div className="w-0.5 h-6 bg-[#0b433f]/80"></div>
                           </div>
                         </div>
 
@@ -3008,7 +3052,7 @@ export default function App() {
                           className={`w-full py-2 px-4 rounded-xl text-[10px] font-bold tracking-wider uppercase transition-all duration-300 flex items-center justify-center gap-1.5 ${
                             voucherClaimed 
                               ? 'bg-emerald-600 text-white shadow-none cursor-default' 
-                              : 'bg-amber-500 text-black hover:bg-amber-400 active:translate-y-0.5 shadow-md shadow-amber-500/15'
+                              : 'bg-[#0b433f] text-white hover:bg-[#0e544f] active:translate-y-0.5 shadow-md shadow-[#0b433f]/15'
                           }`}
                         >
                           {voucherClaimed ? (
@@ -3028,8 +3072,8 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="mt-4 lg:mt-0 pt-3 border-t border-zinc-800 text-center">
-                  <span className="text-[8px] tracking-widest text-zinc-500 uppercase">Lục Lam Hospitality Oasis</span>
+                <div className="mt-4 lg:mt-0 pt-3 border-t border-zinc-200/40 text-center">
+                  <span className="text-[8px] tracking-widest text-zinc-400 uppercase">Lục Lam Hospitality Oasis</span>
                 </div>
               </section>
 

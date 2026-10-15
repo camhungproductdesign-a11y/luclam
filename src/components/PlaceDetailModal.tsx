@@ -27,6 +27,7 @@ import { detectEmbed, getEmbedDetails } from '../videoEmbed';
 import { Picture } from './Picture';
 import { saveMedia } from '../indexedDBStore';
 import { creditFor } from '../mediaCredits';
+import { localize, type Language } from '../translations';
 
 interface PlaceMedia {
   img: string;
@@ -49,7 +50,7 @@ interface PlaceDetailModalProps {
   media: PlaceMedia;
   isOpen: boolean;
   onClose: () => void;
-  lang: string;
+  lang: Language;
   onUpdateMedia?: (placeId: string, type: 'img' | 'video', url: string) => void;
   /**
    * The video this place carries as an override, if it has one — not the one
@@ -421,10 +422,10 @@ export function PlaceDetailModal({
                 onClose();
               }}
               className="h-9 rounded-full bg-black/60 backdrop-blur-md flex items-center justify-center gap-1.5 px-3 text-white hover:bg-black/80 transition-all cursor-pointer"
-              aria-label={lang === 'vi' ? 'Quay lại' : 'Back'}
+              aria-label={localize(lang, { vi: "Quay lại", en: "Back", ja: "戻る", ko: "뒤로", zh: "返回", zht: "返回" })}
             >
               <ArrowLeft className="w-4 h-4" />
-              <span className="text-[10px] font-bold">{lang === 'vi' ? 'Quay lại' : 'Back'}</span>
+              <span className="text-[10px] font-bold">{localize(lang, { vi: "Quay lại", en: "Back", ja: "戻る", ko: "뒤로", zh: "返回", zht: "返回" })}</span>
             </button>
             
             <div className="flex gap-2">
@@ -580,7 +581,7 @@ export function PlaceDetailModal({
                       <Play className="w-3.5 h-3.5 text-amber-600 fill-current" />
                     </div>
                     <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-700">
-                      {lang === 'vi' ? 'Video Trải Nghiệm Thực Tế' : lang === 'ja' ? '現地動画レビュー' : 'Live Experience Video'}
+                      {localize(lang, { vi: "Video Trải Nghiệm Thực Tế", en: "Live Experience Video", ja: "現地動画レビュー", ko: "현지 체험 영상", zh: "实地体验视频", zht: "實地體驗影片" })}
                     </span>
                   </div>
                   
@@ -646,12 +647,8 @@ export function PlaceDetailModal({
                           className="block text-[9px] text-zinc-500 hover:text-zinc-800 transition-colors truncate"
                         >
                           {embedDetails.handle
-                            ? `${embedDetails.handle} — ${lang === 'vi' ? 'xem trên TikTok' : lang === 'ja' ? 'TikTok で見る' : 'watch on TikTok'}`
-                            : lang === 'vi'
-                              ? 'Xem video gốc trên TikTok'
-                              : lang === 'ja'
-                                ? 'TikTok で元動画を見る'
-                                : 'Watch the original on TikTok'}
+                            ? `${embedDetails.handle} — ${localize(lang, { vi: "xem trên TikTok", en: "watch on TikTok", ja: "TikTok で見る", ko: "TikTok에서 보기", zh: "在 TikTok 观看", zht: "在 TikTok 觀看" })}`
+                            : localize(lang, { vi: "Xem video gốc trên TikTok", en: "Watch the original on TikTok", ja: "TikTok で元動画を見る", ko: "TikTok에서 원본 영상 보기", zh: "在 TikTok 观看原视频", zht: "在 TikTok 觀看原始影片" })}
                         </a>
                       )}
                     </div>
@@ -860,7 +857,7 @@ export function PlaceDetailModal({
                 
                 <h4 className="text-xs font-bold font-serif text-amber-900 flex items-center gap-1.5 mb-2.5">
                   <Sparkles className="w-4 h-4 text-amber-600 animate-pulse" />
-                  <span>{lang === 'vi' ? 'Bí Quyết Trải Nghiệm' : lang === 'ja' ? 'ローカル極秘メモ' : 'The Saigon Secret'}</span>
+                  <span>{localize(lang, { vi: "Bí Quyết Trải Nghiệm", en: "The Saigon Secret", ja: "ローカル極秘メモ", ko: "현지인의 비밀 팁", zh: "西贡私房秘诀", zht: "西貢私房秘訣" })}</span>
                 </h4>
 
                 <p className="text-xs text-amber-950 font-light leading-relaxed whitespace-pre-line">
@@ -899,14 +896,14 @@ export function PlaceDetailModal({
             className="bg-zinc-800 hover:bg-zinc-900 text-white text-xs font-bold py-3.5 rounded-xl transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
           >
             <X className="w-4 h-4" />
-            <span>{lang === 'vi' ? 'Đóng' : 'Close'}</span>
+            <span>{localize(lang, { vi: "Đóng", en: "Close", ja: "閉じる", ko: "닫기", zh: "关闭", zht: "關閉" })}</span>
           </button>
           <button 
             onClick={handleCopyAddress}
             className="flex-1 bg-zinc-100 hover:bg-zinc-200 text-[#0b433f] text-xs font-bold py-3.5 rounded-xl border border-zinc-200 transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
           >
             {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
-            <span>{copied ? (lang === 'vi' ? 'Đã sao chép!' : 'Copied!') : (lang === 'vi' ? 'Sao chép địa chỉ' : 'Copy Address')}</span>
+            <span>{copied ? localize(lang, { vi: "Đã sao chép!", en: "Copied!", ja: "コピーしました！", ko: "복사됨!", zh: "已复制！", zht: "已複製！" }) : localize(lang, { vi: "Sao chép địa chỉ", en: "Copy Address", ja: "住所をコピー", ko: "주소 복사", zh: "复制地址", zht: "複製地址" })}</span>
           </button>
           
           <a
@@ -916,7 +913,7 @@ export function PlaceDetailModal({
             className="flex-1 bg-[#b85233] hover:bg-[#a14327] text-white text-xs font-bold py-3.5 rounded-xl text-center shadow-md shadow-[#b85233]/20 transition-all active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
           >
             <Navigation className="w-4 h-4" />
-            <span>{lang === 'vi' ? 'Dẫn đường Maps' : lang === 'ja' ? 'マップで開く' : 'Open in Maps'}</span>
+            <span>{localize(lang, { vi: "Dẫn đường Maps", en: "Open in Maps", ja: "マップで開く", ko: "지도에서 열기", zh: "在地图中打开", zht: "在地圖中開啟" })}</span>
           </a>
         </div>
 

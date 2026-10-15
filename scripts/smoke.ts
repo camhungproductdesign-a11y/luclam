@@ -18,7 +18,7 @@
  */
 import { ALL_ROUTES } from '../src/routes';
 import { AEO_LEGACY_BLOG_PREFIX } from '../src/aeoBlog';
-import { DEFAULT_BUY_LINKS, FALLBACK_BUY_LINKS } from '../src/buyLinks';
+import { DEFAULT_BUY_LINKS, FALLBACK_BUY_LINKS, STOREFRONT_BY_LANG, luclamProductUrl } from '../src/buyLinks';
 import { COMPANY, SOCIAL, STORES } from '../src/company';
 
 const BASE = (process.argv[2] ?? 'http://localhost:4177').replace(/\/$/, '');
@@ -389,12 +389,12 @@ async function main() {
     );
   } else {
     const outbound = new Set<string>();
-    for (const pair of DEFAULT_BUY_LINKS) {
-      outbound.add(pair.luclam);
-      outbound.add(pair.taka);
-    }
-    outbound.add(FALLBACK_BUY_LINKS.luclam);
+    for (const pair of DEFAULT_BUY_LINKS) outbound.add(pair.taka);
     outbound.add(FALLBACK_BUY_LINKS.taka);
+    for (const url of Object.values(STOREFRONT_BY_LANG)) outbound.add(url);
+    // One language per tea is enough: the storefront serves the same id under
+    // every prefix, so a retired product fails in vi as surely as in ja.
+    DEFAULT_BUY_LINKS.forEach((_, index) => outbound.add(luclamProductUrl('vi', index)));
     outbound.add(COMPANY.website);
     for (const store of STORES) if (store.mapUrl) outbound.add(store.mapUrl);
 

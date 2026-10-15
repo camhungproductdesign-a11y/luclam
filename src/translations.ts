@@ -4839,3 +4839,16 @@ shopping: 'Shop Local',
     }
   }
 };
+
+/**
+ * A short UI string written inline at its call site rather than in the
+ * tables above.
+ *
+ * Those used to be chained ternaries — vi, then ko, then ja, else English —
+ * and every chain stopped somewhere different, so a Chinese reader met
+ * "Start Exploring" on a cover that was otherwise in Chinese. Taking a
+ * Record<Language, string> makes a missing language a type error instead.
+ */
+export function localize(lang: Language, text: Record<Language, string>): string {
+  return text[lang];
+}

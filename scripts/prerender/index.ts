@@ -43,7 +43,7 @@ const BOOT_STYLES = `<style>
       #app-splash {
         position: fixed; inset: 0; z-index: 9999;
         display: flex; flex-direction: column; align-items: center; justify-content: center;
-        gap: 14px; background: #0b1513;
+        gap: 14px; background: #f6f3eb;
       }
       #app-splash .wordmark {
         /* A system stack, not Be Vietnam Pro: the splash paints before any
@@ -51,10 +51,10 @@ const BOOT_STYLES = `<style>
            landed. These are sans faces already installed on the reader's
            device, which is what keeps the first frame sans too. */
         font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-        font-size: 22px; font-weight: 700; letter-spacing: 0.22em; color: #d16b4c;
+        font-size: 22px; font-weight: 700; letter-spacing: 0.22em; color: #0b433f;
       }
       #app-splash .bar {
-        width: 56px; height: 2px; background: #d16b4c; opacity: 0.35;
+        width: 56px; height: 2px; background: #b85233; opacity: 0.35;
         animation: app-splash-pulse 1.1s ease-in-out infinite;
       }
       @keyframes app-splash-pulse {
