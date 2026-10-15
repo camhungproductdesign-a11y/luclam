@@ -62,7 +62,7 @@ import {
 } from './adminToken';
 import { resolveContent } from './resolveContent';
 import { pathFor, parsePath, TOPICS, type Topic } from './routes';
-import { DEFAULT_BUY_LINKS, FALLBACK_BUY_LINKS, STOREFRONT_BY_LANG } from './buyLinks';
+import { DEFAULT_BUY_LINKS, FALLBACK_BUY_LINKS, luclamProductUrl } from './buyLinks';
 import { SOCIAL } from './company';
 
 /**
@@ -987,7 +987,7 @@ export default function App() {
   // nothing else. The two switch together now.
   return (
     <div
-      className="app-shell w-full flex flex-col lg:flex-row overflow-hidden bg-[#0b1513] text-zinc-200"
+      className="app-shell w-full flex flex-col lg:flex-row overflow-hidden bg-[#e6e2d8] text-zinc-800"
       id="saigon-guide-root"
     >
       
@@ -1220,10 +1220,10 @@ export default function App() {
       {/* ==========================================================================
           MOBILE NAVIGATION TOP STICKY BAR (Visible on mobile/tablet)
           ========================================================================== */}
-      <header className="lg:hidden shrink-0 flex items-center justify-between px-4 py-3 bg-[#0f1f1b] border-b border-zinc-800 sticky top-0 z-50">
+      <header className="lg:hidden shrink-0 flex items-center justify-between px-4 py-3 bg-[#f6f3eb] border-b border-[#e6e2d8] sticky top-0 z-50">
         <span
           onClick={handleBrandClick}
-          className="text-lg font-serif font-bold text-[#d16b4c] select-none cursor-pointer"
+          className="text-lg font-serif font-bold text-[#a2472b] select-none cursor-pointer"
         >
           {t.brand}
         </span>
@@ -1239,13 +1239,13 @@ export default function App() {
 
               Shaped like the select beside it so the two read as one pair of
               controls, and coloured rather than bordered so it still reads as a
-              link. #d98a6e on #0f1f1b measures 6.34:1, against the 4.5:1 text
+              link. #963f26 on #f6f3eb measures 6.24:1, against the 4.5:1 text
               this size needs. Padding matches the select's, so the sticky header
               does not grow — the vertical budget here is the whole reason the
               page fits one screen. */}
           <a
             href="/blog"
-            className="text-xs py-1.5 px-2.5 rounded-lg font-medium text-[#d98a6e] hover:text-white hover:bg-zinc-800/90 transition-colors"
+            className="text-xs py-1.5 px-2.5 rounded-lg font-medium text-[#963f26] hover:text-[#7a3320] hover:bg-black/5 transition-colors"
           >
             {t.blog}
           </a>
@@ -1270,7 +1270,7 @@ export default function App() {
             }
             value={lang}
             onChange={(e) => handleLangChange(e.target.value as Language)}
-            className="bg-zinc-800/90 text-white text-xs py-1.5 px-2.5 rounded-lg border border-zinc-700 font-medium focus:outline-none focus:ring-1 focus:ring-[#d16b4c]"
+            className="bg-white text-zinc-800 text-xs py-1.5 px-2.5 rounded-lg border border-[#e6e2d8] font-medium focus:outline-none focus:ring-1 focus:ring-[#d16b4c]"
           >
             <option value="en">English</option>
             <option value="zht">繁體中文</option>
@@ -1289,7 +1289,7 @@ export default function App() {
       <main className="flex-1 flex items-center justify-center p-0 lg:p-8 relative overflow-y-auto">
         
         {/* Device Container Mockup frame on desktop */}
-        <div className="w-full max-w-full lg:max-w-none h-full bg-zinc-900 border-0 lg:border-8 lg:border-zinc-800 lg:rounded-3xl lg:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.8)] flex flex-col relative overflow-hidden transition-all duration-300">
+        <div className="w-full max-w-full lg:max-w-none h-full bg-zinc-900 border-0 lg:border-8 lg:border-[#d6d0c2] lg:rounded-3xl lg:shadow-[0_25px_60px_-15px_rgba(44,53,49,0.25)] flex flex-col relative overflow-hidden transition-all duration-300">
           
           {/* Nothing here any more. The notch went when the frame stopped
               pretending to be a phone, and the fold went with the spread. */}
@@ -2666,7 +2666,7 @@ export default function App() {
                         const productItem = item as any;
                         const defaults = DEFAULT_BUY_LINKS[idx] ?? FALLBACK_BUY_LINKS;
                         const links = {
-                          luclam: productItem.buyLuclam || STOREFRONT_BY_LANG[lang],
+                          luclam: productItem.buyLuclam || luclamProductUrl(lang, idx),
                           taka: productItem.buyTaka || defaults.taka,
                         };
                         const productVideo = getPlaceMedia(`luclam-${idx}`).video;

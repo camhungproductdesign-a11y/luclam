@@ -9,7 +9,8 @@ import type { Language } from './translations';
  * own language codes; the paths are the storefront's, which spell Chinese as
  * zh-CN and zh-TW.
  *
- * Used for every product unless the editor has set menuItems[i].buyLuclam.
+ * The bare storefront is where a product with no entry in DEFAULT_BUY_LINKS
+ * lands; the five teas each go to their own page, see luclamProductUrl.
  */
 export const STOREFRONT_BY_LANG: Record<Language, string> = {
   vi: 'https://pos.luclam.vn/vi',
@@ -21,31 +22,41 @@ export const STOREFRONT_BY_LANG: Record<Language, string> = {
 };
 
 /**
- * Where each tea can be bought at Takashimaya.
+ * Where each tea can be bought, in menu order: Red Lava, Velvet Rose, Violet
+ * Jasmine, Golden Peach, Zen Relaxing.
+ *
+ * `luclam` is the product's id on pos.luclam.vn, not a URL. The storefront
+ * serves the same id under every language prefix, translated, so one id gives
+ * all six readers their own page — see luclamProductUrl.
  *
  * These lived inside App.tsx, which meant nothing could read them without
  * importing React and the whole application with it — so `npm run smoke` could
- * not check whether they still led anywhere. They are the links most likely to
- * rot: they belong to Takashimaya, who retires pages on its own
- * schedule and tell nobody.
+ * not check whether they still led anywhere. The Takashimaya half is the most
+ * likely to rot: Takashimaya retires pages on its own schedule and tells
+ * nobody.
  *
  * Used when nothing has been set in the editor. Editable per product as
- * menuItems[i].buyTaka; these are only the starting values.
+ * menuItems[i].buyLuclam / buyTaka; these are only the starting values.
  */
-export const DEFAULT_BUY_LINKS: Array<{ taka: string }> = [
+export const DEFAULT_BUY_LINKS: Array<{ luclam: string; taka: string }> = [
   {
+    luclam: '562eefec-2d3d-482b-b11d-1ee551e7ecd4',
     taka: 'https://online.takashimaya-vn.com/chai-tra-red-lava-luc-lam-50g--s230800289',
   },
   {
+    luclam: 'ad8217cd-998f-44c4-a013-68692136272a',
     taka: 'https://online.takashimaya-vn.com/chai-tra-velvet-rose-luc-lam-50g--s230800295',
   },
   {
+    luclam: 'a02c9110-6a56-4722-8bc1-915d16999ada',
     taka: 'https://online.takashimaya-vn.com/c/luc-lam-tet',
   },
   {
+    luclam: 'b73286be-2cb9-47f1-9675-ef4ae8fe8819',
     taka: 'https://online.takashimaya-vn.com/c/luc-lam-tet',
   },
   {
+    luclam: 'f1282338-154c-47ee-a5bc-632d37abefcd',
     taka: 'https://online.takashimaya-vn.com/c/luc-lam-tet',
   },
 ];
@@ -64,3 +75,13 @@ export const DEFAULT_BUY_LINKS: Array<{ taka: string }> = [
 export const FALLBACK_BUY_LINKS = {
   taka: 'https://online.takashimaya-vn.com/c/luc-lam-tet',
 };
+
+/**
+ * The tea's own page on pos.luclam.vn in the reader's language, or the
+ * storefront's home page for a product the shop has not been given an id for
+ * (a sixth tea added in the editor).
+ */
+export function luclamProductUrl(lang: Language, index: number): string {
+  const id = DEFAULT_BUY_LINKS[index]?.luclam;
+  return id ? `${STOREFRONT_BY_LANG[lang]}/products/${id}` : STOREFRONT_BY_LANG[lang];
+}

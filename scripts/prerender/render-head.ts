@@ -8,7 +8,7 @@ import { describe } from './describe';
 import { faqFor } from '../../src/faq';
 import { videosFor } from './place-videos';
 import { COMPANY, STORES, storeName, type Store, SAME_AS } from '../../src/company';
-import { STOREFRONT_BY_LANG } from '../../src/buyLinks';
+import { luclamProductUrl } from '../../src/buyLinks';
 
 import { ORIGIN } from '../../src/origin';
 const OG_IMAGE = `${ORIGIN}/uploads/og-cover.jpg`;
@@ -207,7 +207,7 @@ function products(lang: Language, topic: Topic, resolved: ResolvedContent): stri
         availability: 'https://schema.org/InStock',
         // Sold through the shop's own store and Takashimaya rather than here —
         // this page presents the range, it does not take orders.
-        url: item.buyLuclam || STOREFRONT_BY_LANG[lang],
+        url: item.buyLuclam || luclamProductUrl(lang, index),
         seller: { '@type': 'Organization', name: 'Lục Lam Art Of Tea' },
       };
     }
