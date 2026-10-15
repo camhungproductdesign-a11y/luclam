@@ -1339,7 +1339,7 @@ export default function App() {
               {/* ==========================================================================
                   PAGE 01: COVER PAGE
                   ========================================================================== */}
-              <section className="w-full h-full shrink-0 snap-start text-[#f6f3eb] flex flex-col justify-between page-section p-6 relative overflow-y-auto overflow-x-hidden bg-zinc-950">
+              <section className="w-full h-full shrink-0 snap-start text-[#2c3531] flex flex-col justify-between page-section p-6 relative overflow-y-auto overflow-x-hidden bg-[#f6f3eb]">
                 
                 {/* Full-bleed high-contrast premium Ben Thanh aerial photograph background */}
                 <div className="absolute inset-0 transition-all duration-700">
@@ -1353,9 +1353,11 @@ export default function App() {
                     onError={useFallbackImage}
                     className="w-full h-full object-cover transition-opacity duration-300 opacity-90"
                   />
-                  {/* Premium vignette gradient overlays for magazine contrast */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-zinc-950/60 to-zinc-950/40"></div>
-                  <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-transparent to-black/85"></div>
+                  {/* A cream wash rather than a black vignette: the photo stays
+                      readable as Bến Thành, the type sits on the page colour
+                      every other page uses. Heaviest at the masthead and the
+                      call-to-action, lightest behind the title. */}
+                  <div className="absolute inset-0 bg-gradient-to-b from-[#f6f3eb]/90 via-[#f6f3eb]/55 to-[#f6f3eb]/95"></div>
                 </div>
                 
                 {/* Masthead strip. The brand leads and the edition is a quiet
@@ -1363,16 +1365,16 @@ export default function App() {
                     made the brand read thin while the tighter edition read
                     heavier. Padding was pt-8/pb-3 alongside py-2, so the box sat
                     32px off the top and 12px off the bottom. */}
-                <div className="relative z-10 flex items-center justify-between gap-3 rounded-xl border border-amber-500/25 bg-black/45 backdrop-blur-md px-4 py-2.5">
+                <div className="relative z-10 flex items-center justify-between gap-3 rounded-xl border border-[#0b433f]/15 bg-white/70 backdrop-blur-md px-4 py-2.5">
                   {/* Larger below lg because the mobile type floor lifts the
                       edition stamp from 8.5px to 11px; without this the two
                       would sit a pixel apart and read as equals again. */}
-                  <span className="font-serif font-bold uppercase text-[12px] max-lg:text-[15px] tracking-[0.3em] text-amber-400 leading-none">
+                  <span className="font-serif font-bold uppercase text-[12px] max-lg:text-[15px] tracking-[0.3em] text-[#0b433f] leading-none">
                     {t.brand}
                   </span>
                   <span className="flex items-center gap-1.5 shrink-0">
-                    <span className="w-1 h-1 rounded-full bg-amber-500/70"></span>
-                    <span className="font-serif uppercase text-[8.5px] font-medium tracking-[0.14em] text-amber-200/70 leading-none tabular-nums">
+                    <span className="w-1 h-1 rounded-full bg-[#b85233]/70"></span>
+                    <span className="font-serif uppercase text-[8.5px] font-medium tracking-[0.14em] text-zinc-600 leading-none tabular-nums">
                       2026 Edition
                     </span>
                   </span>
@@ -1381,53 +1383,53 @@ export default function App() {
                 {/* Elegant Minimal Magazine Typography Heading */}
                 <div className="my-auto space-y-5 text-center relative z-10 px-2 py-6">
                   <div className="space-y-3">
-                    <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-amber-500/40 rounded-full text-[10px] tracking-widest text-amber-300 uppercase font-bold bg-black/60 backdrop-blur-md shadow-lg">
-                      <Sparkles className="w-3 h-3 text-amber-400" />
+                    <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-[#b85233]/30 rounded-full text-[10px] tracking-widest text-[#b85233] uppercase font-bold bg-white/75 backdrop-blur-md shadow-sm">
+                      <Sparkles className="w-3 h-3 text-[#b85233]" />
                       <span>{t.cover.badge}</span>
                     </div>
                     
                     {/* Big Bold Magazine Title */}
                     <div className="space-y-1">
-                      <h1 className="text-5xl md:text-6xl font-serif tracking-tight font-black text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.95)] leading-none uppercase">
+                      <h1 className="text-5xl md:text-6xl font-serif tracking-tight font-black text-[#0b433f] drop-shadow-[0_2px_12px_rgba(246,243,235,0.95)] leading-none uppercase">
                         {t.cover.heading}
                       </h1>
-                      <h2 className="text-xl md:text-2xl font-serif tracking-widest font-semibold text-amber-400 italic drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
+                      <h2 className="text-xl md:text-2xl font-serif tracking-widest font-semibold text-[#b85233] italic drop-shadow-[0_2px_12px_rgba(246,243,235,0.95)]">
                         {t.cover.subheading}
                       </h2>
                     </div>
                   </div>
 
                   <div className="space-y-2 max-w-xs mx-auto pt-4">
-                    <div className="w-16 h-[2px] bg-amber-500 mx-auto"></div>
-                    <p className="text-xs font-semibold tracking-wide text-zinc-100 drop-shadow-[0_2px_8px_rgba(0,0,0,0.95)] leading-relaxed">
+                    <div className="w-16 h-[2px] bg-[#b85233] mx-auto"></div>
+                    <p className="text-xs font-semibold tracking-wide text-[#2c3531] drop-shadow-[0_2px_12px_rgba(246,243,235,0.95)] leading-relaxed">
                       {t.cover.tagline}
                     </p>
-                    <div className="w-16 h-[2px] bg-amber-500 mx-auto"></div>
+                    <div className="w-16 h-[2px] bg-[#b85233] mx-auto"></div>
                   </div>
 
                   {/* Quick highlight chips */}
                   <div className="flex flex-wrap justify-center gap-1.5 pt-2">
-                    <span className="text-[8px] font-bold bg-black/60 text-amber-300 px-2.5 py-1 rounded-full border border-amber-500/30 backdrop-blur-md shadow">
+                    <span className="text-[8px] font-bold bg-white/75 text-[#0b433f] px-2.5 py-1 rounded-full border border-[#0b433f]/20 backdrop-blur-md shadow-sm">
                       📍 Chợ Bến Thành & Takashimaya
                     </span>
-                    <span className="text-[8px] font-bold bg-black/60 text-amber-300 px-2.5 py-1 rounded-full border border-amber-500/30 backdrop-blur-md shadow">
+                    <span className="text-[8px] font-bold bg-white/75 text-[#0b433f] px-2.5 py-1 rounded-full border border-[#0b433f]/20 backdrop-blur-md shadow-sm">
                       🍵 Lục Lam Art of Tea
                     </span>
                   </div>
                 </div>
 
                 {/* Clean cover footer with single elegant call-to-action */}
-                <div className="pt-4 pb-4 flex flex-col items-center gap-3 relative z-10 p-5 rounded-2xl w-full text-center bg-black/60 backdrop-blur-md border border-amber-500/20 shadow-2xl">
+                <div className="pt-4 pb-4 flex flex-col items-center gap-3 relative z-10 p-5 rounded-2xl w-full text-center bg-white/75 backdrop-blur-md border border-zinc-200/80 shadow-lg">
                   {!customMedia.cover?.img && (
                     <div className="space-y-0.5 text-center">
-                      <span className="text-[9px] uppercase tracking-[0.2em] text-zinc-300 block font-semibold">EXCLUSIVE POCKET GUIDE</span>
-                      <span className="text-[11px] font-bold text-amber-400 block tracking-wide">by Lục Lam & Team</span>
+                      <span className="text-[9px] uppercase tracking-[0.2em] text-zinc-600 block font-semibold">EXCLUSIVE POCKET GUIDE</span>
+                      <span className="text-[11px] font-bold text-[#b85233] block tracking-wide">by Lục Lam & Team</span>
                     </div>
                   )}
                   
                   <button 
                     onClick={() => navigateToPage(1)}
-                    className="w-full max-w-xs inline-flex items-center justify-center gap-2 text-xs text-black bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 px-5 py-3 rounded-xl transition-all font-bold shadow-xl shadow-black/50 active:scale-95 cursor-pointer text-center uppercase tracking-wider"
+                    className="w-full max-w-xs inline-flex items-center justify-center gap-2 text-xs text-white bg-[#0b433f] hover:bg-[#0e544f] px-5 py-3 rounded-xl transition-all font-bold shadow-lg shadow-[#0b433f]/25 active:scale-95 cursor-pointer text-center uppercase tracking-wider"
                   >
                     <span>{localize(lang, { vi: "Bắt đầu khám phá", en: "Start Exploring", ja: "探索を始める", ko: "시작하기", zh: "开始探索", zht: "開始探索" })}</span>
                     <ArrowRight className="w-4 h-4" />
@@ -1439,7 +1441,7 @@ export default function App() {
                         setShowEditor(true);
                         setActiveEditPlaceId('cover');
                       }}
-                      className="mt-1 text-[9px] text-amber-400 bg-amber-950/40 hover:bg-amber-950/80 px-2.5 py-1.5 rounded-lg border border-amber-500/20 flex items-center gap-1 transition-all cursor-pointer"
+                      className="mt-1 text-[9px] text-[#0b433f] bg-[#0b433f]/5 hover:bg-[#0b433f]/10 px-2.5 py-1.5 rounded-lg border border-[#0b433f]/20 flex items-center gap-1 transition-all cursor-pointer"
                     >
                       <Settings className="w-3 h-3" />
                       <span>Đổi ảnh bìa (Creator)</span>
