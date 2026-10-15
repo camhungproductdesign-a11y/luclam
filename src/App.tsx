@@ -1351,13 +1351,13 @@ export default function App() {
                     decoding="async"
                     referrerPolicy="no-referrer"
                     onError={useFallbackImage}
-                    className="w-full h-full object-cover transition-opacity duration-300 opacity-90"
+                    className="w-full h-full object-cover transition-opacity duration-300"
                   />
                   {/* A cream wash rather than a black vignette: the photo stays
                       readable as Bến Thành, the type sits on the page colour
                       every other page uses. Heaviest at the masthead and the
                       call-to-action, lightest behind the title. */}
-                  <div className="absolute inset-0 bg-gradient-to-b from-[#f6f3eb]/90 via-[#f6f3eb]/55 to-[#f6f3eb]/95"></div>
+                  <div className="absolute inset-0 bg-gradient-to-b from-[#f6f3eb]/75 via-[#f6f3eb]/40 to-[#f6f3eb]/85"></div>
                 </div>
                 
                 {/* Masthead strip. The brand leads and the edition is a quiet
@@ -1419,7 +1419,7 @@ export default function App() {
                 </div>
 
                 {/* Clean cover footer with single elegant call-to-action */}
-                <div className="pt-4 pb-4 flex flex-col items-center gap-3 relative z-10 p-5 rounded-2xl w-full text-center bg-white/75 backdrop-blur-md border border-zinc-200/80 shadow-lg">
+                <div className="pt-4 pb-4 flex flex-col items-center gap-3 relative z-10 w-full text-center">
                   {!customMedia.cover?.img && (
                     <div className="space-y-0.5 text-center">
                       <span className="text-[9px] uppercase tracking-[0.2em] text-zinc-600 block font-semibold">EXCLUSIVE POCKET GUIDE</span>
