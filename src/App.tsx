@@ -43,7 +43,7 @@ import { PlaceVideos, type PlaceVideo } from './components/PlaceVideos';
 // ==========================================================================
 // Translation Data for Saigon Pocket Guide
 // ==========================================================================
-import { Language, translations } from './translations';
+import { Language, translations, localize } from './translations';
 import { useMediaUrl } from './hooks/useMediaUrl';
 import { withBasePath } from './basePath';
 import { Picture } from './components/Picture';
@@ -189,10 +189,30 @@ function getInitialLanguage(): Language {
   } catch {
     // Storage can be unavailable in private browsing; continue with browser language.
   }
-  const browserLanguage = navigator.language.toLowerCase();
-  if (browserLanguage.startsWith('zh-tw') || browserLanguage.startsWith('zh-hk')) return 'zht';
-  const language = browserLanguage.split('-')[0] as Language;
-  return supportedLanguages.includes(language) ? language : 'vi';
+  // The device's whole preference list, not just its first entry: a reader set
+  // to French-then-Japanese should get Japanese, not the fallback.
+  const preferred = navigator.languages?.length ? navigator.languages : [navigator.language];
+  for (const tag of preferred) {
+    const language = deviceLanguage(tag);
+    if (language) return language;
+  }
+  // English, not Vietnamese: a device set to none of the six belongs to a
+  // visitor, and English is what hreflang="x-default" already promises them.
+  return 'en';
+}
+
+/**
+ * Traditional Chinese is a script, not only a region. zh-TW and zh-HK were
+ * caught, but zh-MO and the script-tagged forms browsers also send (zh-Hant,
+ * zh-Hant-TW) fell through to Simplified.
+ */
+function deviceLanguage(tag: string): Language | null {
+  const lower = tag.toLowerCase();
+  if (lower.startsWith('zh')) {
+    return /^zh-(hant|tw|hk|mo)\b/.test(lower) ? 'zht' : 'zh';
+  }
+  const base = lower.split('-')[0] as Language;
+  return supportedLanguages.includes(base) ? base : null;
 }
 
 /**
@@ -488,6 +508,16 @@ export default function App() {
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
+
+  useEffect(() => {
+    // "/" is the Vietnamese cover. When the device chose another language, put
+    // that language's address in the bar, so what gets shared or bookmarked
+    // opens in the language that was actually on screen.
+    const path = pathFor(initialState.lang, initialState.topic);
+    if (window.location.pathname === '/' && path !== '/') {
+      window.history.replaceState({}, '', path + window.location.search + window.location.hash);
+    }
+  }, [initialState]);
 
   // Update localStorage when preferences change
   const handleLangChange = (selectedLang: Language) => {
@@ -1399,7 +1429,7 @@ export default function App() {
                     onClick={() => navigateToPage(1)}
                     className="w-full max-w-xs inline-flex items-center justify-center gap-2 text-xs text-black bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 px-5 py-3 rounded-xl transition-all font-bold shadow-xl shadow-black/50 active:scale-95 cursor-pointer text-center uppercase tracking-wider"
                   >
-                    <span>{lang === 'vi' ? 'Bắt đầu khám phá' : lang === 'ko' ? '시작하기' : lang === 'ja' ? '探索を始める' : 'Start Exploring'}</span>
+                    <span>{localize(lang, { vi: "Bắt đầu khám phá", en: "Start Exploring", ja: "探索を始める", ko: "시작하기", zh: "开始探索", zht: "開始探索" })}</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
 
@@ -1613,7 +1643,7 @@ export default function App() {
                         // The same string the map's own <h3> uses, so the tab
                         // and the heading it reveals cannot say different
                         // things.
-                        label: lang === 'vi' ? 'Bản Đồ Chợ Bến Thành' : lang === 'ko' ? '벤탄 시장 지도' : lang === 'ja' ? 'ベンタイン市場 地図' : 'Bến Thành Market Map',
+                        label: localize(lang, { vi: "Bản Đồ Chợ Bến Thành", en: "Bến Thành Market Map", ja: "ベンタイン市場 地図", ko: "벤탄 시장 지도", zh: "滨城市场地图", zht: "濱城市場地圖" }),
                       },
                     ] as const}
                   />
@@ -1663,10 +1693,10 @@ export default function App() {
                         <span className="text-xl shrink-0">🗺️</span>
                         <div className="min-w-0">
                           <h3 className="text-xs font-bold text-[#0b433f] uppercase tracking-wider">
-                            {lang === 'vi' ? 'Bản Đồ Chợ Bến Thành' : lang === 'ko' ? '벤탄 시장 지도' : lang === 'ja' ? 'ベンタイン市場 地図' : 'Bến Thành Market Map'}
+                            {localize(lang, { vi: "Bản Đồ Chợ Bến Thành", en: "Bến Thành Market Map", ja: "ベンタイン市場 地図", ko: "벤탄 시장 지도", zh: "滨城市场地图", zht: "濱城市場地圖" })}
                           </h3>
                           <p className="text-[9px] text-zinc-500 font-light">
-                            {lang === 'vi' ? 'Đã đồng bộ trực tiếp với Google Maps' : lang === 'ko' ? '구글 지도와 실시간 동기화됨' : lang === 'ja' ? 'Googleマップと同期済み' : 'Synchronized directly with Google Maps'}
+                            {localize(lang, { vi: "Đã đồng bộ trực tiếp với Google Maps", en: "Synchronized directly with Google Maps", ja: "Googleマップと同期済み", ko: "구글 지도와 실시간 동기화됨", zh: "已与 Google 地图同步", zht: "已與 Google 地圖同步" })}
                           </p>
                         </div>
                       </div>
@@ -1691,7 +1721,7 @@ export default function App() {
                               : 'text-zinc-500 hover:text-zinc-800'
                           }`}
                         >
-                          {lang === 'vi' ? 'Sơ đồ cổng' : lang === 'ko' ? '게이트 안내도' : 'Gate Layout'}
+                          {localize(lang, { vi: "Sơ đồ cổng", en: "Gate Layout", ja: "門の配置図", ko: "게이트 안내도", zh: "市场大门示意图", zht: "市場大門示意圖" })}
                         </button>
                       </div>
                     </div>
@@ -1732,7 +1762,7 @@ export default function App() {
                               rel="noreferrer"
                               className="bg-zinc-900/95 text-white border border-zinc-700 font-bold py-1 px-2 rounded-lg text-[8.5px] shadow-lg flex items-center gap-1 hover:bg-black"
                             >
-                              <span>{lang === 'vi' ? 'Mở Google Maps' : 'Open in Maps'}</span>
+                              <span>{localize(lang, { vi: "Mở Google Maps", en: "Open in Maps", ja: "Googleマップで開く", ko: "구글 지도에서 열기", zh: "在 Google 地图中打开", zht: "在 Google 地圖中開啟" })}</span>
                               <ExternalLink className="w-2.5 h-2.5" />
                             </a>
                           </div>
@@ -1756,9 +1786,9 @@ export default function App() {
                           {/* North Gate (Cổng Bắc) */}
                           <div className="text-center w-full">
                             <span className="bg-[#0b433f] text-white text-[7px] font-bold px-1 py-0.5 rounded shadow">
-                              {lang === 'vi' ? 'CỔNG BẮC' : lang === 'ko' ? '북문 (North)' : 'NORTH GATE'}
+                              {localize(lang, { vi: "CỔNG BẮC", en: "NORTH GATE", ja: "北門", ko: "북문 (North)", zh: "北门", zht: "北門" })}
                             </span>
-                            <span className="block text-[8px] text-zinc-500 mt-0.5">{lang === 'vi' ? 'Hoa tươi & Trái cây' : 'Flowers & Fruits'}</span>
+                            <span className="block text-[8px] text-zinc-500 mt-0.5">{localize(lang, { vi: "Hoa tươi & Trái cây", en: "Flowers & Fruits", ja: "生花・果物", ko: "꽃 & 과일", zh: "鲜花与水果", zht: "鮮花與水果" })}</span>
                           </div>
 
                           {/* Middle Row with East and West Gates + Center Dome */}
@@ -1771,33 +1801,33 @@ export default function App() {
                             {/* West Gate (Cổng Tây) */}
                             <div className="text-center flex-1 min-w-0">
                               <span className="bg-amber-600 text-white text-[7px] font-bold px-1 py-0.5 rounded shadow block">
-                                {lang === 'vi' ? 'CỔNG TÂY' : lang === 'ko' ? '서문' : 'WEST'}
+                                {localize(lang, { vi: "CỔNG TÂY", en: "WEST", ja: "西門", ko: "서문", zh: "西门", zht: "西門" })}
                               </span>
-                              <span className="block text-[6px] text-zinc-500 mt-0.5 leading-tight">{lang === 'vi' ? 'Quà lưu niệm' : 'Souvenirs'}</span>
+                              <span className="block text-[6px] text-zinc-500 mt-0.5 leading-tight">{localize(lang, { vi: "Quà lưu niệm", en: "Souvenirs", ja: "お土産", ko: "기념품", zh: "纪念品", zht: "紀念品" })}</span>
                             </div>
 
                             {/* Center Dome (Gian trung tâm) */}
                             <div className="text-center shrink-0 w-20 h-20 lg:w-28 lg:h-28 flex flex-col items-center justify-center p-1 lg:p-2 bg-[#b85233]/10 border border-[#b85233]/30 rounded-full">
                               <span className="text-[8px] font-bold text-[#b85233] block">
-                                {lang === 'vi' ? 'ẨM THỰC' : lang === 'ko' ? '푸드코트' : 'FOOD'}
+                                {localize(lang, { vi: "ẨM THỰC", en: "FOOD", ja: "フード", ko: "푸드코트", zh: "美食", zht: "美食" })}
                               </span>
-                              <span className="text-[6px] text-zinc-500 block leading-tight font-light">{lang === 'vi' ? 'Chè, Cà phê' : 'Food court'}</span>
+                              <span className="text-[6px] text-zinc-500 block leading-tight font-light">{localize(lang, { vi: "Chè, Cà phê", en: "Food court", ja: "チェー・コーヒー", ko: "쩨 · 커피", zh: "甜汤、咖啡", zht: "甜湯、咖啡" })}</span>
                             </div>
 
                             {/* East Gate (Cổng Đông) */}
                             <div className="text-center flex-1 min-w-0">
                               <span className="bg-amber-600 text-white text-[7px] font-bold px-1 py-0.5 rounded shadow block">
-                                {lang === 'vi' ? 'CỔNG ĐÔNG' : lang === 'ko' ? '동문' : 'EAST'}
+                                {localize(lang, { vi: "CỔNG ĐÔNG", en: "EAST", ja: "東門", ko: "동문", zh: "东门", zht: "東門" })}
                               </span>
-                              <span className="block text-[6px] text-zinc-500 mt-0.5 leading-tight">{lang === 'vi' ? 'Bánh kẹo' : 'Sweets'}</span>
+                              <span className="block text-[6px] text-zinc-500 mt-0.5 leading-tight">{localize(lang, { vi: "Bánh kẹo", en: "Sweets", ja: "お菓子", ko: "과자", zh: "糖果点心", zht: "糖果點心" })}</span>
                             </div>
                           </div>
 
                           {/* South Gate (Cổng Nam - Main clock tower) */}
                           <div className="text-center w-full">
-                            <span className="block text-[8px] text-zinc-500 mb-0.5">{lang === 'vi' ? 'Vải vóc & Tháp đồng hồ' : 'Textiles & Clock'}</span>
+                            <span className="block text-[8px] text-zinc-500 mb-0.5">{localize(lang, { vi: "Vải vóc & Tháp đồng hồ", en: "Textiles & Clock", ja: "布地・時計塔", ko: "원단 & 시계탑", zh: "布料与钟楼", zht: "布料與鐘樓" })}</span>
                             <span className="bg-[#b85233] text-white text-[7px] font-bold px-1 py-0.5 rounded shadow">
-                              {lang === 'vi' ? 'CỔNG NAM' : lang === 'ko' ? '남문 (South)' : 'SOUTH GATE'}
+                              {localize(lang, { vi: "CỔNG NAM", en: "SOUTH GATE", ja: "南門", ko: "남문 (South)", zh: "南门", zht: "南門" })}
                             </span>
                           </div>
 
@@ -1807,11 +1837,11 @@ export default function App() {
                       {/* Info & Tips */}
                       <div className="space-y-2 text-[10px] text-zinc-600">
                         <div className="bg-zinc-100 p-2 rounded-lg border border-zinc-200">
-                          <strong className="block text-[#0b433f] text-[10px] font-bold mb-1">💡 {lang === 'vi' ? 'Mẹo khám phá:' : lang === 'ko' ? '쇼핑 및 네고 팁:' : 'Local Bargaining Pro-Tips:'}</strong>
+                          <strong className="block text-[#0b433f] text-[10px] font-bold mb-1">💡 {localize(lang, { vi: "Mẹo khám phá:", en: "Local Bargaining Pro-Tips:", ja: "散策・値切りのコツ：", ko: "쇼핑 및 네고 팁:", zh: "逛街与砍价小贴士：", zht: "逛街與殺價小撇步：" })}</strong>
                           <ul className="space-y-1 list-disc pl-3 text-[9px] font-light leading-tight">
-                            <li>{lang === 'vi' ? 'Cổng Nam (đối diện quảng trường) là tháp đồng hồ biểu tượng, chụp ảnh cực đẹp.' : lang === 'ko' ? '남문(광장 쪽)은 시그니처 시계탑이 있어 사진 촬영 명소입니다.' : 'South Gate features the iconic clock tower, ideal for photos.'}</li>
-                            <li>{lang === 'vi' ? 'Khu ẩm thực ở trung tâm chợ là thiên đường các món chè, gỏi cuốn, giá cả niêm yết rõ ràng.' : lang === 'ko' ? '중앙 음식 구역은 베트남 빙수(Chè)와 스프링롤의 천국입니다.' : 'The central dome houses food stalls with clear pricing.'}</li>
-                            <li>{lang === 'vi' ? 'Nên mặc cả giảm 30-50% khi mua đồ lưu niệm hoặc quần áo ở các cổng Đông & Tây.' : lang === 'ko' ? '동문, 서문의 옷/기념품 상점에서는 30~50% 내외 네고를 권장합니다.' : 'Negotiate 30-50% off for souvenirs at East & West gates.'}</li>
+                            <li>{localize(lang, { vi: "Cổng Nam (đối diện quảng trường) là tháp đồng hồ biểu tượng, chụp ảnh cực đẹp.", en: "South Gate features the iconic clock tower, ideal for photos.", ja: "南門（広場側）には象徴的な時計塔があり、写真撮影に最適です。", ko: "남문(광장 쪽)은 시그니처 시계탑이 있어 사진 촬영 명소입니다.", zh: "南门（广场对面）有标志性的钟楼，非常适合拍照。", zht: "南門（廣場對面）有標誌性的鐘樓，非常適合拍照。" })}</li>
+                            <li>{localize(lang, { vi: "Khu ẩm thực ở trung tâm chợ là thiên đường các món chè, gỏi cuốn, giá cả niêm yết rõ ràng.", en: "The central dome houses food stalls with clear pricing.", ja: "市場中央のフードエリアはチェーや生春巻きの宝庫で、価格もはっきり表示されています。", ko: "중앙 음식 구역은 베트남 빙수(Chè)와 스프링롤의 천국입니다.", zh: "市场中央的美食区汇集各式甜汤和春卷，价格明码标示。", zht: "市場中央的美食區匯集各式甜湯和春捲，價格明碼標示。" })}</li>
+                            <li>{localize(lang, { vi: "Nên mặc cả giảm 30-50% khi mua đồ lưu niệm hoặc quần áo ở các cổng Đông & Tây.", en: "Negotiate 30-50% off for souvenirs at East & West gates.", ja: "東門・西門でお土産や衣類を買うときは、30〜50%の値引き交渉がおすすめです。", ko: "동문, 서문의 옷/기념품 상점에서는 30~50% 내외 네고를 권장합니다.", zh: "在东门和西门买纪念品或衣服时，建议砍价 30–50%。", zht: "在東門和西門買紀念品或衣服時，建議殺價 30–50%。" })}</li>
                           </ul>
                         </div>
                       </div>
@@ -2649,8 +2679,8 @@ export default function App() {
                     onChange={setActiveLuclamTab}
                     tabs={[
                       { id: 'teas', label: t.luclam.menuHeading },
-                      { id: 'stores', label: lang === 'vi' ? 'Hệ thống cửa hàng' : lang === 'ko' ? '매장 안내' : lang === 'ja' ? '店舗ネットワーク' : 'Branch locator' },
-                      { id: 'offers', label: lang === 'vi' ? 'Ưu đãi & Đánh giá' : lang === 'ko' ? '혜택 & 리뷰' : lang === 'ja' ? '特典＆口コミ' : 'Offers & reviews' },
+                      { id: 'stores', label: localize(lang, { vi: "Hệ thống cửa hàng", en: "Branch locator", ja: "店舗ネットワーク", ko: "매장 안내", zh: "门店分布", zht: "門市據點" }) },
+                      { id: 'offers', label: localize(lang, { vi: "Ưu đãi & Đánh giá", en: "Offers & reviews", ja: "特典＆口コミ", ko: "혜택 & 리뷰", zh: "优惠与评价", zht: "優惠與評價" }) },
                     ] as const}
                   />
 
@@ -2743,9 +2773,24 @@ export default function App() {
                                       ✨ Sản phẩm chính hãng tại <strong>Tầng B2 Takashimaya</strong> và <strong>Lục Lam Store</strong>.
                                     </div>
                                   )}
-                                  {lang !== 'ko' && lang !== 'vi' && (
+                                  {lang === 'en' && (
                                     <div className="bg-[#f6f3eb] p-2 rounded border border-[#0b433f]/10 text-[#0b433f]">
                                       ✨ Official product available at <strong>Takashimaya B2 Floor</strong> and <strong>Lục Lam Webstore</strong>.
+                                    </div>
+                                  )}
+                                  {lang === 'ja' && (
+                                    <div className="bg-[#f6f3eb] p-2 rounded border border-[#0b433f]/10 text-[#0b433f]">
+                                      ✨ <strong>高島屋 B2階</strong>と<strong>Lục Lam 公式オンラインストア</strong>でお買い求めいただけます。
+                                    </div>
+                                  )}
+                                  {lang === 'zh' && (
+                                    <div className="bg-[#f6f3eb] p-2 rounded border border-[#0b433f]/10 text-[#0b433f]">
+                                      ✨ 正品可在<strong>高岛屋 B2 层</strong>及<strong>Lục Lam 官网</strong>购买。
+                                    </div>
+                                  )}
+                                  {lang === 'zht' && (
+                                    <div className="bg-[#f6f3eb] p-2 rounded border border-[#0b433f]/10 text-[#0b433f]">
+                                      ✨ 正品可於<strong>高島屋 B2 樓</strong>及<strong>Lục Lam 官網</strong>購買。
                                     </div>
                                   )}
                                 </div>
@@ -2802,7 +2847,7 @@ export default function App() {
                         instead of both being squeezed into broken words. */}
                     <div className="flex flex-wrap justify-between items-center gap-x-2 gap-y-1 border-l-2 border-[#b85233] pl-2">
                       <h4 className="text-[11px] font-bold text-[#0b433f] tracking-wider uppercase">
-                        {lang === 'vi' ? 'Hệ Thống Cửa Hàng Lục Lam' : lang === 'ko' ? '룩람 오프라인 매장' : lang === 'ja' ? 'Lục Lam 店舗ネットワーク' : 'Lục Lam Branch Locator'}
+                        {localize(lang, { vi: "Hệ Thống Cửa Hàng Lục Lam", en: "Lục Lam Branch Locator", ja: "Lục Lam 店舗ネットワーク", ko: "룩람 오프라인 매장", zh: "Lục Lam 门店分布", zht: "Lục Lam 門市據點" })}
                       </h4>
                       <span className="text-[7px] font-mono bg-[#0b433f]/10 text-[#0b433f] border border-[#0b433f]/20 px-1.5 py-0.5 rounded font-bold shrink-0 whitespace-nowrap">{STORES.length} BRANCHES</span>
                     </div>
@@ -2887,10 +2932,10 @@ export default function App() {
                   {/* International Instagram Portals */}
                   <div className={`space-y-3 pt-2 ${activeLuclamTab === 'offers' ? '' : 'hidden'}`}>
                     <h4 className="text-[11px] font-bold text-[#0b433f] tracking-wider uppercase border-l-2 border-[#b85233] pl-2">
-                      {lang === 'vi' ? 'Đánh Giá Từ Du Khách Quốc Tế' : lang === 'ko' ? '글로벌 여행자 리뷰 포털' : lang === 'ja' ? 'グローバル旅行者の口コミ' : 'Global Traveler Review Portals'}
+                      {localize(lang, { vi: "Đánh Giá Từ Du Khách Quốc Tế", en: "Global Traveler Review Portals", ja: "グローバル旅行者の口コミ", ko: "글로벌 여행자 리뷰 포털", zh: "国际旅客评价", zht: "國際旅客評價" })}
                     </h4>
                     <p className="text-[9px] text-zinc-600 font-light leading-snug">
-                      {lang === 'vi' ? 'Khám phá trải nghiệm thực tế từ các cộng đồng du lịch Nhật Bản, Hàn Quốc, và Trung Quốc trên Instagram.' : lang === 'ko' ? '인스타그램에서 각국(일본, 한국, 중국) 여행자들의 실시간 생생한 룩람 리뷰를 만나보세요.' : 'Discover authentic reviews from Japan, Korea, and China travel communities on Instagram.'}
+                      {localize(lang, { vi: "Khám phá trải nghiệm thực tế từ các cộng đồng du lịch Nhật Bản, Hàn Quốc, và Trung Quốc trên Instagram.", en: "Discover authentic reviews from Japan, Korea, and China travel communities on Instagram.", ja: "日本・韓国・中国の旅行者によるリアルな口コミをInstagramでご覧いただけます。", ko: "인스타그램에서 각국(일본, 한국, 중국) 여행자들의 실시간 생생한 룩람 리뷰를 만나보세요.", zh: "在 Instagram 上查看来自日本、韩国和中国旅行社群的真实评价。", zht: "在 Instagram 上查看來自日本、韓國和中國旅遊社群的真實評價。" })}
                     </p>
 
                     <div className="grid grid-cols-3 gap-2">
